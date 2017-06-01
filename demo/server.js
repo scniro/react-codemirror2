@@ -1,23 +1,30 @@
-let express = require('express');
-let app = express();
+import express from 'express';
+import webpack from 'webpack';
+import path from 'path';
+import config from './webpack.config.js';
+import open from 'open';
 
-app.set('port', 5000);
+const app = express();
+const compiler = webpack(config);
 
-app.use(express.static('.'));
+app.set('port', 8000);
 
-app.use(function (req, res, next) {
-  if (req.path.substr(-1) === '/' && req.path.length > 1) {
-    let query = req.url.slice(req.path.length);
-    res.redirect(301, req.path.slice(0, -1) + query);
+app.use(require('webpack-dev-middleware')(compiler, {
+  noInfo: true,
+  publicPath: config.output.publicPath
+}));
+
+app.use(require('webpack-hot-middleware')(compiler));
+
+app.all('/*', function (req, res) {
+  res.sendFile(path.join(__dirname, './index.html'));
+});
+
+app.listen(app.get('port'), function (err) {
+  if (err) {
+    console.log(err);
   } else {
-    next();
+    console.log(`react-codemirror2 demo listening on port ${app.get('port')}`);
+    open(`http://localhost:${app.get('port')}`);
   }
-});
-
-app.all('/*', function (req, res, next) {
-  res.sendFile(`${__dirname}/index.html`)
-});
-
-app.listen(app.get('port'), function () {
-  console.log(`react-codemirror2 demo listening on port ${app.get('port')}`);
 });

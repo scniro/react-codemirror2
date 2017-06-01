@@ -1,13 +1,24 @@
-let path = require('path');
-let context = path.resolve(__dirname, '..');
+import webpack from 'webpack';
+import path from 'path';
 
-let config = {
-
-  entry: path.normalize(`${context}/demo/index.jsx`),
+export default {
+  devtool: 'eval',
+  entry: [
+    'webpack-hot-middleware/client?reload=true',
+    path.resolve(__dirname, 'index.jsx')
+  ],
+  target: 'web',
   output: {
-    path: path.normalize(`${context}/demo/`),
+    path: __dirname + '/demo',
+    publicPath: '/',
     filename: 'bundle.js'
   },
+  devServer: {
+    contentBase: path.resolve(__dirname, 'demo')
+  },
+  plugins: [
+    new webpack.HotModuleReplacementPlugin()
+  ],
   module: {
     rules: [{
       test: /\.jsx?/,
@@ -25,8 +36,12 @@ let config = {
       }, {
         loader: 'sass-loader'
       }]
+    }, {
+      test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
+      exclude: /(node_modules)/,
+      use: [{
+        loader: 'file-loader'
+      }]
     }]
-  }
+  },
 };
-
-module.exports = config;

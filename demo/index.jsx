@@ -1,6 +1,6 @@
 import React from 'react';
 import {render} from 'react-dom';
-import CodeMirror from '../index.jsx';
+import CodeMirror from '../src/react-codemirror2.jsx';
 
 require('./index.scss');
 
