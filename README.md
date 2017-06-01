@@ -1,3 +1,5 @@
+[![NPM Version](https://img.shields.io/npm/v/react-codemirror2.svg?style=flat-square)](https://www.npmjs.com/package/react-codemirror2)
+
 ### react-codemirror2
 
 ```
