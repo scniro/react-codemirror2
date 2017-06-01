@@ -1,0 +1,40 @@
+{
+  "name": "react-codemirror2",
+  "version": "0.0.1",
+  "description": "a tiny react codemirror component wrapper",
+  "main": "index.js",
+  "scripts": {
+    "prestart": "npm run webpack",
+    "start": "cd demo && node server.js",
+    "webpack": "webpack --config ./demo/webpack.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/scniro/react-codemirror2.git"
+  },
+  "author": "scniro",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/scniro/react-codemirror2/issues"
+  },
+  "homepage": "https://github.com/scniro/react-codemirror2#readme",
+  "dependencies": {
+    "codemirror": "^5.26.0",
+    "react": "^15.5.4"
+  },
+  "devDependencies": {
+    "babel-cli": "6.24.1",
+    "babel-core": "6.24.1",
+    "babel-loader": "7.0.0",
+    "babel-preset-es2015": "6.24.1",
+    "babel-preset-react": "6.24.1",
+    "babel-register": "6.24.1",
+    "css-loader": "^0.28.4",
+    "express": "^4.15.3",
+    "node-sass": "^4.5.3",
+    "react-dom": "^15.5.4",
+    "sass-loader": "^6.0.5",
+    "style-loader": "^0.18.1",
+    "webpack": "^2.6.1"
+  }
+}
