@@ -1,3 +1,5 @@
+'use strict';
+
 const fs = require('fs');
 const babel = require('babel-core');
 const path = require('path');
@@ -7,9 +9,9 @@ const Transform = require('stream').Transform;
 const transpile = new Transform({
   transform(chunk, encoding, cb) {
 
-    let transformed = babel.transform(chunk.toString(), {plugins: ['transform-react-jsx']})
+    let transformed = babel.transform(chunk.toString(), {plugins: ['transform-react-jsx']});
 
-    this.push(transformed.code)
+    this.push(transformed.code);
     cb();
   }
 });
