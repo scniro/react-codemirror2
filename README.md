@@ -6,11 +6,35 @@
 import CodeMirror from 'react-codemirror2'
 
 <CodeMirror
-  value='foo'
-  options={{theme: 'material'}}
-  onChange={(value) => {
-    console.log(value);
-  }} />
+  defaultValue='react-codemirror2'
+  options={{theme: 'material', lineNumbers: true}}
+  editorWillMount={(cm) => {
+  }}
+  editorDidMount={(cm) => {
+  }}
+  editorDidConfigure={(cm) => {
+  }}
+  editorWillUnmount={(cm) => {
+  }}
+  onSetDefaultValue={(defaultValue) => {
+  }}
+  onChange={(internalValue) => {
+  }}
+  onCursorActivity={() => {
+  }}
+  onViewportChange={(cm, viewportStart, viewportEnd) => {
+  }}
+  onGutterClick={(cm, lineNumber, event) => {
+  }}
+  onFocus={() => {
+  }}
+  onBlur={() => {
+  }}
+  onScroll={() => {
+  }}
+  onUpdate={() => {
+  }}
+/>
 ```
 
-// TODO
+// better docs coming soon. all props are optional...

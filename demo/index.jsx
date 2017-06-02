@@ -6,7 +6,32 @@ require('./index.scss');
 
 render(
   <CodeMirror
-    value='foo'
-    options={{theme: 'material', viewportMargin: Infinity}}
-    onChange={(value) => console.log(value)}/>
+    defaultValue='react-codemirror2'
+    options={{theme: 'material', lineNumbers: true}}
+    editorWillMount={(cm) => {
+    }}
+    editorDidMount={(cm) => {
+    }}
+    editorDidConfigure={(cm) => {
+    }}
+    editorWillUnmount={(cm) => {
+    }}
+    onSetDefaultValue={(defaultValue) => {
+    }}
+    onChange={(internalValue) => {
+    }}
+    onCursorActivity={() => {
+    }}
+    onViewportChange={(cm, viewportStart, viewportEnd) => {
+    }}
+    onGutterClick={(cm, lineNumber, event) => {
+    }}
+    onFocus={() => {
+    }}
+    onBlur={() => {
+    }}
+    onScroll={() => {
+    }}
+    onUpdate={() => {
+    }}/>
   , document.getElementById('app'));
