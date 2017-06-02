@@ -45,7 +45,7 @@ import CodeMirror from 'react-codemirror2'
   onDragOver={(cm, event) => {
   }}
   onDrop={(cm, event) => {
-  }
+  }}
 />
 ```
 
