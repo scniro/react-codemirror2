@@ -1,6 +1,11 @@
 [![NPM Version](https://img.shields.io/npm/v/react-codemirror2.svg?style=flat-square)](https://www.npmjs.com/package/react-codemirror2)
+[![Build Status](https://travis-ci.org/scniro/react-codemirror2.svg?branch=master)](https://travis-ci.org/scniro/react-codemirror2)
+
+https://travis-ci.org/scniro/react-codemirror2.svg?branch=master
 
 ### react-codemirror2
+
+better docs coming soon. all props are optional...
 
 ```
 import CodeMirror from 'react-codemirror2'
@@ -51,5 +56,3 @@ import CodeMirror from 'react-codemirror2'
   }}
 />
 ```
-
-// better docs coming soon. all props are optional...
