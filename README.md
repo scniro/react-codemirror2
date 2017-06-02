@@ -7,7 +7,10 @@ import CodeMirror from 'react-codemirror2'
 
 <CodeMirror
   defaultValue='react-codemirror2'
-  options={{theme: 'material', lineNumbers: true}}
+  options={{
+    theme: 'material',
+    lineNumbers: true
+  }}
   editorWillMount={(cm) => {
   }}
   editorDidMount={(cm) => {
