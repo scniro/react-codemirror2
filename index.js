@@ -19,9 +19,9 @@ export default class CodeMirror extends React.Component {
 
     this.editor = codemirror(this.ref);
 
-    this.editor.on('change', () => {
+    this.editor.on('change', (cm, metadata) => {
       if (this.props.onChange && this.initHydration) {
-        this.props.onChange(this.editor.getValue());
+        this.props.onChange(cm, metadata, this.editor.getValue());
       }
     });
 
@@ -55,6 +55,42 @@ export default class CodeMirror extends React.Component {
 
     if (this.props.onUpdate) {
       this.editor.on('update', this.props.onUpdate);
+    }
+
+    if (this.props.onKeyDown) {
+      this.editor.on('keydown', (cm, event) => {
+        this.props.onKeyDown(cm, event);
+      });
+    }
+
+    if (this.props.onKeyUp) {
+      this.editor.on('keyup', (cm, event) => {
+        this.props.onKeyUp(cm, event);
+      });
+    }
+
+    if (this.props.onKeyPress) {
+      this.editor.on('keypress', (cm, event) => {
+        this.props.onKeyPress(cm, event);
+      });
+    }
+
+    if (this.props.onDragEnter) {
+      this.editor.on('dragenter', (cm, event) => {
+        this.props.onDragEnter(cm, event);
+      });
+    }
+
+    if (this.props.onDragOver) {
+      this.editor.on('dragover', (cm, event) => {
+        this.props.onDragOver(cm, event);
+      });
+    }
+
+    if (this.props.onDrop) {
+      this.editor.on('drop', (cm, event) => {
+        this.props.onDrop(cm, event);
+      });
     }
 
     this.hydrate(this.props);

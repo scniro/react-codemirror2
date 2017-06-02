@@ -18,7 +18,7 @@ import CodeMirror from 'react-codemirror2'
   }}
   onSetDefaultValue={(defaultValue) => {
   }}
-  onChange={(internalValue) => {
+  onChange={(cm, metadata, internalValue) => {
   }}
   onCursorActivity={() => {
   }}
@@ -34,6 +34,18 @@ import CodeMirror from 'react-codemirror2'
   }}
   onUpdate={() => {
   }}
+  onKeyDown={(cm, event) => {
+  }}
+  onKeyUp={(cm, event) => {
+  }}
+  onKeyPress={(cm, event) => {
+  }}
+  onDragEnter={(cm, event) => {
+  }}
+  onDragOver={(cm, event) => {
+  }}
+  onDrop={(cm, event) => {
+  }
 />
 ```
 
