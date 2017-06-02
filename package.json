@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "babel-node demo/server.js",
+    "test": "echo todo",
     "build": "node scripts/build.js",
     "prepublish": "npm run build"
   },
