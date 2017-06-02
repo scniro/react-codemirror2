@@ -2,7 +2,7 @@ const fs = require('fs');
 const babel = require('babel-core');
 const path = require('path');
 const root = path.resolve(__dirname, '..');
-const {Transform} = require('stream');
+const Transform = require('stream').Transform;
 
 const transpile = new Transform({
   transform(chunk, encoding, cb) {

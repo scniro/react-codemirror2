@@ -1,2 +1,3 @@
 .babelrc
 demo
+.travis.yml
