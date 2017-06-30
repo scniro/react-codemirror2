@@ -26,10 +26,8 @@ import CodeMirror from 'react-codemirror2'
   }}
   editorDidMount={(editor, next) => {
 
-    // modify the instance on mount alternative to passing down through props
-    editor.setOption('htmlMode', true);
-    // optional callback: will trigger `editorDidConfigure callback`
-    next();
+    editor.setOption('htmlMode', true); // alternative to passing props
+    next(); // optional: will trigger editorDidConfigure
   }}
   editorDidConfigure={(editor) => {
   }}
@@ -39,8 +37,7 @@ import CodeMirror from 'react-codemirror2'
   }}
   onChange={(editor, metadata, internalValue) => {
 
-    // editor value
-    console.log(internalValue)
+    console.log(internalValue); // editor value
   }}
   onCursorActivity={() => {
   }}
