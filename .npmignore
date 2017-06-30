@@ -1,3 +1,6 @@
 .babelrc
 demo
 .travis.yml
+scripts
+src
+.idea
