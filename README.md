@@ -13,7 +13,7 @@ npm start
 
 better docs coming soon. all props are optional...
 
-```
+```jsx
 import CodeMirror from 'react-codemirror2'
 
 <CodeMirror
