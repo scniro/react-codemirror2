@@ -6,12 +6,16 @@ export default class CodeMirror extends React.Component {
   constructor(props) {
     super(props);
 
-    this.initHydration = false;
+    this.hydrated = false;
+    this.initCb = () => {
+
+      this.props.editorDidConfigure(this.editor);
+    }
   }
 
   componentWillMount() {
     if (this.props.editorWillMount) {
-      this.props.editorWillMount(codemirror);
+      this.props.editorWillMount(this.editor);
     }
   }
 
@@ -20,8 +24,8 @@ export default class CodeMirror extends React.Component {
     this.editor = codemirror(this.ref);
 
     this.editor.on('change', (cm, metadata) => {
-      if (this.props.onChange && this.initHydration) {
-        this.props.onChange(cm, metadata, this.editor.getValue());
+      if (this.props.onChange && this.hydrated) {
+        this.props.onChange(this.editor, metadata, this.editor.getValue());
       }
     });
 
@@ -31,13 +35,13 @@ export default class CodeMirror extends React.Component {
 
     if(this.props.onViewportChange) {
       this.editor.on('viewportChange', (cm, start, end) => {
-        this.props.onViewportChange(cm, start, end);
+        this.props.onViewportChange(this.editor, start, end);
       });
     }
 
     if(this.props.onGutterClick) {
       this.editor.on('gutterClick', (cm, lineNumber, event) => {
-        this.props.onGutterClick(cm, lineNumber, event);
+        this.props.onGutterClick(this.editor, lineNumber, event);
       });
     }
 
@@ -59,44 +63,44 @@ export default class CodeMirror extends React.Component {
 
     if(this.props.onKeyDown) {
       this.editor.on('keydown', (cm, event) => {
-        this.props.onKeyDown(cm, event);
+        this.props.onKeyDown(this.editor, event);
       });
     }
 
     if(this.props.onKeyUp) {
       this.editor.on('keyup', (cm, event) => {
-        this.props.onKeyUp(cm, event);
+        this.props.onKeyUp(this.editor, event);
       });
     }
 
     if(this.props.onKeyPress) {
       this.editor.on('keypress', (cm, event) => {
-        this.props.onKeyPress(cm, event);
+        this.props.onKeyPress(this.editor, event);
       });
     }
 
     if(this.props.onDragEnter) {
       this.editor.on('dragenter', (cm, event) => {
-        this.props.onDragEnter(cm, event);
+        this.props.onDragEnter(this.editor, event);
       });
     }
 
     if(this.props.onDragOver) {
       this.editor.on('dragover', (cm, event) => {
-        this.props.onDragOver(cm, event);
+        this.props.onDragOver(this.editor, event);
       });
     }
 
     if(this.props.onDrop) {
       this.editor.on('drop', (cm, event) => {
-        this.props.onDrop(cm, event);
+        this.props.onDrop(this.editor, event);
       });
     }
 
     this.hydrate(this.props);
 
     if (this.props.editorDidMount) {
-      this.props.editorDidMount(codemirror);
+      this.props.editorDidMount(this.editor, this.initCb);
     }
   }
 
@@ -117,10 +121,10 @@ export default class CodeMirror extends React.Component {
     Object.keys(props.options || {}).forEach(key => this.editor.setOption(key, props.options[key]));
 
     if (this.props.editorDidConfigure) {
-      this.props.editorDidConfigure(codemirror);
+      this.props.editorDidConfigure(this.editor);
     }
 
-    if (this.props.defaultValue && !this.initHydration) {
+    if (this.props.defaultValue && !this.hydrated) {
       this.editor.setValue(props.defaultValue);
 
       if (this.props.onSetDefaultValue) {
@@ -128,7 +132,7 @@ export default class CodeMirror extends React.Component {
       }
     }
 
-    this.initHydration = true;
+    this.hydrated = true;
   }
 
   render() {

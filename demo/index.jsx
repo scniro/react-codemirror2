@@ -1,51 +1,32 @@
 import React from 'react';
 import {render} from 'react-dom';
-import CodeMirror from '../src/react-codemirror2.jsx';
+import Editor from './components/Editor.jsx'
+import Controls from './components/Controls.jsx';
+
+import {Provider} from 'react-redux';
+import reducer from './reducers';
+import {createStore, combineReducers} from 'redux';
 
 require('./index.scss');
 
+let initialState = {
+  app: {
+    theme: 'material'
+  }
+};
+
+const app = combineReducers({
+  app: reducer
+});
+
+const store = createStore(app, initialState);
+
 render(
-  <div>
-    <CodeMirror
-      defaultValue='react-codemirror2'
-      options={{theme: 'material', lineNumbers: true}}
-      editorWillMount={(cm) => {
-      }}
-      editorDidMount={(cm) => {
-      }}
-      editorDidConfigure={(cm) => {
-      }}
-      editorWillUnmount={(cm) => {
-      }}
-      onSetDefaultValue={(defaultValue) => {
-      }}
-      onChange={(cm, metadata, internalValue) => {
-      }}
-      onCursorActivity={() => {
-      }}
-      onViewportChange={(cm, viewportStart, viewportEnd) => {
-      }}
-      onGutterClick={(cm, lineNumber, event) => {
-      }}
-      onFocus={() => {
-      }}
-      onBlur={() => {
-      }}
-      onScroll={() => {
-      }}
-      onUpdate={() => {
-      }}
-      onKeyDown={(cm, event) => {
-      }}
-      onKeyUp={(cm, event) => {
-      }}
-      onKeyPress={(cm, event) => {
-      }}
-      onDragEnter={(cm, event) => {
-      }}
-      onDragOver={(cm, event) => {
-      }}
-      onDrop={(cm, event) => {
-      }}/>
-  </div>
+  <Provider store={store}>
+    <div>
+      <Controls />
+      <Editor />
+    </div>
+  </Provider>
   , document.getElementById('app'));
+
