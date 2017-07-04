@@ -17,6 +17,7 @@ class Controls extends React.Component {
           <option value="material">material</option>
           <option value="monokai">monokai</option>
         </select>
+        <span>redux action</span>
       </div>
     )
   }

@@ -14,7 +14,7 @@ class Editor extends React.Component {
   <ul>
     <li>1</li>
     <li>2</li>
-    <li>3</li>
+    <li>better docs coming soon</li>
   </ul>
 </div>`;
   }

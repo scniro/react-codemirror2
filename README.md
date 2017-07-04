@@ -5,11 +5,7 @@
 
 ### react-codemirror2
 
-clone, install, and run the redux demo on `localhost:8000`. Crude & very limited -  better examples coming coon
-
-```
-npm start
-```
+[scniro.github.io/react-codemirror2](https://scniro.github.io/react-codemirror2/)
 
 better docs coming soon. all props are optional...
 
