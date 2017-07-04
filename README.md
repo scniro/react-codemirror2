@@ -7,7 +7,7 @@
 
 [scniro.github.io/react-codemirror2](https://scniro.github.io/react-codemirror2/)
 
-better docs coming soon. all props are optional...
+Better docs coming soon. All props are optional.
 
 ```jsx
 import CodeMirror from 'react-codemirror2'
