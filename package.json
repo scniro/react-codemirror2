@@ -4,7 +4,7 @@
   "description": "a tiny react codemirror component wrapper",
   "main": "index.js",
   "scripts": {
-    "start": "babel-node demo/server.js",
+    "start": "babel-node docs/server.js",
     "test": "echo todo",
     "build": "node scripts/build.js",
     "prepublish": "npm run build"

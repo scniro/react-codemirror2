@@ -9,12 +9,12 @@ export default {
   ],
   target: 'web',
   output: {
-    path: __dirname + '/demo',
+    path: __dirname + '/docs',
     publicPath: '/',
     filename: 'bundle.js'
   },
   devServer: {
-    contentBase: path.resolve(__dirname, 'demo')
+    contentBase: path.resolve(__dirname, 'docs')
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin()
