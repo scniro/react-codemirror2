@@ -4,9 +4,9 @@ let config = {
   devtool: 'eval',
   entry: path.resolve(__dirname, 'src', 'index.jsx'),
   output: {
-    path: __dirname,
+    path: `${__dirname}/react-codemirror2`,
     publicPath: '/',
-    filename: 'bundle.js'
+    filename: 'app.js'
   },
   module: {
     rules: [{
