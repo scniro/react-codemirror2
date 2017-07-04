@@ -1,6 +1,7 @@
 .babelrc
-demo
+docs
 .travis.yml
 scripts
 src
 .idea
+.npmignore

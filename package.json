@@ -4,9 +4,10 @@
   "description": "a tiny react codemirror component wrapper",
   "main": "index.js",
   "scripts": {
-    "start": "babel-node docs/server.js",
+    "start": "node docs/server.js",
     "test": "echo todo",
     "build": "node scripts/build.js",
+    "webpack": "webpack --config docs/webpack.config.js",
     "prepublish": "npm run build"
   },
   "repository": {

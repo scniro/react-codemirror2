@@ -1,8 +1,8 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import CodeMirror from '../../src/react-codemirror2.jsx';
+import CodeMirror from '../../../src/react-codemirror2.jsx';
 
-require('../../node_modules/codemirror/mode/xml/xml.js');
+require('../../../node_modules/codemirror/mode/xml/xml.js');
 
 class Editor extends React.Component {
 

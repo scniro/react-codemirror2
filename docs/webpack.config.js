@@ -1,24 +1,13 @@
-import webpack from 'webpack';
-import path from 'path';
+let path = require('path');
 
-export default {
+let config = {
   devtool: 'eval',
-  entry: [
-    'webpack-hot-middleware/client?reload=true',
-    path.resolve(__dirname, 'index.jsx')
-  ],
-  target: 'web',
+  entry: path.resolve(__dirname, 'src', 'index.jsx'),
   output: {
-    path: __dirname + '/docs',
+    path: __dirname,
     publicPath: '/',
     filename: 'bundle.js'
   },
-  devServer: {
-    contentBase: path.resolve(__dirname, 'docs')
-  },
-  plugins: [
-    new webpack.HotModuleReplacementPlugin()
-  ],
   module: {
     rules: [{
       test: /\.jsx?/,
@@ -45,3 +34,6 @@ export default {
     }]
   },
 };
+
+
+module.exports = config;
