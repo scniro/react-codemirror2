@@ -6,7 +6,7 @@ const app = express();
 
 app.set('port', 8000);
 
-app.use(express.static(__dirname));
+app.use('/react-codemirror2', express.static(__dirname));
 
 app.all('/*', function (req, res) {
   res.sendFile(path.join(__dirname, './index.html'));

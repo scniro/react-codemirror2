@@ -4,7 +4,7 @@ let config = {
   devtool: 'eval',
   entry: path.resolve(__dirname, 'src', 'index.jsx'),
   output: {
-    path: `${__dirname}/react-codemirror2`,
+    path: __dirname,
     publicPath: '/',
     filename: 'app.js'
   },
