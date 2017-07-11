@@ -15,7 +15,7 @@ demo @ [scniro.github.io/react-codemirror2](https://scniro.github.io/react-codem
 import CodeMirror from 'react-codemirror2'
 
 <CodeMirror
-  value='<h1>I <3 react-codemirror2</h1>'
+  value='<h1>I ♥ react-codemirror2</h1>'
   options={{
     mode: 'xml',
     theme: 'material',
