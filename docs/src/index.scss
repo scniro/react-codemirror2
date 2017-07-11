@@ -1,3 +1,134 @@
+html, body, p, ol, ul, li, dl, dt, dd, blockquote, figure, fieldset, legend, textarea, pre, iframe, hr, h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  padding: 0
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-size: 100%;
+  font-weight: normal
+}
+
+ul {
+  list-style: none
+}
+
+button, input, select, textarea {
+  margin: 0
+}
+
+html {
+  box-sizing: border-box
+}
+
+*, *:before, *:after {
+  box-sizing: inherit
+}
+
+img, embed, iframe, object, audio, video {
+  height: auto;
+  max-width: 100%
+}
+
+iframe {
+  border: 0
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0
+}
+
+td, th {
+  padding: 0;
+  text-align: left
+}
+
+// <libs>
 @import '../../node_modules/codemirror/lib/codemirror.css';
 @import '../../node_modules/codemirror/theme/material.css';
-@import '../../node_modules/codemirror/theme/monokai.css';
+@import '../../node_modules/codemirror/theme/xq-light.css';
+@import '../../node_modules/prismjs/themes/prism.css';
+
+.react-codemirror2 {
+  height: 100%;
+}
+
+.CodeMirror {
+  height: 100%;
+  border: solid 1px transparent;
+
+  &.cm-s-xq-light {
+    border-color: #ddd;
+  }
+}
+
+// </libs>
+
+html, body, #app {
+  height: 100%;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  min-width: 600px;
+}
+
+#app {
+
+  padding-top: 2em;
+
+  #container {
+    width: 80%;
+    margin: 0 auto;
+
+    header {
+      padding: 0.500em 0;
+      height: 2.000em;
+
+      a {
+        &:link {
+          text-decoration: none;
+        }
+
+        h1 {
+          font-size: 16pt;
+          color: dodgerblue;
+
+          &:hover {
+            color: darken(dodgerblue, 20%);
+          }
+        }
+      }
+    }
+
+    #controls {
+      padding-top: 0.250em;
+      height: 2.000em;
+
+      select {
+        margin-right: 1.000em;
+      }
+    }
+
+    #pane-container {
+
+      box-shadow: 0 4px 2px -2px #ccc;
+      height: 28em;
+
+      section {
+        width: 50%;
+        height: 100%;
+        float: left;
+
+        &:last-of-type {
+          border-top: solid 1px #ddd;
+          border-bottom: solid 1px #ddd;
+          border-right: solid 1px #ddd;
+        }
+      }
+    }
+  }
+}
+
+pre {
+  height: 100%;
+  font-size: 10pt;
+  margin: 0 !important;
+}

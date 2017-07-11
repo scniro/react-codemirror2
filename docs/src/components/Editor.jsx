@@ -1,75 +1,37 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import CodeMirror from '../../../src/react-codemirror2.jsx';
+import CodeMirror from '../../../index.js';
 
-require('../../../node_modules/codemirror/mode/xml/xml.js');
+let jBeautify = require('js-beautify').js;
+let hBeautify = require('js-beautify').html;
 
 class Editor extends React.Component {
 
   constructor(props) {
-    super(props)
+    super(props);
 
-    this.defaultValue =
-`<div class="main">
-  <ul>
-    <li>1</li>
-    <li>2</li>
-    <li>better docs coming soon</li>
-  </ul>
-</div>`;
+    let exampleHTML = '<header class="site-header"> <div class="container"> <h1>Example #2</h1> <nav role="navigation" class="site-navigation"> <ul> <li><a href="#">Link</a></li><li><a href="#">Link</a></li><li><a href="#">Link</a></li></ul> </nav> </div></header> <section role="main" class="container"> <img src="http://placehold.it/1400x400/ff694d/f6f2eb" class="banner-image"/> <div class="grid-row col-3"> <div class="grid-unit"> <img src="http://placehold.it/650x300/ff694d/f6f2eb"/> <p>Nullam quis risus eget urna mollis ornare vel eu leo. Donec id elit non mi porta gravida at eget metus. Curabitur blandit tempus porttitor. </p></div><div class="grid-unit"> <img src="http://placehold.it/650x300/ff694d/f6f2eb"/> <p>Nullam quis risus eget urna mollis ornare vel eu leo. Donec id elit non mi porta gravida at eget metus. Curabitur blandit tempus porttitor. </p></div><div class="grid-unit"> <img src="http://placehold.it/650x300/ff694d/f6f2eb"/> <p>Nullam quis risus eget urna mollis ornare vel eu leo. Donec id elit non mi porta gravida at eget metus. Curabitur blandit tempus porttitor. </p></div></div></section>';
+    this.defaultHTML = hBeautify(exampleHTML, {indent_size: 2});
+
+    let exampleJS = 'function StringStream(string) {  this.pos = 0;  this.string = string; }  StringStream.prototype = {  done: function() {return this.pos >= this.string.length;},  peek: function() {return this.string.charAt(this.pos);},  next: function() {  if (this.pos < this.string.length)  return this.string.charAt(this.pos++);  },  eat: function(match) {  var ch = this.string.charAt(this.pos);  if (typeof match == "string") var ok = ch == match;  else var ok = ch && match.test ? match.test(ch) : match(ch);  if (ok) {this.pos++; return ch;}  },  eatWhile: function(match) {  var start = this.pos;  while (this.eat(match));  if (this.pos > start) return this.string.slice(start, this.pos);  },  backUp: function(n) {this.pos -= n;},  column: function() {return this.pos;},  eatSpace: function() {  var start = this.pos;  while (/s/.test(this.string.charAt(this.pos))) this.pos++;  return this.pos - start;  },  match: function(pattern, consume, caseInsensitive) {  if (typeof pattern == "string") {  function cased(str) {return caseInsensitive ? str.toLowerCase() : str;}  if (cased(this.string).indexOf(cased(pattern), this.pos) == this.pos) {  if (consume !== false) this.pos += str.length;  return true;  }  }  else {  var match = this.string.slice(this.pos).match(pattern);  if (match && consume !== false) this.pos += match[0].length;  return match;  }  } };';
+    this.defaultJS = jBeautify(exampleJS, {indent_size: 2});
   }
 
   render() {
 
     return (
       <CodeMirror
-        defaultValue={this.defaultValue}
-        options={{theme: this.props.theme, lineNumbers: true}}
-        editorWillMount={(codemirror) => {
+        value={this.props.mode === 'xml' ? this.defaultHTML : this.defaultJS}
+        options={{
+          mode: this.props.mode,
+          theme: this.props.theme,
+          lineNumbers: true
         }}
-        editorDidMount={(editor, next) => {
-
-          // modify the instance on mount alternative to passing down through props
-          editor.setOption('htmlMode', true);
-          // optional callback: will trigger `editorDidConfigure callback`
-          next();
+        onValueSet={(editor, value) => {
+          console.log('set', {value});
         }}
-        editorDidConfigure={(editor) => {
-        }}
-        editorWillUnmount={(editor) => {
-        }}
-        onSetDefaultValue={(defaultValue) => {
-        }}
-        onChange={(editor, metadata, internalValue) => {
-
-          // editor value
-          console.log(internalValue)
-        }}
-        onCursorActivity={() => {
-        }}
-        onViewportChange={(editor, viewportStart, viewportEnd) => {
-        }}
-        onGutterClick={(editor, lineNumber, event) => {
-        }}
-        onFocus={() => {
-        }}
-        onBlur={() => {
-        }}
-        onScroll={() => {
-        }}
-        onUpdate={() => {
-        }}
-        onKeyDown={(editor, event) => {
-        }}
-        onKeyUp={(editor, event) => {
-        }}
-        onKeyPress={(editor, event) => {
-        }}
-        onDragEnter={(editor, event) => {
-        }}
-        onDragOver={(editor, event) => {
-        }}
-        onDrop={(editor, event) => {
+        onValueChange={(editor, metadata, value) => {
+          console.log('change', {value});
         }}/>
     )
   }
@@ -78,6 +40,7 @@ class Editor extends React.Component {
 function mapState(state) {
   return {
     theme: state.app.theme,
+    mode: state.app.mode
   }
 }
 

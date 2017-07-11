@@ -1,5 +1,6 @@
 'use strict';
 
+let webpack = require('webpack');
 let path = require('path');
 
 let config = {
@@ -8,7 +9,7 @@ let config = {
   output: {
     path: __dirname,
     publicPath: '/',
-    filename: 'app.js'
+    filename: 'app.min.js'
   },
   module: {
     rules: [{
@@ -35,6 +36,22 @@ let config = {
       }]
     }]
   },
+  plugins: [
+    new webpack.optimize.ModuleConcatenationPlugin(),
+    new webpack.DefinePlugin({
+      'process.env': {
+        'BUILD': process.env['BUILD']
+      }
+    }),
+    new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        warnings: false
+      },
+      output: {
+        comments: false
+      }
+    })
+  ]
 };
 
 

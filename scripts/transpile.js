@@ -9,7 +9,7 @@ const Transform = require('stream').Transform;
 const transpile = new Transform({
   transform(chunk, encoding, cb) {
 
-    let transformed = babel.transform(chunk.toString(), {plugins: ['transform-react-jsx']});
+    let transformed = babel.transform(chunk.toString(), {presets: ['es2015'], plugins: ['transform-react-jsx']});
 
     this.push(transformed.code);
     cb();

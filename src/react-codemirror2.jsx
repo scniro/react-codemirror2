@@ -7,15 +7,17 @@ export default class CodeMirror extends React.Component {
     super(props);
 
     this.hydrated = false;
-    this.initCb = () => {
 
-      this.props.editorDidConfigure(this.editor);
+    this.initCb = () => {
+      if (this.props.editorDidConfigure) {
+        this.props.editorDidConfigure(this.editor);
+      }
     }
   }
 
   componentWillMount() {
     if (this.props.editorWillMount) {
-      this.props.editorWillMount(this.editor);
+      this.props.editorWillMount();
     }
   }
 
@@ -24,74 +26,84 @@ export default class CodeMirror extends React.Component {
     this.editor = codemirror(this.ref);
 
     this.editor.on('change', (cm, metadata) => {
-      if (this.props.onChange && this.hydrated) {
-        this.props.onChange(this.editor, metadata, this.editor.getValue());
+      if (this.props.onValueChange && this.hydrated) {
+        this.props.onValueChange(this.editor, metadata, this.editor.getValue());
       }
     });
 
-    if(this.props.onCursorActivity) {
-      this.editor.on('cursorActivity', this.props.onCursorActivity);
+    if (this.props.onCursorActivity) {
+      this.editor.on('cursorActivity', (cm) => {
+        this.props.onViewportChange(this.editor);
+      });
     }
 
-    if(this.props.onViewportChange) {
+    if (this.props.onViewportChange) {
       this.editor.on('viewportChange', (cm, start, end) => {
         this.props.onViewportChange(this.editor, start, end);
       });
     }
 
-    if(this.props.onGutterClick) {
+    if (this.props.onGutterClick) {
       this.editor.on('gutterClick', (cm, lineNumber, event) => {
         this.props.onGutterClick(this.editor, lineNumber, event);
       });
     }
 
-    if(this.props.onFocus) {
-      this.editor.on('focus', this.props.onFocus);
+    if (this.props.onFocus) {
+      this.editor.on('focus', (cm, event) => {
+        this.props.onFocus(this.editor, event);
+      });
     }
 
-    if(this.props.onBlur) {
-      this.editor.on('blur', this.props.onBlur);
+    if (this.props.onBlur) {
+      this.editor.on('blur', (cm, event) => {
+        this.props.onBlur(this.editor, event);
+      });
     }
 
-    if(this.props.onScroll) {
-      this.editor.on('scroll', this.props.onScroll);
+    if (this.props.onScroll) {
+      this.editor.on('scroll', (cm, event) => {
+        this.props.onScroll(this.editor, event);
+      });
     }
 
-    if(this.props.onUpdate) {
-      this.editor.on('update', this.props.onUpdate);
+    if (this.props.onUpdate) {
+      this.editor.on('update', (cm, event) => {
+        this.props.onUpdate(this.editor, event);
+      });
     }
 
-    if(this.props.onKeyDown) {
+    if (this.props.onKeyDown) {
       this.editor.on('keydown', (cm, event) => {
         this.props.onKeyDown(this.editor, event);
       });
     }
 
-    if(this.props.onKeyUp) {
+    if (this.props.onKeyUp) {
       this.editor.on('keyup', (cm, event) => {
         this.props.onKeyUp(this.editor, event);
       });
     }
 
-    if(this.props.onKeyPress) {
+    if (this.props.onKeyPress) {
       this.editor.on('keypress', (cm, event) => {
         this.props.onKeyPress(this.editor, event);
       });
     }
 
-    if(this.props.onDragEnter) {
+    if (this.props.onDragEnter) {
       this.editor.on('dragenter', (cm, event) => {
         this.props.onDragEnter(this.editor, event);
       });
     }
 
-    if(this.props.onDragOver) {
+    if (this.props.onDragOver) {
       this.editor.on('dragover', (cm, event) => {
         this.props.onDragOver(this.editor, event);
       });
     }
 
-    if(this.props.onDrop) {
+    if (this.props.onDrop) {
       this.editor.on('drop', (cm, event) => {
         this.props.onDrop(this.editor, event);
       });
@@ -105,6 +117,10 @@ export default class CodeMirror extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
+
+    if (this.props.value !== nextProps.value) {
+      this.hydrated = false;
+    }
 
     this.hydrate(nextProps);
   }
@@ -124,11 +140,11 @@ export default class CodeMirror extends React.Component {
       this.props.editorDidConfigure(this.editor);
     }
 
-    if (this.props.defaultValue && !this.hydrated) {
-      this.editor.setValue(props.defaultValue);
+    if (this.props.value && !this.hydrated) {
+      this.editor.setValue(props.value);
 
-      if (this.props.onSetDefaultValue) {
-        this.props.onSetDefaultValue(this.editor.getValue());
+      if (this.props.onValueSet) {
+        this.props.onValueSet(this.editor, this.editor.getValue());
       }
     }
 
@@ -136,8 +152,11 @@ export default class CodeMirror extends React.Component {
   }
 
   render() {
+
+    let className = this.props.className ? `react-codemirror2 ${this.props.className}` : 'react-codemirror2';
+
     return (
-      <div ref={(self) => this.ref = self}/>
+      <div className={className} ref={(self) => this.ref = self}/>
     )
   }
 }

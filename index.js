@@ -1,141 +1,202 @@
-import React from 'react';
-let codemirror = require('codemirror');
+'use strict';
 
-export default class CodeMirror extends React.Component {
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-  constructor(props) {
-    super(props);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-    this.hydrated = false;
-    this.initCb = () => {
+var _react = require('react');
 
-      this.props.editorDidConfigure(this.editor);
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var codemirror = require('codemirror');
+
+var CodeMirror = function (_React$Component) {
+  _inherits(CodeMirror, _React$Component);
+
+  function CodeMirror(props) {
+    _classCallCheck(this, CodeMirror);
+
+    var _this = _possibleConstructorReturn(this, (CodeMirror.__proto__ || Object.getPrototypeOf(CodeMirror)).call(this, props));
+
+    _this.hydrated = false;
+
+    _this.initCb = function () {
+      if (_this.props.editorDidConfigure) {
+        _this.props.editorDidConfigure(_this.editor);
+      }
     };
+    return _this;
   }
 
-  componentWillMount() {
-    if (this.props.editorWillMount) {
-      this.props.editorWillMount(this.editor);
-    }
-  }
-
-  componentDidMount() {
-
-    this.editor = codemirror(this.ref);
-
-    this.editor.on('change', (cm, metadata) => {
-      if (this.props.onChange && this.hydrated) {
-        this.props.onChange(this.editor, metadata, this.editor.getValue());
-      }
-    });
-
-    if (this.props.onCursorActivity) {
-      this.editor.on('cursorActivity', this.props.onCursorActivity);
-    }
-
-    if (this.props.onViewportChange) {
-      this.editor.on('viewportChange', (cm, start, end) => {
-        this.props.onViewportChange(this.editor, start, end);
-      });
-    }
-
-    if (this.props.onGutterClick) {
-      this.editor.on('gutterClick', (cm, lineNumber, event) => {
-        this.props.onGutterClick(this.editor, lineNumber, event);
-      });
-    }
-
-    if (this.props.onFocus) {
-      this.editor.on('focus', this.props.onFocus);
-    }
-
-    if (this.props.onBlur) {
-      this.editor.on('blur', this.props.onBlur);
-    }
-
-    if (this.props.onScroll) {
-      this.editor.on('scroll', this.props.onScroll);
-    }
-
-    if (this.props.onUpdate) {
-      this.editor.on('update', this.props.onUpdate);
-    }
-
-    if (this.props.onKeyDown) {
-      this.editor.on('keydown', (cm, event) => {
-        this.props.onKeyDown(this.editor, event);
-      });
-    }
-
-    if (this.props.onKeyUp) {
-      this.editor.on('keyup', (cm, event) => {
-        this.props.onKeyUp(this.editor, event);
-      });
-    }
-
-    if (this.props.onKeyPress) {
-      this.editor.on('keypress', (cm, event) => {
-        this.props.onKeyPress(this.editor, event);
-      });
-    }
-
-    if (this.props.onDragEnter) {
-      this.editor.on('dragenter', (cm, event) => {
-        this.props.onDragEnter(this.editor, event);
-      });
-    }
-
-    if (this.props.onDragOver) {
-      this.editor.on('dragover', (cm, event) => {
-        this.props.onDragOver(this.editor, event);
-      });
-    }
-
-    if (this.props.onDrop) {
-      this.editor.on('drop', (cm, event) => {
-        this.props.onDrop(this.editor, event);
-      });
-    }
-
-    this.hydrate(this.props);
-
-    if (this.props.editorDidMount) {
-      this.props.editorDidMount(this.editor, this.initCb);
-    }
-  }
-
-  componentWillReceiveProps(nextProps) {
-
-    this.hydrate(nextProps);
-  }
-
-  componentWillUnmount() {
-
-    if (this.props.editorWillUnmount) {
-      this.props.editorWillUnmount(codemirror);
-    }
-  }
-
-  hydrate(props) {
-
-    Object.keys(props.options || {}).forEach(key => this.editor.setOption(key, props.options[key]));
-
-    if (this.props.editorDidConfigure) {
-      this.props.editorDidConfigure(this.editor);
-    }
-
-    if (this.props.defaultValue && !this.hydrated) {
-      this.editor.setValue(props.defaultValue);
-
-      if (this.props.onSetDefaultValue) {
-        this.props.onSetDefaultValue(this.editor.getValue());
+  _createClass(CodeMirror, [{
+    key: 'componentWillMount',
+    value: function componentWillMount() {
+      if (this.props.editorWillMount) {
+        this.props.editorWillMount();
       }
     }
+  }, {
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      var _this2 = this;
 
-    this.hydrated = true;
-  }
+      this.editor = codemirror(this.ref);
 
-  render() {
-    return React.createElement('div', { ref: self => this.ref = self });
-  }
-}
+      this.editor.on('change', function (cm, metadata) {
+        if (_this2.props.onValueChange && _this2.hydrated) {
+          _this2.props.onValueChange(_this2.editor, metadata, _this2.editor.getValue());
+        }
+      });
+
+      if (this.props.onCursorActivity) {
+        this.editor.on('cursorActivity', function (cm) {
+          _this2.props.onViewportChange(_this2.editor);
+        });
+      }
+
+      if (this.props.onViewportChange) {
+        this.editor.on('viewportChange', function (cm, start, end) {
+          _this2.props.onViewportChange(_this2.editor, start, end);
+        });
+      }
+
+      if (this.props.onGutterClick) {
+        this.editor.on('gutterClick', function (cm, lineNumber, event) {
+          _this2.props.onGutterClick(_this2.editor, lineNumber, event);
+        });
+      }
+
+      if (this.props.onFocus) {
+        this.editor.on('focus', function (cm, event) {
+          _this2.props.onFocus(_this2.editor, event);
+        });
+      }
+
+      if (this.props.onBlur) {
+        this.editor.on('blur', function (cm, event) {
+          _this2.props.onBlur(_this2.editor, event);
+        });
+      }
+
+      if (this.props.onScroll) {
+        this.editor.on('scroll', function (cm, event) {
+          _this2.props.onScroll(_this2.editor, event);
+        });
+      }
+
+      if (this.props.onUpdate) {
+        this.editor.on('update', function (cm, event) {
+          _this2.props.onUpdate(_this2.editor, event);
+        });
+      }
+
+      if (this.props.onKeyDown) {
+        this.editor.on('keydown', function (cm, event) {
+          _this2.props.onKeyDown(_this2.editor, event);
+        });
+      }
+
+      if (this.props.onKeyUp) {
+        this.editor.on('keyup', function (cm, event) {
+          _this2.props.onKeyUp(_this2.editor, event);
+        });
+      }
+
+      if (this.props.onKeyPress) {
+        this.editor.on('keypress', function (cm, event) {
+          _this2.props.onKeyPress(_this2.editor, event);
+        });
+      }
+
+      if (this.props.onDragEnter) {
+        this.editor.on('dragenter', function (cm, event) {
+          _this2.props.onDragEnter(_this2.editor, event);
+        });
+      }
+
+      if (this.props.onDragOver) {
+        this.editor.on('dragover', function (cm, event) {
+          _this2.props.onDragOver(_this2.editor, event);
+        });
+      }
+
+      if (this.props.onDrop) {
+        this.editor.on('drop', function (cm, event) {
+          _this2.props.onDrop(_this2.editor, event);
+        });
+      }
+
+      this.hydrate(this.props);
+
+      if (this.props.editorDidMount) {
+        this.props.editorDidMount(this.editor, this.initCb);
+      }
+    }
+  }, {
+    key: 'componentWillReceiveProps',
+    value: function componentWillReceiveProps(nextProps) {
+
+      if (this.props.value !== nextProps.value) {
+        this.hydrated = false;
+      }
+
+      this.hydrate(nextProps);
+    }
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+
+      if (this.props.editorWillUnmount) {
+        this.props.editorWillUnmount(codemirror);
+      }
+    }
+  }, {
+    key: 'hydrate',
+    value: function hydrate(props) {
+      var _this3 = this;
+
+      Object.keys(props.options || {}).forEach(function (key) {
+        return _this3.editor.setOption(key, props.options[key]);
+      });
+
+      if (this.props.editorDidConfigure) {
+        this.props.editorDidConfigure(this.editor);
+      }
+
+      if (this.props.value && !this.hydrated) {
+        this.editor.setValue(props.value);
+
+        if (this.props.onValueSet) {
+          this.props.onValueSet(this.editor, this.editor.getValue());
+        }
+      }
+
+      this.hydrated = true;
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this4 = this;
+
+      var className = this.props.className ? 'react-codemirror2 ' + this.props.className : 'react-codemirror2';
+
+      return _react2.default.createElement('div', { className: className, ref: function ref(self) {
+          return _this4.ref = self;
+        } });
+    }
+  }]);
+
+  return CodeMirror;
+}(_react2.default.Component);
+
+exports.default = CodeMirror;
