@@ -15,7 +15,7 @@ demo @ [scniro.github.io/react-codemirror2](https://scniro.github.io/react-codem
 import CodeMirror from 'react-codemirror2'
 
 <CodeMirror
-  value='I <3 react-codemirror2'
+  value='<h1>I <3 react-codemirror2</h1>'
   options={{
     mode: 'xml',
     theme: 'material',
@@ -33,7 +33,6 @@ Since codemirror ships mostly unconfigured, the user is left with the responsibi
 > note that the base codemirror.css file is required in all use cases
 
 ```css
-// index.scss
 @import '~/node_modules/codemirror/lib/codemirror.css';
 @import '~/node_modules/codemirror/theme/material.css';
 ```

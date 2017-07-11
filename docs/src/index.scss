@@ -90,6 +90,7 @@ html, body, #app {
         h1 {
           font-size: 16pt;
           color: dodgerblue;
+          display: inline-block;
 
           &:hover {
             color: darken(dodgerblue, 20%);
@@ -110,7 +111,7 @@ html, body, #app {
     #pane-container {
 
       box-shadow: 0 4px 2px -2px #ccc;
-      height: 28em;
+      height: 30em;
 
       section {
         width: 50%;
