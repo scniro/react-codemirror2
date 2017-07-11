@@ -38,7 +38,7 @@ Since codemirror ships mostly unconfigured, the user is left with the responsibi
 ```
 
 ```jsx
-import CodeMirror from 'react-codemirror2'
+import CodeMirror from 'react-codemirror2';
 require('codemirror/mode/xml/xml');
 require('codemirror/mode/javascript/javascript');
 ```
