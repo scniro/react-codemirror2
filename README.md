@@ -50,6 +50,8 @@ require('codemirror/mode/javascript/javascript');
 - `options` - see codemirror [configuration](https://codemirror.net/doc/manual.html#config)
 - `value` - set component value through props
 > triggers `onValueSet`
+- `resetCursorOnSet`
+> `boolean` reset the internal codemirror cursor position should a new `value` prob be set. Default: `false`
 
 ## component specific events
 

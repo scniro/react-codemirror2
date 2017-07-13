@@ -120,9 +120,17 @@ export default class CodeMirror extends React.Component {
 
     if (this.props.value !== nextProps.value) {
       this.hydrated = false;
+
+      if (!this.props.resetCursorOnSet) {
+        this.cursorPos = this.editor.getCursor();
+      }
     }
 
     this.hydrate(nextProps);
+
+    if (!this.props.resetCursorOnSet) {
+      this.editor.setCursor(this.cursorPos);
+    }
   }
 
   componentWillUnmount() {
@@ -141,6 +149,7 @@ export default class CodeMirror extends React.Component {
     }
 
     if (this.props.value && !this.hydrated) {
+
       this.editor.setValue(props.value);
 
       if (this.props.onValueSet) {

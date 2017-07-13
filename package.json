@@ -1,6 +1,6 @@
 {
   "name": "react-codemirror2",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "a tiny react codemirror component wrapper",
   "main": "index.js",
   "scripts": {
@@ -54,9 +54,9 @@
     "react": "15.6.1",
     "react-dom": "15.6.1",
     "react-redux": "5.0.5",
-    "redux": "3.7.1",
+    "redux": "3.7.2",
     "sass-loader": "6.0.6",
     "style-loader": "0.18.2",
-    "webpack": "3.1.0"
+    "webpack": "3.2.0"
   }
 }

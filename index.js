@@ -148,9 +148,17 @@ var CodeMirror = function (_React$Component) {
 
       if (this.props.value !== nextProps.value) {
         this.hydrated = false;
+
+        if (!this.props.resetCursorOnSet) {
+          this.cursorPos = this.editor.getCursor();
+        }
       }
 
       this.hydrate(nextProps);
+
+      if (!this.props.resetCursorOnSet) {
+        this.editor.setCursor(this.cursorPos);
+      }
     }
   }, {
     key: 'componentWillUnmount',
@@ -174,6 +182,7 @@ var CodeMirror = function (_React$Component) {
       }
 
       if (this.props.value && !this.hydrated) {
+
         this.editor.setValue(props.value);
 
         if (this.props.onValueSet) {
