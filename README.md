@@ -51,37 +51,8 @@ require('codemirror/mode/javascript/javascript');
 - `resetCursorOnSet`
 > `boolean` reset the internal codemirror cursor position should a new `value` prob be set. Default: `false`
 
-## component specific events
+## props cont. (wrapped codemirror [programming api](https://codemirror.net/doc/manual.html#api))
 
-- `editorWillMount()`
-- `editorDidMount(editor, next)`
-> calling optional `next()` will trigger `editorDidConfigure`
-- `editorDidConfigure(editor)`
-- `onValueSet(editor, value)`
-> returns the initial value via `value`
-- `editorWillUnmount(editor)`
-
-## codemirror wrapped [events](https://codemirror.net/doc/manual.html#events)
-
-- `onValueChange(editor, metadata, value)`
-> returns the internal value of the editor
-- `onCursorActivity(editor)`
-- `onViewportChange(editor, viewportStart, viewportEnd)`
-- `onGutterClick(editor, lineNumber, event)`
-- `onFocus(editor, event)`
-- `onBlur(editor, event)`
-- `onUpdate(editor, event)`
-- `onKeyDown(editor, event)`
-- `onKeyUp(editor, event)`
-- `onKeyPress(editor, event)`
-- `onDragEnter(editor, event)`
-- `onDragOver(editor, event)`
-- `onDrop(editor, event)`
-- `onSelection(editor, ranges)`
-- `onScroll(editor, position)`
-- `onCursor(editor, position)`
-
-## prop wrapped codemirror [programming api](https://codemirror.net/doc/manual.html#api)
 - `selection={array<{anchor, head}>}` - *[setSelections](https://codemirror.net/doc/manual.html#setSelections)*
 > will programmatically select the ranges specified
 ```jsx
@@ -118,6 +89,36 @@ require('codemirror/mode/javascript/javascript');
   onCursor={(editor, position) => {}}
 />
 ```
+
+## events
+
+- `editorWillMount()`
+- `editorDidMount(editor, next)`
+> calling optional `next()` will trigger `editorDidConfigure`
+- `editorDidConfigure(editor)`
+- `onValueSet(editor, value)`
+> returns the initial value via `value`
+- `editorWillUnmount(editor)`
+
+## events cont. [wrapped codemirror events](https://codemirror.net/doc/manual.html#events)
+
+- `onValueChange(editor, metadata, value)`
+> returns the internal value of the editor
+- `onCursorActivity(editor)`
+- `onViewportChange(editor, viewportStart, viewportEnd)`
+- `onGutterClick(editor, lineNumber, event)`
+- `onFocus(editor, event)`
+- `onBlur(editor, event)`
+- `onUpdate(editor, event)`
+- `onKeyDown(editor, event)`
+- `onKeyUp(editor, event)`
+- `onKeyPress(editor, event)`
+- `onDragEnter(editor, event)`
+- `onDragOver(editor, event)`
+- `onDrop(editor, event)`
+- `onSelection(editor, ranges)`
+- `onScroll(editor, position)`
+- `onCursor(editor, position)`
 
 
 
