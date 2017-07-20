@@ -49,7 +49,7 @@ require('codemirror/mode/javascript/javascript');
 - `value` - set component value through props
 > triggers `onValueSet`
 - `resetCursorOnSet`
-> `boolean` reset the internal codemirror cursor position should a new `value` prob be set. Default: `false`
+> `boolean` reset the internal codemirror cursor position should a new `value` prop be set. Default: `false`
 
 ## props cont. (wrapped codemirror [programming api](https://codemirror.net/doc/manual.html#api))
 
@@ -102,28 +102,22 @@ require('codemirror/mode/javascript/javascript');
 
 ## events cont. [wrapped codemirror events](https://codemirror.net/doc/manual.html#events)
 
-- `onValueChange(editor, metadata, value)`
+- `onValueChange(editor, metadata, value)` - *[change](https://codemirror.net/doc/manual.html#event_change)*
 > returns the internal value of the editor
-- `onCursorActivity(editor)`
-- `onViewportChange(editor, viewportStart, viewportEnd)`
-- `onGutterClick(editor, lineNumber, event)`
-- `onFocus(editor, event)`
-- `onBlur(editor, event)`
-- `onUpdate(editor, event)`
-- `onKeyDown(editor, event)`
-- `onKeyUp(editor, event)`
-- `onKeyPress(editor, event)`
-- `onDragEnter(editor, event)`
-- `onDragOver(editor, event)`
-- `onDrop(editor, event)`
-- `onSelection(editor, ranges)`
-- `onScroll(editor, position)`
-- `onCursor(editor, position)`
-
-
-
-
-
-
+- `onCursorActivity(editor)` - *[cursorActivity](https://codemirror.net/doc/manual.html#event_cursorActivity)*
+- `onViewportChange(editor, viewportStart, viewportEnd)` - *[viewportChange](https://codemirror.net/doc/manual.html#event_viewportChange)*
+- `onGutterClick(editor, lineNumber, event)` - *[gutterClick](https://codemirror.net/doc/manual.html#event_gutterClick)*
+- `onFocus(editor, event)` - *[focus](https://codemirror.net/doc/manual.html#event_focus)*
+- `onBlur(editor, event)` - *[blur](https://codemirror.net/doc/manual.html#event_blur)*
+- `onUpdate(editor, event)` - *[update](https://codemirror.net/doc/manual.html#event_update)*
+- `onKeyDown(editor, event)` - *[keydown](https://codemirror.net/doc/manual.html#event_dom)*
+- `onKeyUp(editor, event)` - *[keyup](https://codemirror.net/doc/manual.html#event_dom)*
+- `onKeyPress(editor, event)` - *[keypress](https://codemirror.net/doc/manual.html#event_dom)*
+- `onDragEnter(editor, event)` - *[dragenter](https://codemirror.net/doc/manual.html#event_dom)*
+- `onDragOver(editor, event)` - *[dragover](https://codemirror.net/doc/manual.html#event_dom)*
+- `onDrop(editor, event)` - *[drop](https://codemirror.net/doc/manual.html#event_dom)*
+- `onSelection(editor, ranges)` - *[beforeSelectionChange](https://codemirror.net/doc/manual.html#event_doc_beforeSelectionChange)*
+- `onScroll(editor, position)` - *[scroll](https://codemirror.net/doc/manual.html#event_scroll)*
+- `onCursor(editor, position)`- *[cursorActivity](https://codemirror.net/doc/manual.html#event_doc_cursorActivity)*
 
 [MIT](./LICENSE) © 2017 [scniro](https://github.com/scniro)
