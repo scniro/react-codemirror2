@@ -70,7 +70,6 @@ require('codemirror/mode/javascript/javascript');
 - `onGutterClick(editor, lineNumber, event)`
 - `onFocus(editor, event)`
 - `onBlur(editor, event)`
-- `onScroll(editor, event)`
 - `onUpdate(editor, event)`
 - `onKeyDown(editor, event)`
 - `onKeyUp(editor, event)`
@@ -78,6 +77,52 @@ require('codemirror/mode/javascript/javascript');
 - `onDragEnter(editor, event)`
 - `onDragOver(editor, event)`
 - `onDrop(editor, event)`
+- `onSelection(editor, ranges)`
+- `onScroll(editor, position)`
+- `onCursor(editor, position)`
+
+## prop wrapped codemirror [programming api](https://codemirror.net/doc/manual.html#api)
+- `selection={array<{anchor, head}>}` - *[setSelections](https://codemirror.net/doc/manual.html#setSelections)*
+> will programmatically select the ranges specified
+```jsx
+<CodeMirror
+  [...]
+  selection={[{
+    anchor: {ch: 8, line: 5},
+    head: {ch: 37, line: 5}
+  }]}
+  onSelection={(editor, ranges) => {}}
+/>
+```
+- `scroll` - *[scrollTo](https://codemirror.net/doc/manual.html#scrollTo)*
+> will programmatically scroll to the specified coordinate
+```jsx
+<CodeMirror
+  [...]
+  scroll={{
+    x: 50,
+    y: 50
+  }}
+  onScroll={(editor, position) => {}}
+/>
+```
+- `cursor` - *[setCursor](https://codemirror.net/doc/manual.html#setCursor)*
+> will programmatically set cursor to the position specified
+```jsx
+<CodeMirror
+  [...]
+  cursor={{
+    line: 5,
+    ch: 10
+  }}
+  onCursor={(editor, position) => {}}
+/>
+```
+
+
+
+
+
 
 
 [MIT](./LICENSE) © 2017 [scniro](https://github.com/scniro)

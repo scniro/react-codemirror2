@@ -61,12 +61,6 @@ export default class CodeMirror extends React.Component {
       });
     }
 
-    if (this.props.onScroll) {
-      this.editor.on('scroll', (cm, event) => {
-        this.props.onScroll(this.editor, event);
-      });
-    }
-
     if (this.props.onUpdate) {
       this.editor.on('update', (cm, event) => {
         this.props.onUpdate(this.editor, event);
@@ -109,7 +103,51 @@ export default class CodeMirror extends React.Component {
       });
     }
 
+    if (this.props.onSelection) {
+      this.editor.on('beforeSelectionChange', (cm, meta) => {
+        this.props.onSelection(this.editor, meta.ranges);
+      })
+    }
+
+    if (this.props.onScroll) {
+      this.editor.on('scroll', (cm) => {
+
+        let meta = this.editor.getScrollInfo();
+
+        this.props.onScroll(this.editor, {
+          x: meta.left,
+          y: meta.top
+        });
+      })
+    }
+
+    if (this.props.onCursor) {
+      this.editor.on('cursorActivity', (cm) => {
+
+        let meta = this.editor.getCursor();
+
+        this.props.onCursor(this.editor, {
+          line: meta.line,
+          ch: meta.ch
+        });
+      })
+    }
+
     this.hydrate(this.props);
+
+    // commands
+    if (this.props.selection) {
+      this.editor.setSelections(this.props.selection);
+    }
+
+    if (this.props.cursor) {
+      this.editor.focus();
+      this.editor.setCursor(this.props.cursor);
+    }
+
+    if (this.props.scroll) {
+      this.editor.scrollTo(this.props.scroll.x, this.props.scroll.y);
+    }
 
     if (this.props.editorDidMount) {
       this.props.editorDidMount(this.editor, this.initCb);

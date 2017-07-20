@@ -88,12 +88,6 @@ var CodeMirror = function (_React$Component) {
         });
       }
 
-      if (this.props.onScroll) {
-        this.editor.on('scroll', function (cm, event) {
-          _this2.props.onScroll(_this2.editor, event);
-        });
-      }
-
       if (this.props.onUpdate) {
         this.editor.on('update', function (cm, event) {
           _this2.props.onUpdate(_this2.editor, event);
@@ -136,7 +130,51 @@ var CodeMirror = function (_React$Component) {
         });
       }
 
+      if (this.props.onSelection) {
+        this.editor.on('beforeSelectionChange', function (cm, meta) {
+          _this2.props.onSelection(_this2.editor, meta.ranges);
+        });
+      }
+
+      if (this.props.onScroll) {
+        this.editor.on('scroll', function (cm) {
+
+          var meta = _this2.editor.getScrollInfo();
+
+          _this2.props.onScroll(_this2.editor, {
+            x: meta.left,
+            y: meta.top
+          });
+        });
+      }
+
+      if (this.props.onCursor) {
+        this.editor.on('cursorActivity', function (cm) {
+
+          var meta = _this2.editor.getCursor();
+
+          _this2.props.onCursor(_this2.editor, {
+            line: meta.line,
+            ch: meta.ch
+          });
+        });
+      }
+
       this.hydrate(this.props);
+
+      // commands
+      if (this.props.selection) {
+        this.editor.setSelections(this.props.selection);
+      }
+
+      if (this.props.cursor) {
+        this.editor.focus();
+        this.editor.setCursor(this.props.cursor);
+      }
+
+      if (this.props.scroll) {
+        this.editor.scrollTo(this.props.scroll.x, this.props.scroll.y);
+      }
 
       if (this.props.editorDidMount) {
         this.props.editorDidMount(this.editor, this.initCb);
