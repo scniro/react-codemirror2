@@ -158,10 +158,10 @@ export default class CodeMirror extends React.Component {
 
     if (this.props.value !== nextProps.value) {
       this.hydrated = false;
+    }
 
-      if (!this.props.resetCursorOnSet) {
-        this.cursorPos = this.editor.getCursor();
-      }
+    if (!this.props.resetCursorOnSet) {
+      this.cursorPos = this.editor.getCursor();
     }
 
     this.hydrate(nextProps);
