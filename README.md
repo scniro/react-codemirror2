@@ -50,6 +50,8 @@ require('codemirror/mode/javascript/javascript');
 > triggers `onValueSet`
 - `resetCursorOnSet`
 > `boolean` reset the internal codemirror cursor position should a new `value` prop be set. Default: `false`
+- `autoScrollCursorOnSet`
+> `boolean` scroll the cursor position into view automatically. Default: `false`
 
 ## props cont. (wrapped codemirror [programming api](https://codemirror.net/doc/manual.html#api))
 
