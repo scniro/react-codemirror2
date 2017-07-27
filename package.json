@@ -32,7 +32,7 @@
     "code"
   ],
   "dependencies": {
-    "codemirror": "5.27.4"
+    "codemirror": "5.28.0"
   },
   "peerDependencies": {
     "react": ">=15.5 <16"
@@ -57,6 +57,6 @@
     "redux": "3.7.2",
     "sass-loader": "6.0.6",
     "style-loader": "0.18.2",
-    "webpack": "3.2.0"
+    "webpack": "3.4.1"
   }
 }
