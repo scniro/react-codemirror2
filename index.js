@@ -196,7 +196,7 @@ var CodeMirror = function (_React$Component) {
 
       if (!this.props.resetCursorOnSet) {
 
-        this.props.autoScrollCursorOnSet ? this.editor.setCursor(this.cursorPos, null, { scroll: false }) : this.editor.setCursor(this.cursorPos);
+        !this.props.autoScrollCursorOnSet && this.props.autoScrollCursorOnSet !== undefined ? this.editor.setCursor(this.cursorPos, null, { scroll: false }) : this.editor.setCursor(this.cursorPos);
       }
     }
   }, {

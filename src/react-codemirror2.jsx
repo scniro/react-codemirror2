@@ -168,8 +168,10 @@ export default class CodeMirror extends React.Component {
 
     if (!this.props.resetCursorOnSet) {
 
-      this.props.autoScrollCursorOnSet ?
+      !this.props.autoScrollCursorOnSet && this.props.autoScrollCursorOnSet !== undefined ?
         this.editor.setCursor(this.cursorPos, null, {scroll: false}) : this.editor.setCursor(this.cursorPos);
+
+
     }
   }
 
