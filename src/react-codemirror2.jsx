@@ -170,8 +170,6 @@ export default class CodeMirror extends React.Component {
 
       !this.props.autoScrollCursorOnSet && this.props.autoScrollCursorOnSet !== undefined ?
         this.editor.setCursor(this.cursorPos, null, {scroll: false}) : this.editor.setCursor(this.cursorPos);
-
-
     }
   }
 
@@ -190,9 +188,9 @@ export default class CodeMirror extends React.Component {
       this.props.editorDidConfigure(this.editor);
     }
 
-    if (this.props.value && !this.hydrated) {
+    if (!this.hydrated) {
 
-      this.editor.setValue(props.value);
+      this.editor.setValue(props.value || '');
 
       if (this.props.onValueSet) {
         this.props.onValueSet(this.editor, this.editor.getValue());
