@@ -32,7 +32,7 @@
     "code"
   ],
   "dependencies": {
-    "codemirror": "5.28.0"
+    "codemirror": "5.29.0"
   },
   "peerDependencies": {
     "react": ">=15.5 <16"
