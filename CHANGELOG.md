@@ -1,5 +1,5 @@
 1.0.0
 ==================
-* (`onValueSet`, `onValueChange`) deprecated, now => (`onSet`, `onChange`);
-* + (`onBeforeChange`, `onBeforeSet`)
-* + `defineMode`
+* [`onValueSet`, `onValueChange`] deprecated, now => [`onSet`, `onChange`];
+* add `onBeforeChange` `onBeforeSet`
+* add `defineMode`
