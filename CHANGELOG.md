@@ -1,5 +1,5 @@
 1.0.0
 ==================
-* (`onValueSet`, `onValueChange`) renamed => (`onSet`, `onChange`);
+* (`onValueSet`, `onValueChange`) deprecated, now => (`onSet`, `onChange`);
 * + (`onBeforeChange`, `onBeforeSet`)
 
