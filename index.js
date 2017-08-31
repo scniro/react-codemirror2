@@ -29,6 +29,18 @@ var CodeMirror = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (CodeMirror.__proto__ || Object.getPrototypeOf(CodeMirror)).call(this, props));
 
     _this.hydrated = false;
+    _this.continuePreSet = false;
+    _this.continuePreChange = false;
+
+    _this.onBeforeChangeCb = function () {
+
+      _this.continuePreChange = true;
+    };
+
+    _this.onBeforeSetCb = function () {
+
+      _this.continuePreSet = true;
+    };
 
     _this.initCb = function () {
       if (_this.props.editorDidConfigure) {
@@ -52,9 +64,24 @@ var CodeMirror = function (_React$Component) {
 
       this.editor = codemirror(this.ref);
 
+      this.editor.on('beforeChange', function (cm, changeObj) {
+        if (_this2.props.onBeforeChange && _this2.hydrated) {
+          _this2.props.onBeforeChange(_this2.editor, changeObj, _this2.onBeforeChangeCb);
+        }
+      });
+
       this.editor.on('change', function (cm, metadata) {
-        if (_this2.props.onValueChange && _this2.hydrated) {
-          _this2.props.onValueChange(_this2.editor, metadata, _this2.editor.getValue());
+
+        if (_this2.props.onChange && _this2.hydrated) {
+
+          if (_this2.props.onBeforeChange) {
+
+            if (_this2.continuePreChange) {
+              _this2.props.onChange(_this2.editor, metadata, _this2.editor.getValue());
+            }
+          } else {
+            _this2.props.onChange(_this2.editor, metadata, _this2.editor.getValue());
+          }
         }
       });
 
@@ -224,8 +251,20 @@ var CodeMirror = function (_React$Component) {
 
         this.editor.setValue(props.value || '');
 
-        if (this.props.onValueSet) {
-          this.props.onValueSet(this.editor, this.editor.getValue());
+        if (this.props.onBeforeSet) {
+          this.props.onBeforeSet(this.editor, this.onBeforeSetCb);
+        }
+
+        if (this.props.onBeforeSet) {
+
+          if (this.continuePreSet && this.props.onSet) {
+
+            this.props.onSet(this.editor, this.editor.getValue());
+          }
+        } else {
+          if (this.props.onSet) {
+            this.props.onSet(this.editor, this.editor.getValue());
+          }
         }
       }
 

@@ -57,10 +57,10 @@ import 'Codemirror' from 'react-codemirror';
     theme: this.theme,
     lineNumbers: true
   }}
-  onValueSet={(editor, value) => {
+  onSet={(editor, value) => {
     console.log('set', {value});
   }}
-  onValueChange={(editor, metadata, value) => {
+  onChange={(editor, metadata, value) => {
     console.log('change', {value});
   }}
 />

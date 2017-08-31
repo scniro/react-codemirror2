@@ -27,11 +27,21 @@ class Editor extends React.Component {
           theme: this.props.theme,
           lineNumbers: true
         }}
-        onValueSet={(editor, value) => {
-          console.log('set', {value});
+        onBeforeSet={(editor, next) => {
+
+          next();
         }}
-        onValueChange={(editor, metadata, value) => {
-          console.log('change', {value});
+        onSet={(editor, value) => {
+
+          console.log('onSet', {value});
+        }}
+        onBeforeChange={(editor, changeObj, next) => {
+
+          next();
+        }}
+        onChange={(editor, metadata, value) => {
+
+          console.log('onChange', {value});
         }}
       />
     )

@@ -7,6 +7,18 @@ export default class CodeMirror extends React.Component {
     super(props);
 
     this.hydrated = false;
+    this.continuePreSet = false;
+    this.continuePreChange = false;
+
+    this.onBeforeChangeCb = () => {
+
+      this.continuePreChange = true;
+    };
+
+    this.onBeforeSetCb = () => {
+
+      this.continuePreSet = true;
+    };
 
     this.initCb = () => {
       if (this.props.editorDidConfigure) {
@@ -25,9 +37,24 @@ export default class CodeMirror extends React.Component {
 
     this.editor = codemirror(this.ref);
 
+    this.editor.on('beforeChange', (cm, changeObj) => {
+      if (this.props.onBeforeChange && this.hydrated) {
+        this.props.onBeforeChange(this.editor, changeObj, this.onBeforeChangeCb);
+      }
+    });
+
     this.editor.on('change', (cm, metadata) => {
-      if (this.props.onValueChange && this.hydrated) {
-        this.props.onValueChange(this.editor, metadata, this.editor.getValue());
+
+      if (this.props.onChange && this.hydrated) {
+
+        if(this.props.onBeforeChange) {
+
+          if(this.continuePreChange) {
+            this.props.onChange(this.editor, metadata, this.editor.getValue());
+          }
+        } else {
+          this.props.onChange(this.editor, metadata, this.editor.getValue());
+        }
       }
     });
 
@@ -192,8 +219,20 @@ export default class CodeMirror extends React.Component {
 
       this.editor.setValue(props.value || '');
 
-      if (this.props.onValueSet) {
-        this.props.onValueSet(this.editor, this.editor.getValue());
+      if (this.props.onBeforeSet) {
+        this.props.onBeforeSet(this.editor, this.onBeforeSetCb);
+      }
+
+      if (this.props.onBeforeSet) {
+
+        if (this.continuePreSet && this.props.onSet) {
+
+          this.props.onSet(this.editor, this.editor.getValue());
+        }
+      } else {
+        if (this.props.onSet) {
+          this.props.onSet(this.editor, this.editor.getValue());
+        }
       }
     }
 

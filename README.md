@@ -20,7 +20,7 @@ import CodeMirror from 'react-codemirror2'
     theme: 'material',
     lineNumbers: true
   }}
-  onValueChange={(editor, metadata, value) => {
+  onChange={(editor, metadata, value) => {
   }}
 />
 ```
@@ -47,7 +47,7 @@ require('codemirror/mode/javascript/javascript');
 - `className` - sets `class="react-codemirror2 yourClassName"`
 - `options` - see codemirror [configuration](https://codemirror.net/doc/manual.html#config)
 - `value` - set component value through props
-> triggers `onValueSet`
+> triggers `onSet`
 - `resetCursorOnSet`
 > `boolean` reset the internal codemirror cursor position should a new `value` prop be set. Default: `false`
 - `autoScrollCursorOnSet`
@@ -98,13 +98,17 @@ require('codemirror/mode/javascript/javascript');
 - `editorDidMount(editor, next)`
 > calling optional `next()` will trigger `editorDidConfigure`
 - `editorDidConfigure(editor)`
-- `onValueSet(editor, value)`
+- `onSet(editor, value)`
 > returns the initial value via `value`
+- `onBeforeSet(editor, next)`
+> if defined, `next()` must be invoked to trigger `onSet`
 - `editorWillUnmount(editor)`
+- `onBeforeChange(editor, changeObj, next)`
+> if defined, `next()` must be invoked to trigger `onChange`
 
 ## events cont. [wrapped codemirror events](https://codemirror.net/doc/manual.html#events)
 
-- `onValueChange(editor, metadata, value)` - *[change](https://codemirror.net/doc/manual.html#event_change)*
+- `onChange(editor, metadata, value)` - *[change](https://codemirror.net/doc/manual.html#event_change)*
 > returns the internal value of the editor
 - `onCursorActivity(editor)` - *[cursorActivity](https://codemirror.net/doc/manual.html#event_cursorActivity)*
 - `onViewportChange(editor, viewportStart, viewportEnd)` - *[viewportChange](https://codemirror.net/doc/manual.html#event_viewportChange)*
