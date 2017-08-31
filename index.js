@@ -72,6 +72,12 @@ var CodeMirror = function (_React$Component) {
       }
       /* end deprecation warnings per 1.0.0 release */
 
+      if (this.props.defineMode) {
+        if (this.props.defineMode.name && this.props.defineMode.fn) {
+          codemirror.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
+        }
+      }
+
       this.editor = codemirror(this.ref);
 
       this.editor.on('beforeChange', function (cm, changeObj) {

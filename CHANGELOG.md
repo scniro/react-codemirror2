@@ -2,4 +2,4 @@
 ==================
 * (`onValueSet`, `onValueChange`) deprecated, now => (`onSet`, `onChange`);
 * + (`onBeforeChange`, `onBeforeSet`)
-
+* + `defineMode`

@@ -26,6 +26,7 @@ class Controls extends React.Component {
         <select value={this.props.mode} onChange={this.onModeSelect.bind(this)}>
           <option value='xml'>html</option>
           <option value='javascript'>javascript</option>
+          <option value='strings'>strings (custom)</option>
         </select>
       </div>
     )

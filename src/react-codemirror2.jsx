@@ -36,14 +36,20 @@ export default class CodeMirror extends React.Component {
   componentDidMount() {
 
     /* deprecation warnings per 1.0.0 release */
-    if(this.props.onValueChange) {
+    if (this.props.onValueChange) {
       console.warn('`onValueChange` has been deprecated. Please use `onChange` instead');
     }
 
-    if(this.props.onValueSet) {
+    if (this.props.onValueSet) {
       console.warn('`onValueSet` has been deprecated. Please use `onSet` instead');
     }
     /* end deprecation warnings per 1.0.0 release */
+
+    if (this.props.defineMode) {
+      if (this.props.defineMode.name && this.props.defineMode.fn) {
+        codemirror.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
+      }
+    }
 
     this.editor = codemirror(this.ref);
 

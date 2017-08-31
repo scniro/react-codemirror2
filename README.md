@@ -52,6 +52,8 @@ require('codemirror/mode/javascript/javascript');
 > `boolean` reset the internal codemirror cursor position should a new `value` prop be set. Default: `false`
 - `autoScrollCursorOnSet`
 > `boolean` scroll the cursor position into view automatically. Default: `false`
+- `defineMode`
+> pass a custom mode object `{name: 'custom', fn: myModeFn}`
 
 ## props cont. (wrapped codemirror [programming api](https://codemirror.net/doc/manual.html#api))
 
