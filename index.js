@@ -62,6 +62,16 @@ var CodeMirror = function (_React$Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
+      /* deprecation warnings per 1.0.0 release */
+      if (this.props.onValueChange) {
+        console.warn('`onValueChange` has been deprecated. Please use `onChange` instead');
+      }
+
+      if (this.props.onValueSet) {
+        console.warn('`onValueSet` has been deprecated. Please use `onSet` instead');
+      }
+      /* end deprecation warnings per 1.0.0 release */
+
       this.editor = codemirror(this.ref);
 
       this.editor.on('beforeChange', function (cm, changeObj) {
@@ -75,7 +85,6 @@ var CodeMirror = function (_React$Component) {
         if (_this2.props.onChange && _this2.hydrated) {
 
           if (_this2.props.onBeforeChange) {
-
             if (_this2.continuePreChange) {
               _this2.props.onChange(_this2.editor, metadata, _this2.editor.getValue());
             }

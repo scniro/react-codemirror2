@@ -35,6 +35,16 @@ export default class CodeMirror extends React.Component {
 
   componentDidMount() {
 
+    /* deprecation warnings per 1.0.0 release */
+    if(this.props.onValueChange) {
+      console.warn('`onValueChange` has been deprecated. Please use `onChange` instead');
+    }
+
+    if(this.props.onValueSet) {
+      console.warn('`onValueSet` has been deprecated. Please use `onSet` instead');
+    }
+    /* end deprecation warnings per 1.0.0 release */
+
     this.editor = codemirror(this.ref);
 
     this.editor.on('beforeChange', (cm, changeObj) => {
@@ -47,9 +57,8 @@ export default class CodeMirror extends React.Component {
 
       if (this.props.onChange && this.hydrated) {
 
-        if(this.props.onBeforeChange) {
-
-          if(this.continuePreChange) {
+        if (this.props.onBeforeChange) {
+          if (this.continuePreChange) {
             this.props.onChange(this.editor, metadata, this.editor.getValue());
           }
         } else {
