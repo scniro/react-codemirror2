@@ -27,13 +27,19 @@ import CodeMirror from 'react-codemirror2'
 
 ## requiring codemirror resources
 
+- [codemirror](https://www.npmjs.com/package/codemirror)
+
+`codemirror` comes as a [peer dependency](https://nodejs.org/en/blog/npm/peer-dependencies/), meaning you'll need to require it in your project _in addition to_ `react-codemirror2`. This prevents any versioning conflicts that would arise if `codemirror` came as a dependency through this wrapper. It's been observed that version mismatches can cause difficult to trace issues such as sytax highlighting disappearing without any explicit errors/warnings
+
+- additional
+
 Since codemirror ships mostly unconfigured, the user is left with the responsibility for requiring any additional resources should they be necessary. This is often the case when specifying certain [language modes]() and [themes](). How to import/require these assets will vary according to the specifics of your development environment. Below is a sample to include the assets necessary to specify a mode of `xml` (HTML) and a `material` theme.
 
 > note that the base codemirror.css file is required in all use cases
 
 ```css
-@import '~/node_modules/codemirror/lib/codemirror.css';
-@import '~/node_modules/codemirror/theme/material.css';
+@import 'codemirror/lib/codemirror.css';
+@import 'codemirror/theme/material.css';
 ```
 
 ```jsx
