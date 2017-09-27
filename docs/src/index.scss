@@ -128,8 +128,22 @@ html, body, #app {
   }
 }
 
-pre {
+pre.syntax-block {
   height: 100%;
   font-size: 10pt;
-  margin: 0 !important;
+  margin: 0;
+  padding: 1em;
+  overflow: auto;
+  background-color: #f5f2f0;
+  color: black;
+  text-shadow: 0 1px white;
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.5;
+  tab-size: 4;
+  hyphens: none;
 }

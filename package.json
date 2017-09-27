@@ -1,6 +1,6 @@
 {
   "name": "react-codemirror2",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "a tiny react codemirror component wrapper",
   "main": "index.js",
   "scripts": {
@@ -32,7 +32,7 @@
     "code"
   ],
   "peerDependencies": {
-    "react": ">=15.5 <16",
+    "react": ">=15.5 <=16.x",
     "codemirror": "5.x"
   },
   "devDependencies": {
@@ -45,13 +45,13 @@
     "babel-register": "6.26.0",
     "codemirror": "^5.0.0",
     "css-loader": "0.28.7",
-    "express": "4.15.4",
+    "express": "4.15.5",
     "js-beautify": "1.7.3",
     "node-sass": "4.5.3",
     "open": "0.0.5",
     "prismjs": "1.8.1",
-    "react": "15.6.1",
-    "react-dom": "15.6.1",
+    "react": "16.0.0",
+    "react-dom": "16.0.0",
     "react-redux": "5.0.6",
     "redux": "3.7.2",
     "sass-loader": "6.0.6",
