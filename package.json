@@ -1,6 +1,6 @@
 {
   "name": "react-codemirror2",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "a tiny react codemirror component wrapper",
   "main": "index.js",
   "scripts": {
@@ -45,7 +45,7 @@
     "babel-register": "6.26.0",
     "codemirror": "^5.0.0",
     "css-loader": "0.28.7",
-    "express": "4.15.5",
+    "express": "4.16.0",
     "js-beautify": "1.7.3",
     "node-sass": "4.5.3",
     "open": "0.0.5",

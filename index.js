@@ -62,16 +62,6 @@ var CodeMirror = function (_React$Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      /* deprecation warnings per 1.0.0 release */
-      if (this.props.onValueChange) {
-        console.warn('`onValueChange` has been deprecated. Please use `onChange` instead');
-      }
-
-      if (this.props.onValueSet) {
-        console.warn('`onValueSet` has been deprecated. Please use `onSet` instead');
-      }
-      /* end deprecation warnings per 1.0.0 release */
-
       if (this.props.defineMode) {
         if (this.props.defineMode.name && this.props.defineMode.fn) {
           codemirror.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
@@ -264,7 +254,10 @@ var CodeMirror = function (_React$Component) {
 
       if (!this.hydrated) {
 
-        this.editor.setValue(props.value || '');
+        var lastLine = this.editor.lastLine();
+        var lastChar = this.editor.getLine(this.editor.lastLine()).length;
+
+        this.editor.replaceRange(props.value || '', { line: 0, ch: 0 }, { line: lastLine, ch: lastChar });
 
         if (this.props.onBeforeSet) {
           this.props.onBeforeSet(this.editor, this.onBeforeSetCb);
