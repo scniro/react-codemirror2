@@ -14,7 +14,7 @@ require('codemirror/theme/neat.css');
 require('codemirror/mode/xml/xml.js');
 require('codemirror/mode/javascript/javascript.js');
 
-import 'Codemirror' from 'react-codemirror';
+import 'Codemirror' from 'react-codemirror2';
 
 <CodeMirror
   value={this.value}
