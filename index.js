@@ -279,6 +279,11 @@ var CodeMirror = function (_React$Component) {
       this.hydrated = true;
     }
   }, {
+    key: 'getCodeMirror',
+    value: function getCodeMirror() {
+      return this.editor;
+    }
+  }, {
     key: 'render',
     value: function render() {
       var _this4 = this;

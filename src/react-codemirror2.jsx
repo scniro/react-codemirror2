@@ -249,6 +249,10 @@ export default class CodeMirror extends React.Component {
     this.hydrated = true;
   }
 
+  getCodeMirror() {
+    return this.editor;
+  }
+
   render() {
 
     let className = this.props.className ? `react-codemirror2 ${this.props.className}` : 'react-codemirror2';
