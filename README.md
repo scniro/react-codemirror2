@@ -7,7 +7,7 @@
 
 demo @ [scniro.github.io/react-codemirror2](https://scniro.github.io/react-codemirror2/)
 
-> npm install react-codemirror2
+> npm install react-codemirror2 codemirror
 
 ## basic usage
 ```jsx
