@@ -131,7 +131,7 @@ require('codemirror/mode/javascript/javascript');
 - `onDragOver(editor, event)` - *[dragover](https://codemirror.net/doc/manual.html#event_dom)*
 - `onDrop(editor, event)` - *[drop](https://codemirror.net/doc/manual.html#event_dom)*
 - `onSelection(editor, ranges)` - *[beforeSelectionChange](https://codemirror.net/doc/manual.html#event_doc_beforeSelectionChange)*
-- `onScroll(editor, position)` - *[scroll](https://codemirror.net/doc/manual.html#event_scroll)*
+- `onScroll(editor, data)` - *[scroll](https://codemirror.net/doc/manual.html#event_scroll)*
 - `onCursor(editor, position)`- *[cursorActivity](https://codemirror.net/doc/manual.html#event_doc_cursorActivity)*
 
 [MIT](./LICENSE) © 2017 [scniro](https://github.com/scniro)

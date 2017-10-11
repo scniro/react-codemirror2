@@ -1,3 +1,4 @@
+// original, keep for reference (for now) during tsx transition
 import React from 'react';
 let codemirror = require('codemirror');
 
