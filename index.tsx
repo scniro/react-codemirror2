@@ -3,7 +3,7 @@ import * as codemirror from 'codemirror';
 
 export interface IDefineModeOptions {
   name: string;
-  fn: () => any;
+  fn: () => codemirror.Mode<any>;
 }
 
 export interface ISetScrollOptions {
@@ -27,6 +27,7 @@ export interface IInstance extends codemirror.Editor, IDoc {
 
 export interface ICodeMirror {
   value?: string;
+  options?: codemirror.EditorConfiguration
   className?: string;
   defineMode?: IDefineModeOptions;
   editorDidConfigure?: (editor: IInstance) => void;

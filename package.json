@@ -9,7 +9,7 @@
     "start": "node docs/server.js",
     "prewebpack": "npm run transpile",
     "webpack": "webpack --display-error-details --config docs/webpack.config.js",
-    "prepublish": "npm run transpile && npm run webpack",
+    "prepublish": "npm run transpile && npm run test && npm run webpack",
     "transpile": "tsc",
     "test": "jest"
   },
