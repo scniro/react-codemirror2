@@ -6,3 +6,4 @@ src
 .idea
 .npmignore
 tsconfig.json
+*.spec.*

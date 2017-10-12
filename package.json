@@ -1,17 +1,28 @@
 {
   "name": "react-codemirror2",
-  "version": "2.0.2",
+  "version": "3.0.0-alpha",
   "description": "a tiny react codemirror component wrapper",
   "main": "index.js",
   "typings": "index.d.ts",
   "scripts": {
     "prestart": "npm run webpack",
     "start": "node docs/server.js",
-    "test": "echo todo",
     "prewebpack": "npm run transpile",
     "webpack": "webpack --config docs/webpack.config.js",
     "prepublish": "npm run transpile && npm run webpack",
-    "transpile": "tsc"
+    "transpile": "tsc",
+    "test": "jest"
+  },
+  "jest": {
+    "setupFiles": [
+      "@nteract/mockument",
+      "raf/polyfill"
+    ],
+    "testRegex": "(/test/.*|\\.(test|spec))\\.(js|jsx)$",
+    "moduleFileExtensions": [
+      "js",
+      "jsx"
+    ]
   },
   "repository": {
     "type": "git",
@@ -37,8 +48,9 @@
     "codemirror": "5.x"
   },
   "devDependencies": {
+    "@nteract/mockument": "1.0.4",
     "@types/codemirror": "0.0.47",
-    "@types/react": "^16.0.10",
+    "@types/react": "16.0.10",
     "babel-cli": "6.26.0",
     "babel-core": "6.26.0",
     "babel-loader": "7.1.2",
@@ -48,17 +60,22 @@
     "babel-register": "6.26.0",
     "codemirror": "5.30.0",
     "css-loader": "0.28.7",
-    "express": "4.16.0",
-    "js-beautify": "1.7.3",
+    "enzyme": "3.1.0",
+    "enzyme-adapter-react-16": "1.0.1",
+    "express": "4.16.2",
+    "jest": "21.2.1",
+    "js-beautify": "1.7.4",
     "node-sass": "4.5.3",
     "open": "0.0.5",
     "prismjs": "1.8.1",
+    "raf": "3.4.0",
     "react": "16.0.0",
     "react-dom": "16.0.0",
     "react-redux": "5.0.6",
+    "react-test-renderer": "16.0.0",
     "redux": "3.7.2",
     "sass-loader": "6.0.6",
-    "style-loader": "0.18.2",
+    "style-loader": "0.19.0",
     "typescript": "2.5.3",
     "webpack": "3.6.0"
   }

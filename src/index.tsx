@@ -16,7 +16,12 @@ export interface ISetSelectionOptions {
   head: codemirror.Position
 }
 
-export interface IInstance extends codemirror.Editor, codemirror.Doc {
+// tshack: `setSelections` missing in @types/codemirror
+export interface IDoc extends codemirror.Doc {
+  setSelections: (ranges: Array<ISetSelectionOptions>) => void;
+}
+
+export interface IInstance extends codemirror.Editor, IDoc {
 
 }
 
@@ -24,32 +29,32 @@ export interface ICodeMirror {
   value?: string;
   className?: string;
   defineMode?: IDefineModeOptions;
-  editorDidConfigure?: (editor: codemirror.Editor) => void;
+  editorDidConfigure?: (editor: IInstance) => void;
   cursor?: codemirror.Position;
-  onSet?: (editor: codemirror.Editor, value: string) => void;
-  onBeforeSet?: (editor: codemirror.Editor, cb: () => void) => void;
+  onSet?: (editor: IInstance, value: string) => void;
+  onBeforeSet?: (editor: IInstance, cb: () => void) => void;
   autoScrollCursorOnSet?: boolean;
   resetCursorOnSet?: boolean;
   scroll?: ISetScrollOptions;
   selection?: Array<ISetSelectionOptions>;
-  onGutterClick?: (editor: codemirror.Editor, lineNumber: number, gutter: string, event: Event) => void;
-  onBeforeChange?: (editor: codemirror.Editor, data: codemirror.EditorChange, cb: () => void) => void;
-  onChange?: (editor: codemirror.Editor, data: codemirror.EditorChange, value: string) => void;
-  onCursor?: (editor: codemirror.Editor, data: codemirror.Position) => void;
-  onScroll?: (editor: codemirror.Editor, data: codemirror.ScrollInfo) => void;
-  onDrop?: (editor: codemirror.Editor, event: Event) => void;
-  onDragOver?: (editor: codemirror.Editor, event: Event) => void;
-  onDragEnter?: (editor: codemirror.Editor, event: Event) => void;
-  onSelection?: (editor: codemirror.Editor, ranges: any) => void;
-  onKeyPress?: (editor: codemirror.Editor, event: Event) => void;
-  onKeyDown?: (editor: codemirror.Editor, event: Event) => void;
-  onKeyUp?: (editor: codemirror.Editor, event: Event) => void;
-  onUpdate?: (editor: codemirror.Editor, event: Event) => void;
-  onBlur?: (editor: codemirror.Editor, event: Event) => void;
-  onFocus?: (editor: codemirror.Editor, event: Event) => void;
-  onCursorActivity?: (editor: codemirror.Editor) => void;
-  onViewportChange?: (editor: codemirror.Editor, start: number, end: number) => void;
-  editorDidMount?: (editor: codemirror.Editor, cb: () => void) => void;
+  onGutterClick?: (editor: IInstance, lineNumber: number, gutter: string, event: Event) => void;
+  onBeforeChange?: (editor: IInstance, data: codemirror.EditorChange, cb: () => void) => void;
+  onChange?: (editor: IInstance, data: codemirror.EditorChange, value: string) => void;
+  onCursor?: (editor: IInstance, data: codemirror.Position) => void;
+  onScroll?: (editor: IInstance, data: codemirror.ScrollInfo) => void;
+  onDrop?: (editor: IInstance, event: Event) => void;
+  onDragOver?: (editor: IInstance, event: Event) => void;
+  onDragEnter?: (editor: IInstance, event: Event) => void;
+  onSelection?: (editor: IInstance, ranges: ISetSelectionOptions) => void;
+  onKeyPress?: (editor: IInstance, event: Event) => void;
+  onKeyDown?: (editor: IInstance, event: Event) => void;
+  onKeyUp?: (editor: IInstance, event: Event) => void;
+  onUpdate?: (editor: IInstance) => void;
+  onBlur?: (editor: IInstance, event: Event) => void;
+  onFocus?: (editor: IInstance, event: Event) => void;
+  onCursorActivity?: (editor: IInstance) => void;
+  onViewportChange?: (editor: IInstance, start: number, end: number) => void;
+  editorDidMount?: (editor: IInstance, cb: () => void) => void;
   editorWillMount?: () => void;
   editorWillUnmount?: (lib: any) => void;
 }
@@ -59,7 +64,7 @@ export default class CodeMirror extends React.Component<ICodeMirror, any> {
   /** @internal */
   private ref: HTMLElement;
   /** @internal */
-  private editor: any;
+  private editor: IInstance;
   /** @internal */
   private hydrated: boolean;
   /** @internal */
@@ -112,7 +117,7 @@ export default class CodeMirror extends React.Component<ICodeMirror, any> {
       }
     }
 
-    this.editor = codemirror(this.ref);
+    this.editor = codemirror(this.ref) as IInstance;
 
     this.editor.on('beforeChange', (cm, data) => {
       if (this.props.onBeforeChange && this.hydrated) {
@@ -153,20 +158,22 @@ export default class CodeMirror extends React.Component<ICodeMirror, any> {
     }
 
     if (this.props.onFocus) {
-      this.editor.on('focus', (cm, event) => {
+      // tshack: missing `focus` DOM event in @types/codemirror
+      (this.editor as any).on('focus', (cm, event) => {
         this.props.onFocus(this.editor, event);
       });
     }
 
     if (this.props.onBlur) {
-      this.editor.on('blur', (cm, event) => {
+      // tshack: missing `blur` DOM event in @types/codemirror
+      (this.editor as any).on('blur', (cm, event) => {
         this.props.onBlur(this.editor, event);
       });
     }
 
     if (this.props.onUpdate) {
-      this.editor.on('update', (cm, event) => {
-        this.props.onUpdate(this.editor, event);
+      this.editor.on('update', (cm) => {
+        this.props.onUpdate(this.editor);
       });
     }
 
@@ -208,7 +215,7 @@ export default class CodeMirror extends React.Component<ICodeMirror, any> {
 
     if (this.props.onSelection) {
       this.editor.on('beforeSelectionChange', (cm, data) => {
-        this.props.onSelection(this.editor, data.ranges);
+        this.props.onSelection(this.editor, data);
       })
     }
 
@@ -230,12 +237,14 @@ export default class CodeMirror extends React.Component<ICodeMirror, any> {
 
     // commands
     if (this.props.selection) {
-      this.editor.setSelections(this.props.selection);
+      let doc = this.editor.getDoc() as IDoc;
+      doc.setSelections(this.props.selection);
     }
 
     if (this.props.cursor) {
       this.editor.focus();
-      this.editor.setCursor(this.props.cursor);
+      let doc = this.editor.getDoc();
+      doc.setCursor(this.props.cursor);
     }
 
     if (this.props.scroll) {
@@ -250,7 +259,7 @@ export default class CodeMirror extends React.Component<ICodeMirror, any> {
   /** @internal */
   public componentWillReceiveProps(nextProps) {
 
-    let cursorPos: ISetSelectionOptions;
+    let cursorPos: codemirror.Position;
 
     if (this.props.value !== nextProps.value) {
       this.hydrated = false;
@@ -264,8 +273,9 @@ export default class CodeMirror extends React.Component<ICodeMirror, any> {
 
     if (!this.props.resetCursorOnSet) {
 
-      !this.props.autoScrollCursorOnSet && this.props.autoScrollCursorOnSet !== undefined ?
-        this.editor.setCursor(cursorPos, null, {scroll: false}) : this.editor.setCursor(cursorPos);
+      let doc = this.editor.getDoc();
+
+      doc.setCursor(cursorPos);
     }
   }
 

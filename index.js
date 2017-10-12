@@ -81,18 +81,20 @@ var CodeMirror = /** @class */ (function (_super) {
             });
         }
         if (this.props.onFocus) {
+            // tshack: missing `focus` DOM event in @types/codemirror
             this.editor.on('focus', function (cm, event) {
                 _this.props.onFocus(_this.editor, event);
             });
         }
         if (this.props.onBlur) {
+            // tshack: missing `blur` DOM event in @types/codemirror
             this.editor.on('blur', function (cm, event) {
                 _this.props.onBlur(_this.editor, event);
             });
         }
         if (this.props.onUpdate) {
-            this.editor.on('update', function (cm, event) {
-                _this.props.onUpdate(_this.editor, event);
+            this.editor.on('update', function (cm) {
+                _this.props.onUpdate(_this.editor);
             });
         }
         if (this.props.onKeyDown) {
@@ -127,7 +129,7 @@ var CodeMirror = /** @class */ (function (_super) {
         }
         if (this.props.onSelection) {
             this.editor.on('beforeSelectionChange', function (cm, data) {
-                _this.props.onSelection(_this.editor, data.ranges);
+                _this.props.onSelection(_this.editor, data);
             });
         }
         if (this.props.onScroll) {
@@ -143,11 +145,13 @@ var CodeMirror = /** @class */ (function (_super) {
         this.hydrate(this.props);
         // commands
         if (this.props.selection) {
-            this.editor.setSelections(this.props.selection);
+            var doc = this.editor.getDoc();
+            doc.setSelections(this.props.selection);
         }
         if (this.props.cursor) {
             this.editor.focus();
-            this.editor.setCursor(this.props.cursor);
+            var doc = this.editor.getDoc();
+            doc.setCursor(this.props.cursor);
         }
         if (this.props.scroll) {
             this.editor.scrollTo(this.props.scroll.x, this.props.scroll.y);
@@ -167,8 +171,8 @@ var CodeMirror = /** @class */ (function (_super) {
         }
         this.hydrate(nextProps);
         if (!this.props.resetCursorOnSet) {
-            !this.props.autoScrollCursorOnSet && this.props.autoScrollCursorOnSet !== undefined ?
-                this.editor.setCursor(cursorPos, null, { scroll: false }) : this.editor.setCursor(cursorPos);
+            var doc = this.editor.getDoc();
+            doc.setCursor(cursorPos);
         }
     };
     /** @internal */
