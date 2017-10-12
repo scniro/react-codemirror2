@@ -8,7 +8,7 @@
     "prestart": "npm run webpack",
     "start": "node docs/server.js",
     "prewebpack": "npm run transpile",
-    "webpack": "webpack --config docs/webpack.config.js",
+    "webpack": "webpack --display-error-details --config docs/webpack.config.js",
     "prepublish": "npm run transpile && npm run webpack",
     "transpile": "tsc",
     "test": "jest"
@@ -77,6 +77,6 @@
     "sass-loader": "6.0.6",
     "style-loader": "0.19.0",
     "typescript": "2.5.3",
-    "webpack": "3.6.0"
+    "webpack": "3.7.1"
   }
 }

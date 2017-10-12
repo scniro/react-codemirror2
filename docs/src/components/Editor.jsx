@@ -71,7 +71,7 @@ class Editor extends React.Component {
         options={{
           mode: this.props.mode,
           theme: this.props.theme,
-          lineNumbers: true
+          lineNumbers: true,
         }}
         onSet={(editor, value) => {
 
