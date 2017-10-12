@@ -16,6 +16,7 @@ export interface ISetSelectionOptions {
 }
 export interface IDoc extends codemirror.Doc {
     setSelections: (ranges: Array<ISetSelectionOptions>) => void;
+    setCursor: (pos: codemirror.Position, ch?: number, options?: {}) => void;
 }
 export interface IInstance extends codemirror.Editor, IDoc {
 }
@@ -28,8 +29,9 @@ export interface ICodeMirror {
     cursor?: codemirror.Position;
     onSet?: (editor: IInstance, value: string) => void;
     onBeforeSet?: (editor: IInstance, cb: () => void) => void;
-    autoScrollCursorOnSet?: boolean;
-    resetCursorOnSet?: boolean;
+    autoScroll?: boolean;
+    autoFocus?: boolean;
+    autoCursor?: boolean;
     scroll?: ISetScrollOptions;
     selection?: Array<ISetSelectionOptions>;
     onGutterClick?: (editor: IInstance, lineNumber: number, gutter: string, event: Event) => void;
@@ -52,6 +54,8 @@ export interface ICodeMirror {
     editorDidMount?: (editor: IInstance, cb: () => void) => void;
     editorWillMount?: () => void;
     editorWillUnmount?: (lib: any) => void;
+    autoScrollCursorOnSet?: boolean;
+    resetCursorOnSet?: boolean;
 }
 export default class CodeMirror extends React.Component<ICodeMirror, any> {
 }

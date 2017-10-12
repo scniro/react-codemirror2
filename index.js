@@ -17,6 +17,9 @@ var CodeMirror = /** @class */ (function (_super) {
     /** @internal */
     function CodeMirror(props) {
         var _this = _super.call(this, props) || this;
+        if (_this.props.autoScrollCursorOnSet !== undefined || _this.props.resetCursorOnSet !== undefined) {
+            _this.notifyOfDeprecation();
+        }
         _this.hydrated = false;
         _this.continuePreSet = false;
         _this.continuePreChange = false;
@@ -34,6 +37,38 @@ var CodeMirror = /** @class */ (function (_super) {
         return _this;
     }
     /** @internal */
+    CodeMirror.prototype.setCursor = function (cursorPos, scroll, focus) {
+        var doc = this.editor.getDoc();
+        if (focus) {
+            this.editor.focus();
+        }
+        if (scroll) {
+            doc.setCursor(cursorPos);
+        }
+        else {
+            doc.setCursor(cursorPos, null, { scroll: false });
+        }
+    };
+    /** @internal */
+    CodeMirror.prototype.moveCursor = function (cursorPos, scroll) {
+        var doc = this.editor.getDoc();
+        if (scroll) {
+            doc.setCursor(cursorPos);
+        }
+        else {
+            doc.setCursor(cursorPos, null, { scroll: false });
+        }
+    };
+    /** @internal */
+    CodeMirror.prototype.notifyOfDeprecation = function () {
+        if (this.props.autoScrollCursorOnSet !== undefined) {
+            console.warn('`autoScrollCursorOnSet` has been deprecated. Use `autoScroll` instead\n\nSee https://github.com/scniro/react-codemirror2#props');
+        }
+        if (this.props.resetCursorOnSet !== undefined) {
+            console.warn('`resetCursorOnSet` has been deprecated. Use `autoCursor` instead\n\nSee https://github.com/scniro/react-codemirror2#props');
+        }
+    };
+    /** @internal */
     CodeMirror.prototype.componentWillMount = function () {
         if (this.props.editorWillMount) {
             this.props.editorWillMount();
@@ -48,6 +83,7 @@ var CodeMirror = /** @class */ (function (_super) {
             }
         }
         this.editor = codemirror(this.ref);
+        window.editor = this.editor;
         this.editor.on('beforeChange', function (cm, data) {
             if (_this.props.onBeforeChange && _this.hydrated) {
                 _this.props.onBeforeChange(_this.editor, data, _this.onBeforeChangeCb);
@@ -149,9 +185,7 @@ var CodeMirror = /** @class */ (function (_super) {
             doc.setSelections(this.props.selection);
         }
         if (this.props.cursor) {
-            this.editor.focus();
-            var doc = this.editor.getDoc();
-            doc.setCursor(this.props.cursor);
+            this.setCursor(this.props.cursor, this.props.autoScroll || false, this.props.autoFocus || false);
         }
         if (this.props.scroll) {
             this.editor.scrollTo(this.props.scroll.x, this.props.scroll.y);
@@ -166,13 +200,12 @@ var CodeMirror = /** @class */ (function (_super) {
         if (this.props.value !== nextProps.value) {
             this.hydrated = false;
         }
-        if (!this.props.resetCursorOnSet) {
+        if (!this.props.autoCursor && this.props.autoCursor !== undefined) {
             cursorPos = this.editor.getCursor();
         }
         this.hydrate(nextProps);
-        if (!this.props.resetCursorOnSet) {
-            var doc = this.editor.getDoc();
-            doc.setCursor(cursorPos);
+        if (!this.props.autoCursor && this.props.autoCursor !== undefined) {
+            this.moveCursor(cursorPos, this.props.autoScroll || false);
         }
     };
     /** @internal */

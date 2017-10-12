@@ -19,10 +19,10 @@ export interface ISetSelectionOptions {
 // tshack: `setSelections` missing in @types/codemirror
 export interface IDoc extends codemirror.Doc {
   setSelections: (ranges: Array<ISetSelectionOptions>) => void;
+  setCursor: (pos: codemirror.Position, ch?: number, options?: {}) => void;
 }
 
 export interface IInstance extends codemirror.Editor, IDoc {
-
 }
 
 export interface ICodeMirror {
@@ -34,8 +34,9 @@ export interface ICodeMirror {
   cursor?: codemirror.Position;
   onSet?: (editor: IInstance, value: string) => void;
   onBeforeSet?: (editor: IInstance, cb: () => void) => void;
-  autoScrollCursorOnSet?: boolean;
-  resetCursorOnSet?: boolean;
+  autoScroll?: boolean, // default: false
+  autoFocus?: boolean, // default: false
+  autoCursor?: boolean, // default: true
   scroll?: ISetScrollOptions;
   selection?: Array<ISetSelectionOptions>;
   onGutterClick?: (editor: IInstance, lineNumber: number, gutter: string, event: Event) => void;
@@ -58,6 +59,10 @@ export interface ICodeMirror {
   editorDidMount?: (editor: IInstance, cb: () => void) => void;
   editorWillMount?: () => void;
   editorWillUnmount?: (lib: any) => void;
+  //deprecated: temporary
+  autoScrollCursorOnSet?: boolean;
+  //deprecated: temporary
+  resetCursorOnSet?: boolean;
 }
 
 export default class CodeMirror extends React.Component<ICodeMirror, any> {
@@ -83,6 +88,10 @@ export default class CodeMirror extends React.Component<ICodeMirror, any> {
   constructor(props: ICodeMirror) {
     super(props);
 
+    if (this.props.autoScrollCursorOnSet !== undefined || this.props.resetCursorOnSet !== undefined) {
+      this.notifyOfDeprecation();
+    }
+
     this.hydrated = false;
     this.continuePreSet = false;
     this.continuePreChange = false;
@@ -103,6 +112,46 @@ export default class CodeMirror extends React.Component<ICodeMirror, any> {
   }
 
   /** @internal */
+  private setCursor(cursorPos: codemirror.Position, scroll: boolean, focus?: boolean) {
+
+    let doc = this.editor.getDoc() as IDoc;
+
+    if (focus) {
+      this.editor.focus();
+    }
+
+    if (scroll) {
+      doc.setCursor(cursorPos);
+    } else {
+      doc.setCursor(cursorPos, null, {scroll: false});
+    }
+  }
+
+  /** @internal */
+  private moveCursor(cursorPos: codemirror.Position, scroll: boolean) {
+
+    let doc = this.editor.getDoc() as IDoc;
+
+    if (scroll) {
+      doc.setCursor(cursorPos);
+    } else {
+      doc.setCursor(cursorPos, null, {scroll: false});
+    }
+  }
+
+  /** @internal */
+  private notifyOfDeprecation() {
+
+    if (this.props.autoScrollCursorOnSet !== undefined) {
+      console.warn('`autoScrollCursorOnSet` has been deprecated. Use `autoScroll` instead\n\nSee https://github.com/scniro/react-codemirror2#props')
+    }
+
+    if (this.props.resetCursorOnSet !== undefined) {
+      console.warn('`resetCursorOnSet` has been deprecated. Use `autoCursor` instead\n\nSee https://github.com/scniro/react-codemirror2#props')
+    }
+  }
+
+  /** @internal */
   public componentWillMount() {
     if (this.props.editorWillMount) {
       this.props.editorWillMount();
@@ -119,6 +168,7 @@ export default class CodeMirror extends React.Component<ICodeMirror, any> {
     }
 
     this.editor = codemirror(this.ref) as IInstance;
+    (window as any).editor = this.editor;
 
     this.editor.on('beforeChange', (cm, data) => {
       if (this.props.onBeforeChange && this.hydrated) {
@@ -243,9 +293,8 @@ export default class CodeMirror extends React.Component<ICodeMirror, any> {
     }
 
     if (this.props.cursor) {
-      this.editor.focus();
-      let doc = this.editor.getDoc();
-      doc.setCursor(this.props.cursor);
+
+      this.setCursor(this.props.cursor, this.props.autoScroll || false, this.props.autoFocus || false);
     }
 
     if (this.props.scroll) {
@@ -266,17 +315,14 @@ export default class CodeMirror extends React.Component<ICodeMirror, any> {
       this.hydrated = false;
     }
 
-    if (!this.props.resetCursorOnSet) {
+    if (!this.props.autoCursor && this.props.autoCursor !== undefined) {
       cursorPos = this.editor.getCursor();
     }
 
     this.hydrate(nextProps);
 
-    if (!this.props.resetCursorOnSet) {
-
-      let doc = this.editor.getDoc();
-
-      doc.setCursor(cursorPos);
+    if (!this.props.autoCursor && this.props.autoCursor !== undefined) {
+      this.moveCursor(cursorPos, this.props.autoScroll || false);
     }
   }
 

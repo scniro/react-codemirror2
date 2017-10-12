@@ -66,6 +66,8 @@ class Editor extends React.Component {
 
     return (
       <CodeMirror
+        resetCursorOnSet={false}
+        autoScrollCursorOnSet={true}
         value={value}
         defineMode={{name: 'strings', fn: sampleMode}}
         options={{
@@ -74,11 +76,9 @@ class Editor extends React.Component {
           lineNumbers: true,
         }}
         onSet={(editor, value) => {
-
           console.log('onSet', {value});
         }}
         onChange={(editor, metadata, value) => {
-
           console.log('onChange', {value});
         }}
       />
