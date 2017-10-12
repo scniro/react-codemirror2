@@ -16,9 +16,10 @@ export interface ISetSelectionOptions {
   head: codemirror.Position
 }
 
-// tshack: `setSelections` missing in @types/codemirror
 export interface IDoc extends codemirror.Doc {
+  // tshack: `setSelections` missing in @types/codemirror
   setSelections: (ranges: Array<ISetSelectionOptions>) => void;
+  // tshack: `setCursor` has incorrect/missing overloaded signature in @types/codemirror
   setCursor: (pos: codemirror.Position, ch?: number, options?: {}) => void;
 }
 

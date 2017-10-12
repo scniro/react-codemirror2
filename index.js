@@ -12,9 +12,8 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
 var codemirror = require("codemirror");
-var CodeMirror = /** @class */ (function (_super) {
+var CodeMirror = (function (_super) {
     __extends(CodeMirror, _super);
-    /** @internal */
     function CodeMirror(props) {
         var _this = _super.call(this, props) || this;
         if (_this.props.autoScrollCursorOnSet !== undefined || _this.props.resetCursorOnSet !== undefined) {
@@ -36,7 +35,6 @@ var CodeMirror = /** @class */ (function (_super) {
         };
         return _this;
     }
-    /** @internal */
     CodeMirror.prototype.setCursor = function (cursorPos, scroll, focus) {
         var doc = this.editor.getDoc();
         if (focus) {
@@ -49,7 +47,6 @@ var CodeMirror = /** @class */ (function (_super) {
             doc.setCursor(cursorPos, null, { scroll: false });
         }
     };
-    /** @internal */
     CodeMirror.prototype.moveCursor = function (cursorPos, scroll) {
         var doc = this.editor.getDoc();
         if (scroll) {
@@ -59,7 +56,6 @@ var CodeMirror = /** @class */ (function (_super) {
             doc.setCursor(cursorPos, null, { scroll: false });
         }
     };
-    /** @internal */
     CodeMirror.prototype.notifyOfDeprecation = function () {
         if (this.props.autoScrollCursorOnSet !== undefined) {
             console.warn('`autoScrollCursorOnSet` has been deprecated. Use `autoScroll` instead\n\nSee https://github.com/scniro/react-codemirror2#props');
@@ -68,13 +64,11 @@ var CodeMirror = /** @class */ (function (_super) {
             console.warn('`resetCursorOnSet` has been deprecated. Use `autoCursor` instead\n\nSee https://github.com/scniro/react-codemirror2#props');
         }
     };
-    /** @internal */
     CodeMirror.prototype.componentWillMount = function () {
         if (this.props.editorWillMount) {
             this.props.editorWillMount();
         }
     };
-    /** @internal */
     CodeMirror.prototype.componentDidMount = function () {
         var _this = this;
         if (this.props.defineMode) {
@@ -117,13 +111,11 @@ var CodeMirror = /** @class */ (function (_super) {
             });
         }
         if (this.props.onFocus) {
-            // tshack: missing `focus` DOM event in @types/codemirror
             this.editor.on('focus', function (cm, event) {
                 _this.props.onFocus(_this.editor, event);
             });
         }
         if (this.props.onBlur) {
-            // tshack: missing `blur` DOM event in @types/codemirror
             this.editor.on('blur', function (cm, event) {
                 _this.props.onBlur(_this.editor, event);
             });
@@ -179,7 +171,6 @@ var CodeMirror = /** @class */ (function (_super) {
             });
         }
         this.hydrate(this.props);
-        // commands
         if (this.props.selection) {
             var doc = this.editor.getDoc();
             doc.setSelections(this.props.selection);
@@ -194,7 +185,6 @@ var CodeMirror = /** @class */ (function (_super) {
             this.props.editorDidMount(this.editor, this.initCb);
         }
     };
-    /** @internal */
     CodeMirror.prototype.componentWillReceiveProps = function (nextProps) {
         var cursorPos;
         if (this.props.value !== nextProps.value) {
@@ -208,19 +198,16 @@ var CodeMirror = /** @class */ (function (_super) {
             this.moveCursor(cursorPos, this.props.autoScroll || false);
         }
     };
-    /** @internal */
     CodeMirror.prototype.componentWillUnmount = function () {
         if (this.props.editorWillUnmount) {
             this.props.editorWillUnmount(codemirror);
         }
     };
-    /** @internal */
     CodeMirror.prototype.render = function () {
         var _this = this;
         var className = this.props.className ? "react-codemirror2 " + this.props.className : 'react-codemirror2';
         return (React.createElement("div", { className: className, ref: function (self) { return _this.ref = self; } }));
     };
-    /** @internal */
     CodeMirror.prototype.hydrate = function (props) {
         var _this = this;
         Object.keys(props.options || {}).forEach(function (key) { return _this.editor.setOption(key, props.options[key]); });
