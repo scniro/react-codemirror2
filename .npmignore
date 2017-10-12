@@ -1,9 +1,8 @@
 .babelrc
-docs
 .travis.yml
-scripts
-src
 .idea
 .npmignore
+docs
+index.tsx
 tsconfig.json
 *.spec.*

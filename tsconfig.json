@@ -8,12 +8,10 @@
     "stripInternal": true
   },
   "files": [
-    "src/index.tsx"
+    "index.tsx"
   ],
   "exclude": [
-    "node_modules",
-    "docs",
-    "scripts"
+    "node_modules"
   ],
   "types": [
     "React",
