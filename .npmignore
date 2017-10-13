@@ -2,7 +2,8 @@
 .travis.yml
 .idea
 .npmignore
-docs
-index.tsx
 tsconfig.json
-*.spec.*
+coverage
+docs
+src
+test

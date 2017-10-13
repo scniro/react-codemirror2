@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.org/scniro/react-codemirror2.svg?branch=master)](https://travis-ci.org/scniro/react-codemirror2)
 [![Dependency Status](https://img.shields.io/david/scniro/react-codemirror2.svg?label=deps&style=flat-square)](https://david-dm.org/scniro/react-codemirror2)
 [![DevDependency Status](https://img.shields.io/david/dev/scniro/react-codemirror2.svg?label=devDeps&style=flat-square)](https://david-dm.org/scniro/react-codemirror2#info=devDependencies)
+[![Coverage](https://img.shields.io/coveralls/scniro/react-codemirror2.svg?style=flat-square)](https://coveralls.io/github/scniro/react-codemirror2)
 [![NPM Version](https://img.shields.io/npm/v/react-codemirror2.svg?style=flat-square)](https://www.npmjs.com/package/react-codemirror2)
 
 ### react-codemirror2
@@ -50,29 +51,31 @@ require('codemirror/mode/javascript/javascript');
 
 ## props
 
+- `autoCursor`
+> `boolean` if `false`, allow the defaulted internal codemirror cursor position to reset should a new `value` prop be set. Default: `true`
+- `autoFocus`
+> `boolean` if `true`, set focus to the instance `onSet`. Default: `false`
+- `autoScroll`
+> `boolean` if `true`, scroll the cursor position into view automatically. Default: `false`
 - `className` - sets `class="react-codemirror2 yourClassName"`
+- `defineMode`
+> pass a custom mode object `{name: 'custom', fn: myModeFn}`
 - `options` - see codemirror [configuration](https://codemirror.net/doc/manual.html#config)
 - `value` - set component value through props
 > triggers `onSet`
-- `resetCursorOnSet`
-> `boolean` reset the internal codemirror cursor position should a new `value` prop be set. Default: `false`
-- `autoScrollCursorOnSet`
-> `boolean` scroll the cursor position into view automatically. Default: `false`
-- `defineMode`
-> pass a custom mode object `{name: 'custom', fn: myModeFn}`
 
 ## props cont. (wrapped codemirror [programming api](https://codemirror.net/doc/manual.html#api))
 
-- `selection={array<{anchor, head}>}` - *[setSelections](https://codemirror.net/doc/manual.html#setSelections)*
-> will programmatically select the ranges specified
+- `cursor` - *[setCursor](https://codemirror.net/doc/manual.html#setCursor)*
+> will programmatically set cursor to the position specified
 ```jsx
 <CodeMirror
   [...]
-  selection={[{
-    anchor: {ch: 8, line: 5},
-    head: {ch: 37, line: 5}
-  }]}
-  onSelection={(editor, ranges) => {}}
+  cursor={{
+    line: 5,
+    ch: 10
+  }}
+  onCursor={(editor, data) => {}}
 />
 ```
 - `scroll` - *[scrollTo](https://codemirror.net/doc/manual.html#scrollTo)*
@@ -84,54 +87,54 @@ require('codemirror/mode/javascript/javascript');
     x: 50,
     y: 50
   }}
-  onScroll={(editor, position) => {}}
+  onScroll={(editor, data) => {}}
 />
 ```
-- `cursor` - *[setCursor](https://codemirror.net/doc/manual.html#setCursor)*
-> will programmatically set cursor to the position specified
+- `selection={array<{anchor, head}>}` - *[setSelections](https://codemirror.net/doc/manual.html#setSelections)*
+> will programmatically select the ranges specified
 ```jsx
 <CodeMirror
   [...]
-  cursor={{
-    line: 5,
-    ch: 10
-  }}
-  onCursor={(editor, position) => {}}
+  selection={[{
+    anchor: {ch: 8, line: 5},
+    head: {ch: 37, line: 5}
+  }]}
+  onSelection={(editor, data) => {}}
 />
 ```
 
 ## events
 
-- `editorWillMount()`
+- `editorDidConfigure(editor)`
 - `editorDidMount(editor, next)`
 > calling optional `next()` will trigger `editorDidConfigure`
-- `editorDidConfigure(editor)`
-- `onSet(editor, value)`
-> returns the initial value via `value`
-- `onBeforeSet(editor, next)`
-> if defined, `next()` must be invoked to trigger `onSet`
+- `editorWillMount()`
 - `editorWillUnmount(editor)`
 - `onBeforeChange(editor, changeObj, next)`
 > if defined, `next()` must be invoked to trigger `onChange`
+- `onBeforeSet(editor, next)`
+> if defined, `next()` must be invoked to trigger `onSet`
+- `onChange(editor, data, value)`
+> returns value of the editor if changed internally (not via `props#value`)
+- `onSet(editor, value)`
+> returns the value set via `props#value`
 
 ## events cont. [wrapped codemirror events](https://codemirror.net/doc/manual.html#events)
 
-- `onChange(editor, metadata, value)` - *[change](https://codemirror.net/doc/manual.html#event_change)*
-> returns the internal value of the editor
-- `onCursorActivity(editor)` - *[cursorActivity](https://codemirror.net/doc/manual.html#event_cursorActivity)*
-- `onViewportChange(editor, viewportStart, viewportEnd)` - *[viewportChange](https://codemirror.net/doc/manual.html#event_viewportChange)*
-- `onGutterClick(editor, lineNumber, event)` - *[gutterClick](https://codemirror.net/doc/manual.html#event_gutterClick)*
-- `onFocus(editor, event)` - *[focus](https://codemirror.net/doc/manual.html#event_focus)*
 - `onBlur(editor, event)` - *[blur](https://codemirror.net/doc/manual.html#event_blur)*
-- `onUpdate(editor, event)` - *[update](https://codemirror.net/doc/manual.html#event_update)*
-- `onKeyDown(editor, event)` - *[keydown](https://codemirror.net/doc/manual.html#event_dom)*
-- `onKeyUp(editor, event)` - *[keyup](https://codemirror.net/doc/manual.html#event_dom)*
-- `onKeyPress(editor, event)` - *[keypress](https://codemirror.net/doc/manual.html#event_dom)*
+- `onCursor(editor, data)`- *[cursorActivity](https://codemirror.net/doc/manual.html#event_doc_cursorActivity)*
+- `onCursorActivity(editor)` - *[cursorActivity](https://codemirror.net/doc/manual.html#event_cursorActivity)*
 - `onDragEnter(editor, event)` - *[dragenter](https://codemirror.net/doc/manual.html#event_dom)*
 - `onDragOver(editor, event)` - *[dragover](https://codemirror.net/doc/manual.html#event_dom)*
 - `onDrop(editor, event)` - *[drop](https://codemirror.net/doc/manual.html#event_dom)*
-- `onSelection(editor, ranges)` - *[beforeSelectionChange](https://codemirror.net/doc/manual.html#event_doc_beforeSelectionChange)*
+- `onFocus(editor, event)` - *[focus](https://codemirror.net/doc/manual.html#event_focus)*
+- `onGutterClick(editor, lineNumber, gutter, event)` - *[gutterClick](https://codemirror.net/doc/manual.html#event_gutterClick)*
+- `onKeyDown(editor, event)` - *[keydown](https://codemirror.net/doc/manual.html#event_dom)*
+- `onKeyPress(editor, event)` - *[keypress](https://codemirror.net/doc/manual.html#event_dom)*
+- `onKeyUp(editor, event)` - *[keyup](https://codemirror.net/doc/manual.html#event_dom)*
 - `onScroll(editor, data)` - *[scroll](https://codemirror.net/doc/manual.html#event_scroll)*
-- `onCursor(editor, position)`- *[cursorActivity](https://codemirror.net/doc/manual.html#event_doc_cursorActivity)*
+- `onSelection(editor, data)` - *[beforeSelectionChange](https://codemirror.net/doc/manual.html#event_doc_beforeSelectionChange)*
+- `onUpdate(editor, event)` - *[update](https://codemirror.net/doc/manual.html#event_update)*
+- `onViewportChange(editor, from, to)` - *[viewportChange](https://codemirror.net/doc/manual.html#event_viewportChange)*
 
 [MIT](./LICENSE) © 2017 [scniro](https://github.com/scniro)

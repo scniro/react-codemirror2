@@ -1,6 +1,6 @@
 {
   "name": "react-codemirror2",
-  "version": "3.0.0-alpha",
+  "version": "3.0.0",
   "description": "a tiny react codemirror component wrapper",
   "main": "index.js",
   "typings": "index.d.ts",
@@ -11,17 +11,26 @@
     "webpack": "webpack --display-error-details --config docs/webpack.config.js",
     "prepublish": "npm run transpile && npm run test && npm run webpack",
     "transpile": "tsc",
+    "pretest": "npm run transpile",
     "test": "jest"
   },
   "jest": {
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/**"
+    ],
     "setupFiles": [
       "@nteract/mockument",
       "raf/polyfill"
     ],
-    "testRegex": "(/test/.*|\\.(test|spec))\\.(js|jsx)$",
+    "testRegex": "./test/index.spec.tsx",
+    "transform": {
+      ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
     "moduleFileExtensions": [
-      "js",
-      "jsx"
+      "ts",
+      "tsx",
+      "js"
     ]
   },
   "repository": {
@@ -50,15 +59,15 @@
   "devDependencies": {
     "@nteract/mockument": "1.0.4",
     "@types/codemirror": "0.0.47",
+    "@types/jest": "21.1.2",
     "@types/react": "16.0.10",
-    "babel-cli": "6.26.0",
     "babel-core": "6.26.0",
+    "babel-jest": "21.2.0",
     "babel-loader": "7.1.2",
-    "babel-plugin-transform-react-jsx": "6.24.1",
     "babel-preset-es2015": "6.24.1",
     "babel-preset-react": "6.24.1",
-    "babel-register": "6.26.0",
     "codemirror": "5.30.0",
+    "coveralls": "3.0.0",
     "css-loader": "0.28.7",
     "enzyme": "3.1.0",
     "enzyme-adapter-react-16": "1.0.1",
@@ -75,7 +84,9 @@
     "react-test-renderer": "16.0.0",
     "redux": "3.7.2",
     "sass-loader": "6.0.6",
+    "sinon": "4.0.1",
     "style-loader": "0.19.0",
+    "ts-jest": "21.1.2",
     "typescript": "2.5.3",
     "webpack": "3.7.1"
   }

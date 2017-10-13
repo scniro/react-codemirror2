@@ -1,3 +1,15 @@
+3.0.0
+==================
+* ships with typings
+* [`resetCursorOnSet`, `autoScrollCursorOnSet`] deprecated, now => [`autoCursor`, `autoScroll`]
+* add `autoFocus`
+* modify return of `onSelection`: this.editor, data.ranges) now => (this.editor, data)
+
+2.0.2
+==================
+* fixed https://github.com/scniro/react-codemirror2/issues/14
+* remove deprecation warnings from 1.x
+
 2.0.1
 ==================
 * bump `peerDependencies` to support react 16.x

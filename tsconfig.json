@@ -6,10 +6,11 @@
     "outDir": ".",
     "declaration": true,
     "stripInternal": true,
-    "removeComments": true
+    "removeComments": true,
+    "skipLibCheck": true
   },
   "files": [
-    "index.tsx"
+    "src/index.tsx"
   ],
   "exclude": [
     "node_modules"

@@ -66,8 +66,6 @@ class Editor extends React.Component {
 
     return (
       <CodeMirror
-        resetCursorOnSet={false}
-        autoScrollCursorOnSet={true}
         value={value}
         defineMode={{name: 'strings', fn: sampleMode}}
         options={{

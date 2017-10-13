@@ -64,6 +64,32 @@ var CodeMirror = (function (_super) {
             console.warn('`resetCursorOnSet` has been deprecated. Use `autoCursor` instead\n\nSee https://github.com/scniro/react-codemirror2#props');
         }
     };
+    CodeMirror.prototype.hydrate = function (props) {
+        var _this = this;
+        Object.keys(props.options || {}).forEach(function (key) { return _this.editor.setOption(key, props.options[key]); });
+        if (this.props.editorDidConfigure) {
+            this.props.editorDidConfigure(this.editor);
+        }
+        if (!this.hydrated) {
+            var lastLine = this.editor.lastLine();
+            var lastChar = this.editor.getLine(this.editor.lastLine()).length;
+            this.editor.replaceRange(props.value || '', { line: 0, ch: 0 }, { line: lastLine, ch: lastChar });
+            if (this.props.onBeforeSet) {
+                this.props.onBeforeSet(this.editor, this.onBeforeSetCb);
+            }
+            if (this.props.onBeforeSet) {
+                if (this.continuePreSet && this.props.onSet) {
+                    this.props.onSet(this.editor, this.editor.getValue());
+                }
+            }
+            else {
+                if (this.props.onSet) {
+                    this.props.onSet(this.editor, this.editor.getValue());
+                }
+            }
+        }
+        this.hydrated = true;
+    };
     CodeMirror.prototype.componentWillMount = function () {
         if (this.props.editorWillMount) {
             this.props.editorWillMount();
@@ -77,7 +103,6 @@ var CodeMirror = (function (_super) {
             }
         }
         this.editor = codemirror(this.ref);
-        window.editor = this.editor;
         this.editor.on('beforeChange', function (cm, data) {
             if (_this.props.onBeforeChange && _this.hydrated) {
                 _this.props.onBeforeChange(_this.editor, data, _this.onBeforeChangeCb);
@@ -101,8 +126,8 @@ var CodeMirror = (function (_super) {
             });
         }
         if (this.props.onViewportChange) {
-            this.editor.on('viewportChange', function (cm, start, end) {
-                _this.props.onViewportChange(_this.editor, start, end);
+            this.editor.on('viewportChange', function (cm, from, to) {
+                _this.props.onViewportChange(_this.editor, from, to);
             });
         }
         if (this.props.onGutterClick) {
@@ -207,32 +232,6 @@ var CodeMirror = (function (_super) {
         var _this = this;
         var className = this.props.className ? "react-codemirror2 " + this.props.className : 'react-codemirror2';
         return (React.createElement("div", { className: className, ref: function (self) { return _this.ref = self; } }));
-    };
-    CodeMirror.prototype.hydrate = function (props) {
-        var _this = this;
-        Object.keys(props.options || {}).forEach(function (key) { return _this.editor.setOption(key, props.options[key]); });
-        if (this.props.editorDidConfigure) {
-            this.props.editorDidConfigure(this.editor);
-        }
-        if (!this.hydrated) {
-            var lastLine = this.editor.lastLine();
-            var lastChar = this.editor.getLine(this.editor.lastLine()).length;
-            this.editor.replaceRange(props.value || '', { line: 0, ch: 0 }, { line: lastLine, ch: lastChar });
-            if (this.props.onBeforeSet) {
-                this.props.onBeforeSet(this.editor, this.onBeforeSetCb);
-            }
-            if (this.props.onBeforeSet) {
-                if (this.continuePreSet && this.props.onSet) {
-                    this.props.onSet(this.editor, this.editor.getValue());
-                }
-            }
-            else {
-                if (this.props.onSet) {
-                    this.props.onSet(this.editor, this.editor.getValue());
-                }
-            }
-        }
-        this.hydrated = true;
     };
     return CodeMirror;
 }(React.Component));
