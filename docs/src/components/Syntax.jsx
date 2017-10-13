@@ -8,7 +8,7 @@ export default class Syntax extends React.Component {
     super(props);
 
     this.code = `
-require('codemirror/lib/codemirror.css'); // e.g. webpack css loader
+require('codemirror/lib/codemirror.css');
 require('codemirror/theme/material.css');
 require('codemirror/theme/neat.css');
 require('codemirror/mode/xml/xml.js');
