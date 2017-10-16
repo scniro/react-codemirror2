@@ -1,6 +1,7 @@
 3.0.0
 ==================
 * ships with typings
+* [`onSet`, `onChange`, `onBeforeSet`, `onBeforeChange`] deprecated, now => [`onChange`, `onChangeInternal`, `onBeforeChange`, `onBeforeSet`]
 * [`resetCursorOnSet`, `autoScrollCursorOnSet`] deprecated, now => [`autoCursor`, `autoScroll`]
 * add `autoFocus`
 * modify return of `onSelection`: this.editor, data.ranges) now => (this.editor, data)

@@ -33,16 +33,15 @@ export interface ICodeMirror {
   defineMode?: IDefineModeOptions;
   editorDidConfigure?: (editor: IInstance) => void;
   cursor?: codemirror.Position;
-  onSet?: (editor: IInstance, value: string) => void;
-  onBeforeSet?: (editor: IInstance, cb: () => void) => void;
-  autoScroll?: boolean, // default: false
-  autoFocus?: boolean, // default: false
-  autoCursor?: boolean, // default: true
+  controlled?: boolean; // default: false
+  autoScroll?: boolean; // default: false
+  autoFocus?: boolean; // default: false
+  autoCursor?: boolean; // default: true
   scroll?: ISetScrollOptions;
   selection?: Array<ISetSelectionOptions>;
   onGutterClick?: (editor: IInstance, lineNumber: number, gutter: string, event: Event) => void;
-  onBeforeChange?: (editor: IInstance, data: codemirror.EditorChange, cb: () => void) => void;
   onChange?: (editor: IInstance, data: codemirror.EditorChange, value: string) => void;
+  onBeforeChange?: (editor: IInstance, data: codemirror.EditorChange, value: string, next?: () => void) => void;
   onCursor?: (editor: IInstance, data: codemirror.Position) => void;
   onScroll?: (editor: IInstance, data: codemirror.ScrollInfo) => void;
   onDrop?: (editor: IInstance, event: Event) => void;
@@ -57,7 +56,7 @@ export interface ICodeMirror {
   onFocus?: (editor: IInstance, event: Event) => void;
   onCursorActivity?: (editor: IInstance) => void;
   onViewportChange?: (editor: IInstance, start: number, end: number) => void;
-  editorDidMount?: (editor: IInstance, cb: () => void) => void;
+  editorDidMount?: (editor: IInstance, value: string, cb: () => void) => void;
   editorWillMount?: () => void;
   editorWillUnmount?: (lib: any) => void;
   //deprecated: temporary
@@ -75,17 +74,19 @@ export default class CodeMirror extends React.Component<ICodeMirror, any> {
   /** @internal */
   private hydrated: boolean;
   /** @internal */
-  private continuePreSet: boolean;
-  /** @internal */
-  private continuePreChange: boolean;
+  private continueChange: boolean;
   /** @internal */
   private onBeforeChangeCb: () => void;
   /** @internal */
-  private onBeforeSetCb: () => void;
-  /** @internal */
   private initCb: () => void;
-
-  // ---------------------------------------------------------------------------------------
+  /** @internal */
+  private mounted: boolean;
+  /** @internal */
+  private mirror: any;
+  /** @internal */
+  private deferred: any;
+  /** @internal */
+  private emulating: boolean;
 
   /** @internal */
   constructor(props: ICodeMirror) {
@@ -95,16 +96,14 @@ export default class CodeMirror extends React.Component<ICodeMirror, any> {
       this.notifyOfDeprecation();
     }
 
+    this.mounted = false;
     this.hydrated = false;
-    this.continuePreSet = false;
-    this.continuePreChange = false;
+    this.continueChange = false;
+    this.deferred = null;
+    this.emulating = false;
 
     this.onBeforeChangeCb = () => {
-      this.continuePreChange = true;
-    };
-
-    this.onBeforeSetCb = () => {
-      this.continuePreSet = true;
+      this.continueChange = true;
     };
 
     this.initCb = () => {
@@ -159,32 +158,19 @@ export default class CodeMirror extends React.Component<ICodeMirror, any> {
 
     Object.keys(props.options || {}).forEach(key => this.editor.setOption(key, props.options[key]));
 
-    if (this.props.editorDidConfigure) {
-      this.props.editorDidConfigure(this.editor);
-    }
-
     if (!this.hydrated) {
 
-      let lastLine = this.editor.lastLine();
-      let lastChar = this.editor.getLine(this.editor.lastLine()).length;
-
-      this.editor.replaceRange(props.value || '',
-        {line: 0, ch: 0},
-        {line: lastLine, ch: lastChar});
-
-      if (this.props.onBeforeSet) {
-        this.props.onBeforeSet(this.editor, this.onBeforeSetCb);
-      }
-
-      if (this.props.onBeforeSet) {
-
-        if (this.continuePreSet && this.props.onSet) {
-
-          this.props.onSet(this.editor, this.editor.getValue());
-        }
+      if (!this.mounted) {
+        this.initChange(props.value || '');
       } else {
-        if (this.props.onSet) {
-          this.props.onSet(this.editor, this.editor.getValue());
+        if (this.props.controlled) {
+          if (this.deferred) {
+            this.resolveChange();
+          } else {
+            this.initChange(props.value || '');
+          }
+        } else {
+          this.initChange(props.value || '');
         }
       }
     }
@@ -192,10 +178,46 @@ export default class CodeMirror extends React.Component<ICodeMirror, any> {
     this.hydrated = true;
   }
 
-  // ---------------------------------------------------------------------------------------
+  /** @internal */
+  private initChange(value) {
+
+    this.emulating = true;
+
+    this.editor.setValue(value);
+    this.mirror.setValue(value);
+    this.editor.clearHistory();
+    this.mirror.clearHistory();
+
+    this.emulating = false;
+  }
+
+  /** @internal */
+  private resolveChange() {
+
+    this.editor.operation(() => {
+
+      this.emulating = true;
+
+      this.editor.replaceRange(this.deferred.text.join('\n'), this.deferred.from, this.deferred.to, this.deferred.origin);
+
+      this.emulating = false;
+    });
+
+    this.deferred = null;
+  }
+
+  /** @internal */
+  private mirrorChange(deferred) {
+
+    this.mirror.replaceRange(deferred.text, deferred.from, deferred.to, deferred.origin);
+
+    return this.mirror.getValue();
+  }
 
   /** @internal */
   public componentWillMount() {
+
+
     if (this.props.editorWillMount) {
       this.props.editorWillMount();
     }
@@ -212,22 +234,62 @@ export default class CodeMirror extends React.Component<ICodeMirror, any> {
 
     this.editor = codemirror(this.ref) as IInstance;
 
+    this.mirror = (codemirror as any)(() => {
+    });
+
     this.editor.on('beforeChange', (cm, data) => {
-      if (this.props.onBeforeChange && this.hydrated) {
-        this.props.onBeforeChange(this.editor, data, this.onBeforeChangeCb);
+
+      if (this.props.controlled) {
+
+        if (this.emulating) {
+          return;
+        }
+
+        if (data.origin === 'undo') {
+          return;
+        }
+
+        if (data.origin === 'redo') {
+          return;
+        }
+
+        data.cancel();
+
+        this.deferred = data;
+
+        let phantomChange = this.mirrorChange(this.deferred);
+
+        if (this.props.onBeforeChange)
+          this.props.onBeforeChange(this.editor, this.deferred, phantomChange);
+
+      } else {
+
+        // uncontrolled
+        if (this.props.onBeforeChange) {
+          this.props.onBeforeChange(this.editor, data, null, this.onBeforeChangeCb)
+        }
       }
     });
 
     this.editor.on('change', (cm, data) => {
 
-      if (this.props.onChange && this.hydrated) {
+      if (!this.mounted) {
+        return;
+      }
 
+      if (this.props.controlled) {
+        if (this.props.onChange) {
+          this.props.onChange(this.editor, data, this.editor.getValue());
+        }
+      } else {
         if (this.props.onBeforeChange) {
-          if (this.continuePreChange) {
-            this.props.onChange(this.editor, data, this.editor.getValue());
+          if (this.continueChange) {
+            this.props.onChange(this.editor, data, this.editor.getValue())
+          } else {
+            return;
           }
         } else {
-          this.props.onChange(this.editor, data, this.editor.getValue());
+          this.props.onChange(this.editor, data, this.editor.getValue())
         }
       }
     });
@@ -341,8 +403,10 @@ export default class CodeMirror extends React.Component<ICodeMirror, any> {
       this.editor.scrollTo(this.props.scroll.x, this.props.scroll.y);
     }
 
+    this.mounted = true;
+
     if (this.props.editorDidMount) {
-      this.props.editorDidMount(this.editor, this.initCb);
+      this.props.editorDidMount(this.editor, this.editor.getValue(), this.initCb);
     }
   }
 
@@ -351,9 +415,13 @@ export default class CodeMirror extends React.Component<ICodeMirror, any> {
 
     let cursorPos: codemirror.Position;
 
-    if (this.props.value !== nextProps.value) {
+    //this.hydrated = false;
+
+    // TODO WTF!
+
+    //if (this.props.value !== nextProps.value) {
       this.hydrated = false;
-    }
+   // }
 
     if (!this.props.autoCursor && this.props.autoCursor !== undefined) {
       cursorPos = this.editor.getCursor();
@@ -368,6 +436,7 @@ export default class CodeMirror extends React.Component<ICodeMirror, any> {
 
   /** @internal */
   public componentWillUnmount() {
+
 
     if (this.props.editorWillUnmount) {
       this.props.editorWillUnmount(codemirror);

@@ -19,14 +19,13 @@ var CodeMirror = (function (_super) {
         if (_this.props.autoScrollCursorOnSet !== undefined || _this.props.resetCursorOnSet !== undefined) {
             _this.notifyOfDeprecation();
         }
+        _this.mounted = false;
         _this.hydrated = false;
-        _this.continuePreSet = false;
-        _this.continuePreChange = false;
+        _this.continueChange = false;
+        _this.deferred = null;
+        _this.emulating = false;
         _this.onBeforeChangeCb = function () {
-            _this.continuePreChange = true;
-        };
-        _this.onBeforeSetCb = function () {
-            _this.continuePreSet = true;
+            _this.continueChange = true;
         };
         _this.initCb = function () {
             if (_this.props.editorDidConfigure) {
@@ -67,28 +66,46 @@ var CodeMirror = (function (_super) {
     CodeMirror.prototype.hydrate = function (props) {
         var _this = this;
         Object.keys(props.options || {}).forEach(function (key) { return _this.editor.setOption(key, props.options[key]); });
-        if (this.props.editorDidConfigure) {
-            this.props.editorDidConfigure(this.editor);
-        }
         if (!this.hydrated) {
-            var lastLine = this.editor.lastLine();
-            var lastChar = this.editor.getLine(this.editor.lastLine()).length;
-            this.editor.replaceRange(props.value || '', { line: 0, ch: 0 }, { line: lastLine, ch: lastChar });
-            if (this.props.onBeforeSet) {
-                this.props.onBeforeSet(this.editor, this.onBeforeSetCb);
-            }
-            if (this.props.onBeforeSet) {
-                if (this.continuePreSet && this.props.onSet) {
-                    this.props.onSet(this.editor, this.editor.getValue());
-                }
+            if (!this.mounted) {
+                this.initChange(props.value || '');
             }
             else {
-                if (this.props.onSet) {
-                    this.props.onSet(this.editor, this.editor.getValue());
+                if (this.props.controlled) {
+                    if (this.deferred) {
+                        this.resolveChange();
+                    }
+                    else {
+                        this.initChange(props.value || '');
+                    }
+                }
+                else {
+                    this.initChange(props.value || '');
                 }
             }
         }
         this.hydrated = true;
+    };
+    CodeMirror.prototype.initChange = function (value) {
+        this.emulating = true;
+        this.editor.setValue(value);
+        this.mirror.setValue(value);
+        this.editor.clearHistory();
+        this.mirror.clearHistory();
+        this.emulating = false;
+    };
+    CodeMirror.prototype.resolveChange = function () {
+        var _this = this;
+        this.editor.operation(function () {
+            _this.emulating = true;
+            _this.editor.replaceRange(_this.deferred.text.join('\n'), _this.deferred.from, _this.deferred.to, _this.deferred.origin);
+            _this.emulating = false;
+        });
+        this.deferred = null;
+    };
+    CodeMirror.prototype.mirrorChange = function (deferred) {
+        this.mirror.replaceRange(deferred.text, deferred.from, deferred.to, deferred.origin);
+        return this.mirror.getValue();
     };
     CodeMirror.prototype.componentWillMount = function () {
         if (this.props.editorWillMount) {
@@ -103,16 +120,47 @@ var CodeMirror = (function (_super) {
             }
         }
         this.editor = codemirror(this.ref);
+        this.mirror = codemirror(function () {
+        });
         this.editor.on('beforeChange', function (cm, data) {
-            if (_this.props.onBeforeChange && _this.hydrated) {
-                _this.props.onBeforeChange(_this.editor, data, _this.onBeforeChangeCb);
+            if (_this.props.controlled) {
+                if (_this.emulating) {
+                    return;
+                }
+                if (data.origin === 'undo') {
+                    return;
+                }
+                if (data.origin === 'redo') {
+                    return;
+                }
+                data.cancel();
+                _this.deferred = data;
+                var phantomChange = _this.mirrorChange(_this.deferred);
+                if (_this.props.onBeforeChange)
+                    _this.props.onBeforeChange(_this.editor, _this.deferred, phantomChange);
+            }
+            else {
+                if (_this.props.onBeforeChange) {
+                    _this.props.onBeforeChange(_this.editor, data, null, _this.onBeforeChangeCb);
+                }
             }
         });
         this.editor.on('change', function (cm, data) {
-            if (_this.props.onChange && _this.hydrated) {
+            if (!_this.mounted) {
+                return;
+            }
+            if (_this.props.controlled) {
+                if (_this.props.onChange) {
+                    _this.props.onChange(_this.editor, data, _this.editor.getValue());
+                }
+            }
+            else {
                 if (_this.props.onBeforeChange) {
-                    if (_this.continuePreChange) {
+                    if (_this.continueChange) {
                         _this.props.onChange(_this.editor, data, _this.editor.getValue());
+                    }
+                    else {
+                        return;
                     }
                 }
                 else {
@@ -206,15 +254,14 @@ var CodeMirror = (function (_super) {
         if (this.props.scroll) {
             this.editor.scrollTo(this.props.scroll.x, this.props.scroll.y);
         }
+        this.mounted = true;
         if (this.props.editorDidMount) {
-            this.props.editorDidMount(this.editor, this.initCb);
+            this.props.editorDidMount(this.editor, this.editor.getValue(), this.initCb);
         }
     };
     CodeMirror.prototype.componentWillReceiveProps = function (nextProps) {
         var cursorPos;
-        if (this.props.value !== nextProps.value) {
-            this.hydrated = false;
-        }
+        this.hydrated = false;
         if (!this.props.autoCursor && this.props.autoCursor !== undefined) {
             cursorPos = this.editor.getCursor();
         }

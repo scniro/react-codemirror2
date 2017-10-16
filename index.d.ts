@@ -27,16 +27,15 @@ export interface ICodeMirror {
     defineMode?: IDefineModeOptions;
     editorDidConfigure?: (editor: IInstance) => void;
     cursor?: codemirror.Position;
-    onSet?: (editor: IInstance, value: string) => void;
-    onBeforeSet?: (editor: IInstance, cb: () => void) => void;
+    controlled?: boolean;
     autoScroll?: boolean;
     autoFocus?: boolean;
     autoCursor?: boolean;
     scroll?: ISetScrollOptions;
     selection?: Array<ISetSelectionOptions>;
     onGutterClick?: (editor: IInstance, lineNumber: number, gutter: string, event: Event) => void;
-    onBeforeChange?: (editor: IInstance, data: codemirror.EditorChange, cb: () => void) => void;
     onChange?: (editor: IInstance, data: codemirror.EditorChange, value: string) => void;
+    onBeforeChange?: (editor: IInstance, data: codemirror.EditorChange, value: string, next?: () => void) => void;
     onCursor?: (editor: IInstance, data: codemirror.Position) => void;
     onScroll?: (editor: IInstance, data: codemirror.ScrollInfo) => void;
     onDrop?: (editor: IInstance, event: Event) => void;
@@ -51,7 +50,7 @@ export interface ICodeMirror {
     onFocus?: (editor: IInstance, event: Event) => void;
     onCursorActivity?: (editor: IInstance) => void;
     onViewportChange?: (editor: IInstance, start: number, end: number) => void;
-    editorDidMount?: (editor: IInstance, cb: () => void) => void;
+    editorDidMount?: (editor: IInstance, value: string, cb: () => void) => void;
     editorWillMount?: () => void;
     editorWillUnmount?: (lib: any) => void;
     autoScrollCursorOnSet?: boolean;

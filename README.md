@@ -54,7 +54,7 @@ require('codemirror/mode/javascript/javascript');
 - `autoCursor`
 > `boolean` if `false`, allow the defaulted internal codemirror cursor position to reset should a new `value` prop be set. Default: `true`
 - `autoFocus`
-> `boolean` if `true`, set focus to the instance `onSet`. Default: `false`
+> `boolean` if `true`, set focus to the instance `onSet`. Will be invoked within the `componentDidMount` lifecycle stage. Default: `false`
 - `autoScroll`
 > `boolean` if `true`, scroll the cursor position into view automatically. Default: `false`
 - `className` - sets `class="react-codemirror2 yourClassName"`
@@ -110,14 +110,14 @@ require('codemirror/mode/javascript/javascript');
 > calling optional `next()` will trigger `editorDidConfigure`
 - `editorWillMount()`
 - `editorWillUnmount(editor)`
-- `onBeforeChange(editor, changeObj, next)`
+- `onBeforeChange(editor, next)`
 > if defined, `next()` must be invoked to trigger `onChange`
-- `onBeforeSet(editor, next)`
-> if defined, `next()` must be invoked to trigger `onSet`
-- `onChange(editor, data, value)`
-> returns value of the editor if changed internally (not via `props#value`)
-- `onSet(editor, value)`
+- `onBeforeChangeInternal(editor, data, next)`
+> if defined, `next()` must be invoked to trigger `onChangeInternal`
+- `onChange(editor, value)`
 > returns the value set via `props#value`
+- `onChangeInternal(editor, data, value)`
+> returns value and the [change `object`](https://codemirror.net/doc/manual.html#event_change) of the editor if changed internally (not via `props#value`)
 
 ## events cont. [wrapped codemirror events](https://codemirror.net/doc/manual.html#events)
 

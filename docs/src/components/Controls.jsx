@@ -1,8 +1,17 @@
 import React from 'react';
 import {connect} from 'react-redux';
+import Toggle from './Toggle.jsx';
 import * as actions from '../actions';
 
 class Controls extends React.Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      controlled: false
+    }
+  }
 
   onThemeSelect(e) {
 
@@ -12,6 +21,13 @@ class Controls extends React.Component {
   onModeSelect(e) {
 
     this.props.dispatch(actions.toggleMode(e.target.value));
+  }
+
+  onToggleState(value) {
+
+    let controlled = value === 'CONTROLLED';
+
+    this.props.onToggleState(controlled);
   }
 
   render() {
@@ -28,6 +44,12 @@ class Controls extends React.Component {
           <option value='javascript'>javascript</option>
           <option value='strings'>strings (custom)</option>
         </select>
+
+        <Toggle className='state-control'
+                left='CONTROLLED'
+                right='UNCONTROLLED'
+                checked={this.state.controlled}
+                onChange={this.onToggleState.bind(this)}/>
       </div>
     )
   }

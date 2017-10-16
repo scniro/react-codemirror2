@@ -32,7 +32,7 @@ let sampleMode = () => {
       }
     }
   };
-}
+};
 
 class Editor extends React.Component {
 
@@ -46,41 +46,93 @@ class Editor extends React.Component {
     this.defaultJS = jBeautify(exampleJS, {indent_size: 2});
 
     this.exampleCustomModeStrings = 'only "double quotes" will be tokenized\n\nsee http://marijnhaverbeke.nl/blog/codemirror-mode-system.html'
+    this.state = {
+      value: this.defaultHTML
+    };
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+
+    if (this.props.controlled && !prevProps.controlled) {
+      this.setControlledValue(this.props.mode);
+    }
+
+    if (this.props.controlled && (this.props.mode !== prevProps.mode)) {
+      this.setControlledValue(this.props.mode);
+    }
+  }
+
+  setControlledValue(mode) {
+    switch (mode) {
+      case 'xml':
+        this.setState({value: this.defaultHTML});
+        break;
+      case 'javascript':
+        this.setState({value: this.defaultJS});
+        break;
+      case 'strings':
+        this.setState({value: this.exampleCustomModeStrings});
+        break;
+    }
+  }
+
+  getUncontrolledValue(mode) {
+    switch (mode) {
+      case 'xml':
+        return this.defaultHTML;
+        break;
+      case 'javascript':
+        return this.defaultJS;
+        break;
+      case 'strings':
+        return this.exampleCustomModeStrings;
+        break;
+    }
+  }
+
+  renderEditor(controlled) {
+
+    if (controlled) {
+      return (
+        <CodeMirror
+          value={this.state.value}
+          controlled={true}
+          defineMode={{name: 'strings', fn: sampleMode}}
+          options={{
+            mode: this.props.mode,
+            theme: this.props.theme,
+            lineNumbers: true
+          }}
+          onBeforeChange={(editor, data, value, next) => {
+            this.setState({value});
+          }}
+          onChange={(editor, data, value) => {
+            console.log('onChange#setState', {value});
+          }}
+        />
+      )
+    } else {
+      return (
+        <CodeMirror
+          value={this.getUncontrolledValue(this.props.mode)}
+          defineMode={{name: 'strings', fn: sampleMode}}
+          options={{
+            mode: this.props.mode,
+            theme: this.props.theme,
+            lineNumbers: true
+          }}
+          onChange={(editor, data, value) => {
+            console.log('onChange', {value});
+          }}
+        />
+      )
+    }
   }
 
   render() {
 
-    let value = '';
 
-    switch (this.props.mode) {
-      case 'xml':
-        value = this.defaultHTML;
-        break;
-      case 'javascript':
-        value = this.defaultJS;
-        break;
-      case 'strings':
-        value = this.exampleCustomModeStrings;
-        break;
-    }
-
-    return (
-      <CodeMirror
-        value={value}
-        defineMode={{name: 'strings', fn: sampleMode}}
-        options={{
-          mode: this.props.mode,
-          theme: this.props.theme,
-          lineNumbers: true,
-        }}
-        onSet={(editor, value) => {
-          console.log('onSet', {value});
-        }}
-        onChange={(editor, metadata, value) => {
-          console.log('onChange', {value});
-        }}
-      />
-    )
+    return this.renderEditor(this.props.controlled)
   }
 }
 
