@@ -2,66 +2,93 @@ import * as React from 'react';
 import * as Adapter from 'enzyme-adapter-react-16';
 import * as Enzyme from 'enzyme';
 import * as sinon from 'sinon';
-import CodeMirror from '../src';
+
+import {Controlled, UnControlled} from '../src';
 
 Enzyme.configure({adapter: new Adapter()});
 
-// todo investigate portal testing with library rendered (codemirror) instance
-describe('CodeMirror: init', () => {
+describe('[Controlled, UnControlled]: init', () => {
 
   it('should render | props: {}', () => {
 
-    let mounted = Enzyme.shallow(<CodeMirror/>);
+    let uncontrolled = Enzyme.shallow(<UnControlled/>);
+    let controlled = Enzyme.shallow(<Controlled/>);
 
-    expect.anything(mounted);
-    expect.anything(mounted.html())
+    expect.anything(controlled.html());
+    expect.anything(uncontrolled.html());
   });
 });
 
-describe('CodeMirror: editorWillMount', () => {
+describe('[Controlled, UnControlled]: editorWillMount', () => {
 
   it('editorWillMount(editor, next)', () => {
 
-    let mounted;
+    let uMounted, cMounted;
 
     Enzyme.shallow(
-      <CodeMirror
+      <UnControlled
         editorWillMount={() => {
-          mounted = true;
+          uMounted = true;
         }}
         editorDidMount={(editor, next) => {
-          expect(mounted).toBe(true);
+          expect(uMounted).toBe(true);
+        }}/>
+    );
+
+    Enzyme.shallow(
+      <Controlled
+        editorWillMount={() => {
+          cMounted = true;
+        }}
+        editorDidMount={(editor, next) => {
+          expect(cMounted).toBe(true);
         }}/>
     );
   });
 });
 
-describe('CodeMirror: editorDidConfigure', () => {
+describe('[Controlled, UnControlled]: editorDidConfigure', () => {
 
   it('editorDidConfigure(editor)', () => {
 
-    let configured, callback;
+    let uConfigured, uCallback, cContigured, cCallback;
 
-    let wrapper = Enzyme.shallow(
-      <CodeMirror
-        editorDidMount={(editor, next) => {
-          callback = sinon.spy(next);
-          callback();
+    let uWrapper = Enzyme.shallow(
+      <UnControlled
+        editorDidMount={(editor, value, next) => {
+          uCallback = sinon.spy(next);
+          uCallback();
         }}
         editorDidConfigure={(editor) => {
-          configured = true;
+          uConfigured = true;
         }}
         editorWillUnmount={(editor) => {
-          expect(configured).toBe(true);
-          expect(callback.called).toBe(true);
+          expect(uConfigured).toBe(true);
+          expect(uCallback.called).toBe(true);
         }}/>
     );
 
-    wrapper.unmount();
+    let cWrapper = Enzyme.shallow(
+      <Controlled
+        editorDidMount={(editor, value, next) => {
+          uCallback = sinon.spy(next);
+          uCallback();
+        }}
+        editorDidConfigure={(editor) => {
+          uConfigured = true;
+        }}
+        editorWillUnmount={(editor) => {
+          expect(uConfigured).toBe(true);
+          expect(uCallback.called).toBe(true);
+        }}/>
+    );
+
+    uWrapper.unmount();
+    cWrapper.unmount();
   });
 });
 
-describe('CodeMirror: defineMode', () => {
+describe('[Controlled, UnControlled]: defineMode', () => {
 
   it('defineMode', () => {
 
@@ -78,23 +105,32 @@ describe('CodeMirror: defineMode', () => {
       }
     };
 
-    let wrapper = Enzyme.shallow(
-      <CodeMirror
+    let uWrapper = Enzyme.shallow(
+      <UnControlled
         defineMode={mode}
         editorDidMount={(editor, next) => {
           expect(editor.doc.mode.name).toBe('testMode');
         }}/>
-    )
+    );
 
-    wrapper.unmount();
+    let cWrapper = Enzyme.shallow(
+      <Controlled
+        defineMode={mode}
+        editorDidMount={(editor, next) => {
+          expect(editor.doc.mode.name).toBe('testMode');
+        }}/>
+    );
+
+    cWrapper.unmount();
+    uWrapper.unmount();
   });
 });
 
-describe('CodeMirror: onChange', () => {
+describe('UnControlled: onChange', () => {
 
   it('onChange(editor, value)', () => {
     Enzyme.shallow(
-      <CodeMirror
+      <UnControlled
         value='foo'
         onChange={(editor, value) => {
           expect.anything(editor);
@@ -104,16 +140,16 @@ describe('CodeMirror: onChange', () => {
   });
 });
 
-describe('CodeMirror: onBeforeChange', () => {
+describe('UnControlled: onBeforeChange', () => {
 
   it('onBeforeChange(editor, value)', () => {
 
     let callback;
 
     let wrapper = Enzyme.shallow(
-      <CodeMirror
+      <UnControlled
         value='foo'
-        onBeforeChange={(editor, next) => {
+        onBeforeChange={(editor, data, value, next) => {
           callback = sinon.spy(next);
           callback();
         }}
