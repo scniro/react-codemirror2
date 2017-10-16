@@ -21,13 +21,11 @@ export interface IDoc extends codemirror.Doc {
 export interface IInstance extends codemirror.Editor, IDoc {
 }
 export interface ICodeMirror {
-    value?: string;
     options?: codemirror.EditorConfiguration;
     className?: string;
     defineMode?: IDefineModeOptions;
     editorDidConfigure?: (editor: IInstance) => void;
     cursor?: codemirror.Position;
-    controlled?: boolean;
     autoScroll?: boolean;
     autoFocus?: boolean;
     autoCursor?: boolean;
@@ -35,7 +33,6 @@ export interface ICodeMirror {
     selection?: Array<ISetSelectionOptions>;
     onGutterClick?: (editor: IInstance, lineNumber: number, gutter: string, event: Event) => void;
     onChange?: (editor: IInstance, data: codemirror.EditorChange, value: string) => void;
-    onBeforeChange?: (editor: IInstance, data: codemirror.EditorChange, value: string, next?: () => void) => void;
     onCursor?: (editor: IInstance, data: codemirror.Position) => void;
     onScroll?: (editor: IInstance, data: codemirror.ScrollInfo) => void;
     onDrop?: (editor: IInstance, event: Event) => void;
@@ -56,5 +53,15 @@ export interface ICodeMirror {
     autoScrollCursorOnSet?: boolean;
     resetCursorOnSet?: boolean;
 }
-export default class CodeMirror extends React.Component<ICodeMirror, any> {
+export interface IControlledCodeMirror extends ICodeMirror {
+    value: string;
+    onBeforeChange: (editor: IInstance, data: codemirror.EditorChange, value: string) => void;
+}
+export interface IUnControlledCodeMirror extends ICodeMirror {
+    value?: string;
+    onBeforeChange?: (editor: IInstance, data: codemirror.EditorChange, value: string, next: () => void) => void;
+}
+export declare class Controlled extends React.Component<IControlledCodeMirror, any> {
+}
+export declare class UnControlled extends React.Component<IUnControlledCodeMirror, any> {
 }

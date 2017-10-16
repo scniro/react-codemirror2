@@ -14,20 +14,16 @@ require('codemirror/theme/neat.css');
 require('codemirror/mode/xml/xml.js');
 require('codemirror/mode/javascript/javascript.js');
 
-import 'Codemirror' from 'react-codemirror2';
+import {Controlled as Codemirror} from 'react-codemirror2';
 
 <CodeMirror
   value={this.state.value}
-  options={{
-    mode: this.mode
-    theme: this.theme,
-    lineNumbers: true
-  }}
+  options={options}
   onBeforeChange={(editor, data, value) => {
     this.setState({value});
   }}
   onChange={(editor, value) => {
-    console.log('onChange#setState', {value});
+    console.log('onChange', {value});
   }}
 />`.trim();
 
@@ -38,15 +34,11 @@ require('codemirror/theme/neat.css');
 require('codemirror/mode/xml/xml.js');
 require('codemirror/mode/javascript/javascript.js');
 
-import 'Codemirror' from 'react-codemirror2';
+import {UnControlled as Codemirror} from 'react-codemirror2';
 
 <CodeMirror
-  value={this.value}
-  options={{
-    mode: this.mode
-    theme: this.theme,
-    lineNumbers: true
-  }}
+  value={value}
+  options={options}
   onChange={(editor, value) => {
     console.log('onChange', {value});
   }}

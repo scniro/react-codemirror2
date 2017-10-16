@@ -1,6 +1,8 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import CodeMirror from '../../../index.js';
+
+import {Controlled} from '../../../index.js'
+import {UnControlled} from '../../../index.js'
 
 let jBeautify = require('js-beautify').js;
 let hBeautify = require('js-beautify').html;
@@ -94,26 +96,25 @@ class Editor extends React.Component {
 
     if (controlled) {
       return (
-        <CodeMirror
+        <Controlled
           value={this.state.value}
-          controlled={true}
           defineMode={{name: 'strings', fn: sampleMode}}
           options={{
             mode: this.props.mode,
             theme: this.props.theme,
             lineNumbers: true
           }}
-          onBeforeChange={(editor, data, value, next) => {
+          onBeforeChange={(editor, data, value) => {
             this.setState({value});
           }}
           onChange={(editor, data, value) => {
-            console.log('onChange#setState', {value});
+            console.log('onChange', {value});
           }}
         />
       )
     } else {
       return (
-        <CodeMirror
+        <UnControlled
           value={this.getUncontrolledValue(this.props.mode)}
           defineMode={{name: 'strings', fn: sampleMode}}
           options={{
@@ -130,8 +131,6 @@ class Editor extends React.Component {
   }
 
   render() {
-
-
     return this.renderEditor(this.props.controlled)
   }
 }
