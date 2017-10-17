@@ -18,8 +18,8 @@ if (!IS_MOBILE) {
 }
 
 export interface IDefineModeOptions {
-  name: string;
   fn: () => codemirror.Mode<any>;
+  name: string;
 }
 
 export interface ISetScrollOptions {
@@ -33,98 +33,224 @@ export interface ISetSelectionOptions {
 }
 
 export interface IDoc extends codemirror.Doc {
-  // tshack: `setSelections` missing in @types/codemirror
-  setSelections: (ranges: Array<ISetSelectionOptions>) => void;
-  // tshack: `setCursor` has incorrect/missing overloaded signature in @types/codemirror
+  /* tshack: `setCursor` has incorrect/missing overloaded signature in @types/codemirror */
   setCursor: (pos: codemirror.Position, ch?: number, options?: {}) => void;
+  /* tshack: `setSelections` missing in @types/codemirror */
+  setSelections: (ranges: Array<ISetSelectionOptions>) => void;
 }
 
 export interface IInstance extends codemirror.Editor, IDoc {
 }
 
 export interface ICodeMirror {
-  options?: codemirror.EditorConfiguration
+
+  autoCursor?: boolean; // default: true
+  autoFocus?: boolean; // default: false
+  autoScroll?: boolean; // default: false
   className?: string;
+  cursor?: codemirror.Position;
   defineMode?: IDefineModeOptions;
   editorDidConfigure?: (editor: IInstance) => void;
-  cursor?: codemirror.Position;
-  autoScroll?: boolean; // default: false
-  autoFocus?: boolean; // default: false
-  autoCursor?: boolean; // default: true
-  scroll?: ISetScrollOptions;
-  selection?: Array<ISetSelectionOptions>;
-  onGutterClick?: (editor: IInstance, lineNumber: number, gutter: string, event: Event) => void;
-  onChange?: (editor: IInstance, data: codemirror.EditorChange, value: string) => void;
-  onCursor?: (editor: IInstance, data: codemirror.Position) => void;
-  onScroll?: (editor: IInstance, data: codemirror.ScrollInfo) => void;
-  onDrop?: (editor: IInstance, event: Event) => void;
-  onDragOver?: (editor: IInstance, event: Event) => void;
-  onDragEnter?: (editor: IInstance, event: Event) => void;
-  onSelection?: (editor: IInstance, ranges: ISetSelectionOptions) => void;
-  onKeyPress?: (editor: IInstance, event: Event) => void;
-  onKeyDown?: (editor: IInstance, event: Event) => void;
-  onKeyUp?: (editor: IInstance, event: Event) => void;
-  onUpdate?: (editor: IInstance) => void;
-  onBlur?: (editor: IInstance, event: Event) => void;
-  onFocus?: (editor: IInstance, event: Event) => void;
-  onCursorActivity?: (editor: IInstance) => void;
-  onViewportChange?: (editor: IInstance, start: number, end: number) => void;
   editorDidMount?: (editor: IInstance, value: string, cb: () => void) => void;
   editorWillMount?: () => void;
   editorWillUnmount?: (lib: any) => void;
-  //deprecated: temporary
+  onBlur?: (editor: IInstance, event: Event) => void;
+  onChange?: (editor: IInstance, data: codemirror.EditorChange, value: string) => void;
+  onCursor?: (editor: IInstance, data: codemirror.Position) => void;
+  onCursorActivity?: (editor: IInstance) => void;
+  onDragEnter?: (editor: IInstance, event: Event) => void;
+  onDragOver?: (editor: IInstance, event: Event) => void;
+  onDrop?: (editor: IInstance, event: Event) => void;
+  onFocus?: (editor: IInstance, event: Event) => void;
+  onGutterClick?: (editor: IInstance, lineNumber: number, gutter: string, event: Event) => void;
+  onKeyDown?: (editor: IInstance, event: Event) => void;
+  onKeyPress?: (editor: IInstance, event: Event) => void;
+  onKeyUp?: (editor: IInstance, event: Event) => void;
+  onScroll?: (editor: IInstance, data: codemirror.ScrollInfo) => void;
+  onSelection?: (editor: IInstance, ranges: ISetSelectionOptions) => void;
+  onUpdate?: (editor: IInstance) => void;
+  onViewportChange?: (editor: IInstance, start: number, end: number) => void;
+  options?: codemirror.EditorConfiguration
+  selection?: Array<ISetSelectionOptions>;
+  scroll?: ISetScrollOptions;
+  /* <deprecated> */
   autoScrollCursorOnSet?: boolean;
-  //deprecated: temporary
   resetCursorOnSet?: boolean;
+  /* </deprecated> */
 }
 
 export interface IControlledCodeMirror extends ICodeMirror {
-  value: string;
   onBeforeChange: (editor: IInstance, data: codemirror.EditorChange, value: string) => void;
+  value: string;
 }
 
 export interface IUnControlledCodeMirror extends ICodeMirror {
-  value?: string;
   onBeforeChange?: (editor: IInstance, data: codemirror.EditorChange, value: string, next: () => void) => void;
+  value?: string;
+}
+
+declare interface ICommon {
+  wire: (name: string) => void;
+  notifyOfDeprecation: () => void;
+}
+
+class Shared implements ICommon {
+
+  private editor: IInstance;
+  private props: ICodeMirror;
+
+  constructor(editor, props) {
+
+    this.editor = editor;
+    this.props = props;
+
+    this.notifyOfDeprecation();
+  }
+
+  public notifyOfDeprecation() {
+    if (this.props.autoScrollCursorOnSet !== undefined) {
+      console.warn('`autoScrollCursorOnSet` has been deprecated. Use `autoScroll` instead\n\nSee https://github.com/scniro/react-codemirror2#props')
+    }
+
+    if (this.props.resetCursorOnSet !== undefined) {
+      console.warn('`resetCursorOnSet` has been deprecated. Use `autoCursor` instead\n\nSee https://github.com/scniro/react-codemirror2#props')
+    }
+  }
+
+  public wire(name: string) {
+
+    switch (name) {
+      case 'blur': {
+        (this.editor as any).on('onBlur', (cm, event) => {
+          this.props.onBlur(this.editor, event);
+        });
+      }
+        break;
+      case 'onCursor': {
+        this.editor.on('cursorActivity', (cm) => {
+          this.props.onCursor(this.editor, this.editor.getCursor());
+        });
+      }
+        break;
+      case 'onCursorActivity': {
+        this.editor.on('cursorActivity', (cm) => {
+          this.props.onCursorActivity(this.editor);
+        });
+      }
+        break;
+      case 'onDragEnter': {
+        this.editor.on('dragenter', (cm, event) => {
+          this.props.onDragEnter(this.editor, event);
+        });
+      }
+        break;
+      case 'onDragOver': {
+        this.editor.on('dragover', (cm, event) => {
+          this.props.onDragOver(this.editor, event);
+        });
+      }
+        break;
+      case 'onDrop': {
+        this.editor.on('drop', (cm, event) => {
+          this.props.onDrop(this.editor, event);
+        });
+      }
+        break;
+      case 'onFocus': {
+        (this.editor as any).on('focus', (cm, event) => {
+          this.props.onFocus(this.editor, event);
+        });
+      }
+        break;
+      case 'onGutterClick': {
+        this.editor.on('gutterClick', (cm, lineNumber, gutter, event) => {
+          this.props.onGutterClick(this.editor, lineNumber, gutter, event);
+        });
+      }
+        break;
+      case 'onKeyDown': {
+        this.editor.on('keydown', (cm, event) => {
+          this.props.onKeyDown(this.editor, event);
+        });
+      }
+        break;
+      case 'onKeyPress': {
+        this.editor.on('keypress', (cm, event) => {
+          this.props.onKeyPress(this.editor, event);
+        });
+      }
+        break;
+      case 'onKeyUp': {
+        this.editor.on('keyup', (cm, event) => {
+          this.props.onKeyUp(this.editor, event);
+        });
+      }
+        break;
+      case 'onScroll': {
+        this.editor.on('scroll', (cm) => {
+          this.props.onScroll(this.editor, this.editor.getScrollInfo());
+        });
+      }
+        break;
+      case 'onSelection': {
+        this.editor.on('beforeSelectionChange', (cm, data) => {
+          this.props.onSelection(this.editor, data);
+        });
+      }
+        break;
+      case 'onUpdate': {
+        this.editor.on('update', (cm) => {
+          this.props.onUpdate(this.editor);
+        });
+      }
+        break;
+      case 'onViewportChange': {
+        this.editor.on('viewportChange', (cm, from, to) => {
+          this.props.onViewportChange(this.editor, from, to);
+        });
+      }
+        break;
+      default: {
+        break;
+      }
+    }
+  }
 }
 
 export class Controlled extends React.Component<IControlledCodeMirror, any> {
 
   /** @internal */
-  private ref: HTMLElement;
+  private deferred: any;
   /** @internal */
   private editor: IInstance;
+  /** @internal */
+  private emulating: boolean;
   /** @internal */
   private hydrated: boolean;
   /** @internal */
   private initCb: () => void;
   /** @internal */
-  private mounted: boolean;
-  /** @internal */
   private mirror: any;
   /** @internal */
-  private deferred: any;
+  private mounted: boolean;
   /** @internal */
-  private emulating: boolean;
+  private ref: HTMLElement;
+  /** @internal */
+  private shared: Shared;
 
   /** @internal */
   constructor(props: IControlledCodeMirror) {
     super(props);
 
-    if (this.props.autoScrollCursorOnSet !== undefined || this.props.resetCursorOnSet !== undefined) {
-      this.notifyOfDeprecation();
-    }
-
-    this.mounted = false;
-    this.hydrated = false;
     this.deferred = null;
     this.emulating = false;
-
+    this.hydrated = false;
     this.initCb = () => {
       if (this.props.editorDidConfigure) {
         this.props.editorDidConfigure(this.editor);
       }
-    }
+    };
+    this.mounted = false;
   }
 
   /** @internal */
@@ -152,18 +278,6 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
       doc.setCursor(cursorPos);
     } else {
       doc.setCursor(cursorPos, null, {scroll: false});
-    }
-  }
-
-  /** @internal */
-  private notifyOfDeprecation() {
-
-    if (this.props.autoScrollCursorOnSet !== undefined) {
-      console.warn('`autoScrollCursorOnSet` has been deprecated. Use `autoScroll` instead\n\nSee https://github.com/scniro/react-codemirror2#props')
-    }
-
-    if (this.props.resetCursorOnSet !== undefined) {
-      console.warn('`resetCursorOnSet` has been deprecated. Use `autoCursor` instead\n\nSee https://github.com/scniro/react-codemirror2#props')
     }
   }
 
@@ -245,6 +359,8 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
 
       this.editor = cm(this.ref) as IInstance;
 
+      this.shared = new Shared(this.editor, this.props);
+
       this.mirror = (cm as any)(() => {
       });
 
@@ -283,99 +399,21 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
         }
       });
 
-      if (this.props.onCursorActivity) {
-        this.editor.on('cursorActivity', (cm) => {
-          this.props.onCursorActivity(this.editor);
-        });
-      }
-
-      if (this.props.onViewportChange) {
-        this.editor.on('viewportChange', (cm, from, to) => {
-          this.props.onViewportChange(this.editor, from, to);
-        });
-      }
-
-      if (this.props.onGutterClick) {
-        this.editor.on('gutterClick', (cm, lineNumber, gutter, event) => {
-          this.props.onGutterClick(this.editor, lineNumber, gutter, event);
-        });
-      }
-
-      if (this.props.onFocus) {
-        // tshack: missing `focus` DOM event in @types/codemirror
-        (this.editor as any).on('focus', (cm, event) => {
-          this.props.onFocus(this.editor, event);
-        });
-      }
-
-      if (this.props.onBlur) {
-        // tshack: missing `blur` DOM event in @types/codemirror
-        (this.editor as any).on('blur', (cm, event) => {
-          this.props.onBlur(this.editor, event);
-        });
-      }
-
-      if (this.props.onUpdate) {
-        this.editor.on('update', (cm) => {
-          this.props.onUpdate(this.editor);
-        });
-      }
-
-      if (this.props.onKeyDown) {
-        this.editor.on('keydown', (cm, event) => {
-          this.props.onKeyDown(this.editor, event);
-        });
-      }
-
-      if (this.props.onKeyUp) {
-        this.editor.on('keyup', (cm, event) => {
-          this.props.onKeyUp(this.editor, event);
-        });
-      }
-
-      if (this.props.onKeyPress) {
-        this.editor.on('keypress', (cm, event) => {
-          this.props.onKeyPress(this.editor, event);
-        });
-      }
-
-      if (this.props.onDragEnter) {
-        this.editor.on('dragenter', (cm, event) => {
-          this.props.onDragEnter(this.editor, event);
-        });
-      }
-
-      if (this.props.onDragOver) {
-        this.editor.on('dragover', (cm, event) => {
-          this.props.onDragOver(this.editor, event);
-        });
-      }
-
-      if (this.props.onDrop) {
-        this.editor.on('drop', (cm, event) => {
-          this.props.onDrop(this.editor, event);
-        });
-      }
-
-      if (this.props.onSelection) {
-        this.editor.on('beforeSelectionChange', (cm, data) => {
-          this.props.onSelection(this.editor, data);
-        })
-      }
-
-      if (this.props.onScroll) {
-        this.editor.on('scroll', (cm) => {
-
-          this.props.onScroll(this.editor, this.editor.getScrollInfo());
-        })
-      }
-
-      if (this.props.onCursor) {
-        this.editor.on('cursorActivity', (cm) => {
-
-          this.props.onCursor(this.editor, this.editor.getCursor());
-        })
-      }
+      if (this.props.onBlur) this.shared.wire('onBlur');
+      if (this.props.onCursor) this.shared.wire('onCursor');
+      if (this.props.onCursorActivity) this.shared.wire('onCursorActivity');
+      if (this.props.onDragEnter) this.shared.wire('onDragEnter');
+      if (this.props.onDragOver) this.shared.wire('onDragOver');
+      if (this.props.onDrop) this.shared.wire('onDrop');
+      if (this.props.onFocus) this.shared.wire('onFocus');
+      if (this.props.onGutterClick) this.shared.wire('onGutterClick');
+      if (this.props.onKeyDown) this.shared.wire('onKeyDown');
+      if (this.props.onKeyPress) this.shared.wire('onKeyPress');
+      if (this.props.onKeyUp) this.shared.wire('onKeyUp');
+      if (this.props.onScroll) this.shared.wire('onScroll');
+      if (this.props.onSelection) this.shared.wire('onSelection');
+      if (this.props.onUpdate) this.shared.wire('onUpdate');
+      if (this.props.onViewportChange) this.shared.wire('onViewportChange');
 
       this.hydrate(this.props);
 
@@ -442,39 +480,37 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
 export class UnControlled extends React.Component<IUnControlledCodeMirror, any> {
 
   /** @internal */
-  private ref: HTMLElement;
+  private continueChange: boolean;
   /** @internal */
   private editor: IInstance;
   /** @internal */
   private hydrated: boolean;
   /** @internal */
-  private continueChange: boolean;
-  /** @internal */
-  private onBeforeChangeCb: () => void;
-  /** @internal */
   private initCb: () => void;
   /** @internal */
   private mounted: boolean;
+  /** @internal */
+  private onBeforeChangeCb: () => void;
+  /** @internal */
+  private ref: HTMLElement;
+  /** @internal */
+  private shared: Shared;
 
   /** @internal */
   constructor(props: IUnControlledCodeMirror) {
     super(props);
 
-    if (this.props.autoScrollCursorOnSet !== undefined || this.props.resetCursorOnSet !== undefined) {
-      this.notifyOfDeprecation();
-    }
-
-    this.mounted = false;
-    this.hydrated = false;
     this.continueChange = false;
-    this.onBeforeChangeCb = () => {
-      this.continueChange = true;
-    };
+    this.hydrated = false;
     this.initCb = () => {
       if (this.props.editorDidConfigure) {
         this.props.editorDidConfigure(this.editor);
       }
     }
+    this.mounted = false;
+    this.onBeforeChangeCb = () => {
+      this.continueChange = true;
+    };
   }
 
   /** @internal */
@@ -502,18 +538,6 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
       doc.setCursor(cursorPos);
     } else {
       doc.setCursor(cursorPos, null, {scroll: false});
-    }
-  }
-
-  /** @internal */
-  private notifyOfDeprecation() {
-
-    if (this.props.autoScrollCursorOnSet !== undefined) {
-      console.warn('`autoScrollCursorOnSet` has been deprecated. Use `autoScroll` instead\n\nSee https://github.com/scniro/react-codemirror2#props')
-    }
-
-    if (this.props.resetCursorOnSet !== undefined) {
-      console.warn('`resetCursorOnSet` has been deprecated. Use `autoCursor` instead\n\nSee https://github.com/scniro/react-codemirror2#props')
     }
   }
 
@@ -550,6 +574,8 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
 
       this.editor = cm(this.ref) as IInstance;
 
+      this.shared = new Shared(this.editor, this.props);
+
       this.editor.on('beforeChange', (cm, data) => {
 
         if (this.props.onBeforeChange) {
@@ -574,99 +600,21 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
         }
       });
 
-      if (this.props.onCursorActivity) {
-        this.editor.on('cursorActivity', (cm) => {
-          this.props.onCursorActivity(this.editor);
-        });
-      }
-
-      if (this.props.onViewportChange) {
-        this.editor.on('viewportChange', (cm, from, to) => {
-          this.props.onViewportChange(this.editor, from, to);
-        });
-      }
-
-      if (this.props.onGutterClick) {
-        this.editor.on('gutterClick', (cm, lineNumber, gutter, event) => {
-          this.props.onGutterClick(this.editor, lineNumber, gutter, event);
-        });
-      }
-
-      if (this.props.onFocus) {
-        // tshack: missing `focus` DOM event in @types/codemirror
-        (this.editor as any).on('focus', (cm, event) => {
-          this.props.onFocus(this.editor, event);
-        });
-      }
-
-      if (this.props.onBlur) {
-        // tshack: missing `blur` DOM event in @types/codemirror
-        (this.editor as any).on('blur', (cm, event) => {
-          this.props.onBlur(this.editor, event);
-        });
-      }
-
-      if (this.props.onUpdate) {
-        this.editor.on('update', (cm) => {
-          this.props.onUpdate(this.editor);
-        });
-      }
-
-      if (this.props.onKeyDown) {
-        this.editor.on('keydown', (cm, event) => {
-          this.props.onKeyDown(this.editor, event);
-        });
-      }
-
-      if (this.props.onKeyUp) {
-        this.editor.on('keyup', (cm, event) => {
-          this.props.onKeyUp(this.editor, event);
-        });
-      }
-
-      if (this.props.onKeyPress) {
-        this.editor.on('keypress', (cm, event) => {
-          this.props.onKeyPress(this.editor, event);
-        });
-      }
-
-      if (this.props.onDragEnter) {
-        this.editor.on('dragenter', (cm, event) => {
-          this.props.onDragEnter(this.editor, event);
-        });
-      }
-
-      if (this.props.onDragOver) {
-        this.editor.on('dragover', (cm, event) => {
-          this.props.onDragOver(this.editor, event);
-        });
-      }
-
-      if (this.props.onDrop) {
-        this.editor.on('drop', (cm, event) => {
-          this.props.onDrop(this.editor, event);
-        });
-      }
-
-      if (this.props.onSelection) {
-        this.editor.on('beforeSelectionChange', (cm, data) => {
-          this.props.onSelection(this.editor, data);
-        })
-      }
-
-      if (this.props.onScroll) {
-        this.editor.on('scroll', (cm) => {
-
-          this.props.onScroll(this.editor, this.editor.getScrollInfo());
-        })
-      }
-
-      if (this.props.onCursor) {
-        this.editor.on('cursorActivity', (cm) => {
-
-          this.props.onCursor(this.editor, this.editor.getCursor());
-        })
-      }
+      if (this.props.onBlur) this.shared.wire('onBlur');
+      if (this.props.onCursor) this.shared.wire('onCursor');
+      if (this.props.onCursorActivity) this.shared.wire('onCursorActivity');
+      if (this.props.onDragEnter) this.shared.wire('onDragEnter');
+      if (this.props.onDragOver) this.shared.wire('onDragOver');
+      if (this.props.onDrop) this.shared.wire('onDrop');
+      if (this.props.onFocus) this.shared.wire('onFocus');
+      if (this.props.onGutterClick) this.shared.wire('onGutterClick');
+      if (this.props.onKeyDown) this.shared.wire('onKeyDown');
+      if (this.props.onKeyPress) this.shared.wire('onKeyPress');
+      if (this.props.onKeyUp) this.shared.wire('onKeyUp');
+      if (this.props.onScroll) this.shared.wire('onScroll');
+      if (this.props.onSelection) this.shared.wire('onSelection');
+      if (this.props.onUpdate) this.shared.wire('onUpdate');
+      if (this.props.onViewportChange) this.shared.wire('onViewportChange');
 
       this.hydrate(this.props);
 
