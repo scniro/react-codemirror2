@@ -18,7 +18,13 @@ export default class App extends React.Component {
     return (
       <div id='container'>
         <header>
-          <a href="https://github.com/scniro/react-codemirror2" target="_blank"><h1>scniro/react-codemirror2</h1></a>
+          <a href='https://github.com/scniro/react-codemirror2' target='_blank'>
+            <h1>
+              <i className='fa fa-github' aria-hidden='true'/>
+              <span>scniro/react-codemirror2</span>
+              <i className='fa fa-external-link' aria-hidden='true'/>
+            </h1>
+          </a>
         </header>
         <Controls onToggleState={(controlled) => {
           this.setState({controlled});

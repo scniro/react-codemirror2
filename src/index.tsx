@@ -74,8 +74,10 @@ export interface ICodeMirror {
   selection?: Array<ISetSelectionOptions>;
   scroll?: ISetScrollOptions;
   /* <deprecated> */
-  autoScrollCursorOnSet?: boolean;
-  resetCursorOnSet?: boolean;
+  autoScrollCursorOnSet?: any;
+  onBeforeSet?: any;
+  onSet?: any;
+  resetCursorOnSet?: any;
   /* </deprecated> */
 }
 
@@ -109,11 +111,19 @@ class Shared implements ICommon {
 
   public notifyOfDeprecation() {
     if (this.props.autoScrollCursorOnSet !== undefined) {
-      console.warn('`autoScrollCursorOnSet` has been deprecated. Use `autoScroll` instead\n\nSee https://github.com/scniro/react-codemirror2#props')
+      console.warn('`autoScrollCursorOnSet` has been deprecated. Use `autoScroll` instead\n\nSee https://github.com/scniro/react-codemirror2#props');
     }
 
     if (this.props.resetCursorOnSet !== undefined) {
-      console.warn('`resetCursorOnSet` has been deprecated. Use `autoCursor` instead\n\nSee https://github.com/scniro/react-codemirror2#props')
+      console.warn('`resetCursorOnSet` has been deprecated. Use `autoCursor` instead\n\nSee https://github.com/scniro/react-codemirror2#props');
+    }
+
+    if(this.props.onSet !== undefined) {
+      console.warn('`onSet` has been deprecated. User `editorDidMount` instead. See https://github.com/scniro/react-codemirror2#events');
+    }
+
+    if(this.props.onBeforeSet !== undefined) {
+      console.warn('`onBeforeSet` has been deprecated. User `onBeforeChange` for `Controlled`. instead. See https://github.com/scniro/react-codemirror2#events');
     }
   }
 

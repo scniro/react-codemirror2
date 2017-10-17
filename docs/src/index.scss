@@ -79,18 +79,29 @@ html, body, #app {
     margin: 0 auto;
 
     header {
-      padding: 0.500em 0;
-      height: 2.000em;
 
       a {
+
         &:link {
           text-decoration: none;
         }
 
         h1 {
-          font-size: 16pt;
+          font-size: 18pt;
           color: dodgerblue;
+          padding: 0.500em 0;
           display: inline-block;
+
+          i {
+            margin-right: 0.250em;
+
+            &:last-of-type {
+              font-size: 8pt;
+              position: relative;
+              top: -0.750em;
+              left: 0.250em;
+            }
+          }
 
           &:hover {
             color: darken(dodgerblue, 20%);
@@ -100,8 +111,12 @@ html, body, #app {
     }
 
     #controls {
-      padding: 0.250em 0;
+      padding: 0.250em 0.750em;
       height: 2.500em;
+      background-color: #f5f2f0;
+      border-top: solid 1px #ddd;
+      border-left: solid 1px #ddd;
+      border-right: solid 1px #ddd;
 
       select {
         margin-right: 1.000em;
@@ -150,8 +165,8 @@ pre.syntax-block {
 }
 
 @mixin can-toggle-branding(
-  $can-toggle-off-color: dodgerblue,
-  $can-toggle-on-color: dodgerblue,
+  $can-toggle-off-color: #978edc,
+  $can-toggle-on-color: #777,
   $can-toggle-inactive-text: rgba(white, 0.5),
   $can-toggle-transition: cubic-bezier(0,1,0.5,1)
 ) {
@@ -165,17 +180,25 @@ pre.syntax-block {
     &:focus ~ label, &:hover ~ label {
       .can-toggle__switch {
         background-color: $can-toggle-off-color;
-        &:after { color: darken($can-toggle-off-color, 10%); }
+        &:after {
+          color: darken($can-toggle-off-color, 10%);
+        }
       }
     }
-    &:hover ~label { color: darken($can-toggle-off-color, 5%); }
+    &:hover ~ label {
+      color: darken($can-toggle-off-color, 5%);
+    }
     &:checked {
       ~ label {
-        &:hover { color: darken($can-toggle-on-color, 3%); }
+        &:hover {
+          color: darken($can-toggle-on-color, 3%);
+        }
 
         .can-toggle__switch {
           background-color: lighten($can-toggle-on-color, 5%);
-          &:after { color: darken($can-toggle-on-color, 5%); }
+          &:after {
+            color: darken($can-toggle-on-color, 5%);
+          }
         }
       }
 
@@ -183,7 +206,9 @@ pre.syntax-block {
         ~ label {
           .can-toggle__switch {
             background-color: $can-toggle-on-color;
-            &:after { color: darken($can-toggle-on-color, 10%); }
+            &:after {
+              color: darken($can-toggle-on-color, 10%);
+            }
           }
         }
       }
@@ -198,17 +223,25 @@ pre.syntax-block {
     &:focus ~ label, &:hover ~ label {
       .can-toggle__switch {
         background-color: $can-toggle-off-color;
-        &:after { color: darken($can-toggle-off-color, 10%); }
+        &:after {
+          color: darken($can-toggle-off-color, 10%);
+        }
       }
     }
-    &:hover ~label { color: darken($can-toggle-off-color, 5%); }
+    &:hover ~ label {
+      color: darken($can-toggle-off-color, 5%);
+    }
     &:checked {
       ~ label {
-        &:hover { color: darken($can-toggle-on-color, 3%); }
+        &:hover {
+          color: darken($can-toggle-on-color, 3%);
+        }
 
         .can-toggle__switch {
           background-color: lighten($can-toggle-on-color, 5%);
-          &:after { color: darken($can-toggle-on-color, 5%); }
+          &:after {
+            color: darken($can-toggle-on-color, 5%);
+          }
         }
       }
 
@@ -216,7 +249,9 @@ pre.syntax-block {
         ~ label {
           .can-toggle__switch {
             background-color: $can-toggle-on-color;
-            &:after { color: darken($can-toggle-on-color, 10%); }
+            &:after {
+              color: darken($can-toggle-on-color, 10%);
+            }
           }
         }
       }
@@ -225,12 +260,16 @@ pre.syntax-block {
 
   label {
 
-    .can-toggle__label-text { flex: 1; }
+    .can-toggle__label-text {
+      flex: 1;
+    }
 
     .can-toggle__switch {
       transition: background-color 0.3s $can-toggle-transition;
       background: lighten($can-toggle-off-color, 5%);
-      &:before { color: $can-toggle-inactive-text; }
+      &:before {
+        color: $can-toggle-inactive-text;
+      }
       &:after {
         // Autoprefixer choked here, so making the prefixes explicit
         -webkit-transition: -webkit-transform 0.3s $can-toggle-transition;
@@ -244,15 +283,14 @@ pre.syntax-block {
 $toggle-container-width: 240px;
 
 // toggle
-@mixin can-toggle-appearance
-(
+@mixin can-toggle-appearance(
   $can-toggle-width: $toggle-container-width,
   $can-toggle-height: 20px,
   $can-toggle-border-radius: 0,
   $can-toggle-offset: 2px,
   $can-toggle-label-font-size: 12px,
   $can-toggle-switch-font-size: 12px
-){
+) {
   $can-toggle-switch-width: $can-toggle-width / 2;
 
   input[type="checkbox"] {
@@ -260,7 +298,9 @@ $toggle-container-width: 240px;
     &:checked {
       ~ label {
         .can-toggle__switch {
-          &:after { transform: translate3d($can-toggle-width - ($can-toggle-switch-width + $can-toggle-offset),0,0); }
+          &:after {
+            transform: translate3d($can-toggle-width - ($can-toggle-switch-width + $can-toggle-offset), 0, 0);
+          }
         }
       }
     }
@@ -283,7 +323,8 @@ $toggle-container-width: 240px;
       }
 
       &:after {
-        top: $can-toggle-offset; left: $can-toggle-offset;
+        top: $can-toggle-offset;
+        left: $can-toggle-offset;
         border-radius: $can-toggle-border-radius/2;
         width: $can-toggle-switch-width - $can-toggle-offset;
         line-height: $can-toggle-height - ($can-toggle-offset*2);
@@ -296,16 +337,21 @@ $toggle-container-width: 240px;
 .can-toggle {
   position: relative;
   display: block;
-  *, *:before, *:after { box-sizing: border-box; }
+  *, *:before, *:after {
+    box-sizing: border-box;
+  }
 
   input[type="checkbox"] {
     opacity: 0;
     position: absolute;
-    top: 0; left: 0;
+    top: 0;
+    left: 0;
 
     &[disabled] ~ label {
       pointer-events: none;
-      .can-toggle__switch { opacity: 0.4; }
+      .can-toggle__switch {
+        opacity: 0.4;
+      }
     }
 
     &:checked {
@@ -355,7 +401,7 @@ $toggle-container-width: 240px;
         text-transform: uppercase;
         text-align: center;
         background: white;
-        transform: translate3d(0,0,0);
+        transform: translate3d(0, 0, 0);
       }
     }
   }

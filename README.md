@@ -10,9 +10,13 @@ demo @ [scniro.github.io/react-codemirror2](https://scniro.github.io/react-codem
 
 > npm install react-codemirror2
 
-## basic usage
+## new in 3.0.0
+
+`react-codemirror2` now ships with the notion of an [uncontrolled](https://reactjs.org/docs/uncontrolled-components.html) and [controlled](https://reactjs.org/docs/forms.html#controlled-components) component. `UnControlled` consists of a simple wrapper largely powered by the inner workings of `codemirror` itself, while `Controlled` will demand state management from the user, preventing codemirror changes unless properly handled via `value`. The latter will offer more control and likely be more appropriate with [redux](http://redux.js.org/) heavy apps.
+
+## uncontrolled usage
 ```jsx
-import CodeMirror from 'react-codemirror2'
+import {UnControlled as CodeMirror} from 'react-codemirror2'
 
 <CodeMirror
   value='<h1>I ♥ react-codemirror2</h1>'
@@ -20,6 +24,21 @@ import CodeMirror from 'react-codemirror2'
     mode: 'xml',
     theme: 'material',
     lineNumbers: true
+  }}
+  onChange={(editor, metadata, value) => {
+  }}
+/>
+```
+
+## controlled usage
+```jsx
+import {Controlled as CodeMirror} from 'react-codemirror2'
+
+<CodeMirror
+  value={this.state.value}
+  options={options}
+  onBeforeChange={(editor, data, value) => {
+    this.setState({value});
   }}
   onChange={(editor, metadata, value) => {
   }}
@@ -62,7 +81,7 @@ require('codemirror/mode/javascript/javascript');
 > pass a custom mode object `{name: 'custom', fn: myModeFn}`
 - `options` - see codemirror [configuration](https://codemirror.net/doc/manual.html#config)
 - `value` - set component value through props
-> triggers `onSet`
+> must be managed for controlled components
 
 ## props cont. (wrapped codemirror [programming api](https://codemirror.net/doc/manual.html#api))
 
@@ -107,17 +126,15 @@ require('codemirror/mode/javascript/javascript');
 
 - `editorDidConfigure(editor)`
 - `editorDidMount(editor, next)`
-> calling optional `next()` will trigger `editorDidConfigure`
+> invoking optional `next()` will trigger `editorDidConfigure`
 - `editorWillMount()`
 - `editorWillUnmount(editor)`
-- `onBeforeChange(editor, next)`
-> if defined, `next()` must be invoked to trigger `onChange`
-- `onBeforeChangeInternal(editor, data, next)`
-> if defined, `next()` must be invoked to trigger `onChangeInternal`
-- `onChange(editor, value)`
-> returns the value set via `props#value`
-- `onChangeInternal(editor, data, value)`
-> returns value and the [change `object`](https://codemirror.net/doc/manual.html#event_change) of the editor if changed internally (not via `props#value`)
+- `onBeforeChange(editor, data, value)` **[controlled]**
+> required - hook to manage state and update `value`
+- `onBeforeChange(editor, data, value, next)` **[uncontrolled]**
+> optional - if defined, `next()` must be invoked to trigger `onChange`.
+- `onChange(editor, data, value)`
+
 
 ## events cont. [wrapped codemirror events](https://codemirror.net/doc/manual.html#events)
 

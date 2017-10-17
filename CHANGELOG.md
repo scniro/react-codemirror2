@@ -1,14 +1,16 @@
 3.0.0
 ==================
-* ships with typings
-* [`onSet`, `onChange`, `onBeforeSet`, `onBeforeChange`] deprecated, now => [`onChange`, `onChangeInternal`, `onBeforeChange`, `onBeforeSet`]
+* typings
+* [`onSet`, onBeforeSet`] deprecated [removed]
 * [`resetCursorOnSet`, `autoScrollCursorOnSet`] deprecated, now => [`autoCursor`, `autoScroll`]
 * add `autoFocus`
 * modify return of `onSelection`: this.editor, data.ranges) now => (this.editor, data)
+* split component into two per usage, `UnControlled` & `Controlled`
+* fixes  https://github.com/scniro/react-codemirror2/issues/22
 
 2.0.2
 ==================
-* fixed https://github.com/scniro/react-codemirror2/issues/14
+* fixes https://github.com/scniro/react-codemirror2/issues/14
 * remove deprecation warnings from 1.x
 
 2.0.1

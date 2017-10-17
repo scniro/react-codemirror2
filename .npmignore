@@ -1,4 +1,5 @@
 .babelrc
+.editorconfig
 .travis.yml
 .idea
 .npmignore
