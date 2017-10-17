@@ -108,7 +108,7 @@ class Editor extends React.Component {
             this.setState({value});
           }}
           onChange={(editor, data, value) => {
-            console.log('onChange', {value});
+            console.log('controlled', {value});
           }}
         />
       )
@@ -123,7 +123,7 @@ class Editor extends React.Component {
             lineNumbers: true
           }}
           onChange={(editor, data, value) => {
-            console.log('onChange', {value});
+            console.log('uncontrolled', {value});
           }}
         />
       )

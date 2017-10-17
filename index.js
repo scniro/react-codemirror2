@@ -12,6 +12,17 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
 var codemirror = require("codemirror");
+var cm;
+var IS_MOBILE = typeof navigator === 'undefined' || (navigator.userAgent.match(/Android/i)
+    || navigator.userAgent.match(/webOS/i)
+    || navigator.userAgent.match(/iPhone/i)
+    || navigator.userAgent.match(/iPad/i)
+    || navigator.userAgent.match(/iPod/i)
+    || navigator.userAgent.match(/BlackBerry/i)
+    || navigator.userAgent.match(/Windows Phone/i));
+if (!IS_MOBILE) {
+    cm = require('codemirror');
+}
 var Controlled = (function (_super) {
     __extends(Controlled, _super);
     function Controlled(props) {
@@ -91,8 +102,8 @@ var Controlled = (function (_super) {
             _this.emulating = true;
             _this.editor.replaceRange(_this.deferred.text.join('\n'), _this.deferred.from, _this.deferred.to, _this.deferred.origin);
             _this.emulating = false;
+            _this.deferred = null;
         });
-        this.deferred = null;
     };
     Controlled.prototype.mirrorChange = function (deferred) {
         this.mirror.replaceRange(deferred.text, deferred.from, deferred.to, deferred.origin);
@@ -105,127 +116,129 @@ var Controlled = (function (_super) {
     };
     Controlled.prototype.componentDidMount = function () {
         var _this = this;
-        if (this.props.defineMode) {
-            if (this.props.defineMode.name && this.props.defineMode.fn) {
-                codemirror.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
+        if (!IS_MOBILE) {
+            if (this.props.defineMode) {
+                if (this.props.defineMode.name && this.props.defineMode.fn) {
+                    codemirror.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
+                }
             }
-        }
-        this.editor = codemirror(this.ref);
-        this.mirror = codemirror(function () {
-        });
-        this.editor.on('beforeChange', function (cm, data) {
-            if (_this.emulating) {
-                return;
+            this.editor = cm(this.ref);
+            this.mirror = cm(function () {
+            });
+            this.editor.on('beforeChange', function (cm, data) {
+                if (_this.emulating) {
+                    return;
+                }
+                if (data.origin === 'undo') {
+                    return;
+                }
+                if (data.origin === 'redo') {
+                    return;
+                }
+                data.cancel();
+                _this.deferred = data;
+                var phantomChange = _this.mirrorChange(_this.deferred);
+                if (_this.props.onBeforeChange)
+                    _this.props.onBeforeChange(_this.editor, _this.deferred, phantomChange);
+            });
+            this.editor.on('change', function (cm, data) {
+                if (!_this.mounted) {
+                    return;
+                }
+                if (_this.props.onChange) {
+                    _this.props.onChange(_this.editor, data, _this.editor.getValue());
+                }
+            });
+            if (this.props.onCursorActivity) {
+                this.editor.on('cursorActivity', function (cm) {
+                    _this.props.onCursorActivity(_this.editor);
+                });
             }
-            if (data.origin === 'undo') {
-                return;
+            if (this.props.onViewportChange) {
+                this.editor.on('viewportChange', function (cm, from, to) {
+                    _this.props.onViewportChange(_this.editor, from, to);
+                });
             }
-            if (data.origin === 'redo') {
-                return;
+            if (this.props.onGutterClick) {
+                this.editor.on('gutterClick', function (cm, lineNumber, gutter, event) {
+                    _this.props.onGutterClick(_this.editor, lineNumber, gutter, event);
+                });
             }
-            data.cancel();
-            _this.deferred = data;
-            var phantomChange = _this.mirrorChange(_this.deferred);
-            if (_this.props.onBeforeChange)
-                _this.props.onBeforeChange(_this.editor, _this.deferred, phantomChange);
-        });
-        this.editor.on('change', function (cm, data) {
-            if (!_this.mounted) {
-                return;
+            if (this.props.onFocus) {
+                this.editor.on('focus', function (cm, event) {
+                    _this.props.onFocus(_this.editor, event);
+                });
             }
-            if (_this.props.onChange) {
-                _this.props.onChange(_this.editor, data, _this.editor.getValue());
+            if (this.props.onBlur) {
+                this.editor.on('blur', function (cm, event) {
+                    _this.props.onBlur(_this.editor, event);
+                });
             }
-        });
-        if (this.props.onCursorActivity) {
-            this.editor.on('cursorActivity', function (cm) {
-                _this.props.onCursorActivity(_this.editor);
-            });
-        }
-        if (this.props.onViewportChange) {
-            this.editor.on('viewportChange', function (cm, from, to) {
-                _this.props.onViewportChange(_this.editor, from, to);
-            });
-        }
-        if (this.props.onGutterClick) {
-            this.editor.on('gutterClick', function (cm, lineNumber, gutter, event) {
-                _this.props.onGutterClick(_this.editor, lineNumber, gutter, event);
-            });
-        }
-        if (this.props.onFocus) {
-            this.editor.on('focus', function (cm, event) {
-                _this.props.onFocus(_this.editor, event);
-            });
-        }
-        if (this.props.onBlur) {
-            this.editor.on('blur', function (cm, event) {
-                _this.props.onBlur(_this.editor, event);
-            });
-        }
-        if (this.props.onUpdate) {
-            this.editor.on('update', function (cm) {
-                _this.props.onUpdate(_this.editor);
-            });
-        }
-        if (this.props.onKeyDown) {
-            this.editor.on('keydown', function (cm, event) {
-                _this.props.onKeyDown(_this.editor, event);
-            });
-        }
-        if (this.props.onKeyUp) {
-            this.editor.on('keyup', function (cm, event) {
-                _this.props.onKeyUp(_this.editor, event);
-            });
-        }
-        if (this.props.onKeyPress) {
-            this.editor.on('keypress', function (cm, event) {
-                _this.props.onKeyPress(_this.editor, event);
-            });
-        }
-        if (this.props.onDragEnter) {
-            this.editor.on('dragenter', function (cm, event) {
-                _this.props.onDragEnter(_this.editor, event);
-            });
-        }
-        if (this.props.onDragOver) {
-            this.editor.on('dragover', function (cm, event) {
-                _this.props.onDragOver(_this.editor, event);
-            });
-        }
-        if (this.props.onDrop) {
-            this.editor.on('drop', function (cm, event) {
-                _this.props.onDrop(_this.editor, event);
-            });
-        }
-        if (this.props.onSelection) {
-            this.editor.on('beforeSelectionChange', function (cm, data) {
-                _this.props.onSelection(_this.editor, data);
-            });
-        }
-        if (this.props.onScroll) {
-            this.editor.on('scroll', function (cm) {
-                _this.props.onScroll(_this.editor, _this.editor.getScrollInfo());
-            });
-        }
-        if (this.props.onCursor) {
-            this.editor.on('cursorActivity', function (cm) {
-                _this.props.onCursor(_this.editor, _this.editor.getCursor());
-            });
-        }
-        this.hydrate(this.props);
-        if (this.props.selection) {
-            var doc = this.editor.getDoc();
-            doc.setSelections(this.props.selection);
-        }
-        if (this.props.cursor) {
-            this.setCursor(this.props.cursor, this.props.autoScroll || false, this.props.autoFocus || false);
-        }
-        if (this.props.scroll) {
-            this.editor.scrollTo(this.props.scroll.x, this.props.scroll.y);
-        }
-        this.mounted = true;
-        if (this.props.editorDidMount) {
-            this.props.editorDidMount(this.editor, this.editor.getValue(), this.initCb);
+            if (this.props.onUpdate) {
+                this.editor.on('update', function (cm) {
+                    _this.props.onUpdate(_this.editor);
+                });
+            }
+            if (this.props.onKeyDown) {
+                this.editor.on('keydown', function (cm, event) {
+                    _this.props.onKeyDown(_this.editor, event);
+                });
+            }
+            if (this.props.onKeyUp) {
+                this.editor.on('keyup', function (cm, event) {
+                    _this.props.onKeyUp(_this.editor, event);
+                });
+            }
+            if (this.props.onKeyPress) {
+                this.editor.on('keypress', function (cm, event) {
+                    _this.props.onKeyPress(_this.editor, event);
+                });
+            }
+            if (this.props.onDragEnter) {
+                this.editor.on('dragenter', function (cm, event) {
+                    _this.props.onDragEnter(_this.editor, event);
+                });
+            }
+            if (this.props.onDragOver) {
+                this.editor.on('dragover', function (cm, event) {
+                    _this.props.onDragOver(_this.editor, event);
+                });
+            }
+            if (this.props.onDrop) {
+                this.editor.on('drop', function (cm, event) {
+                    _this.props.onDrop(_this.editor, event);
+                });
+            }
+            if (this.props.onSelection) {
+                this.editor.on('beforeSelectionChange', function (cm, data) {
+                    _this.props.onSelection(_this.editor, data);
+                });
+            }
+            if (this.props.onScroll) {
+                this.editor.on('scroll', function (cm) {
+                    _this.props.onScroll(_this.editor, _this.editor.getScrollInfo());
+                });
+            }
+            if (this.props.onCursor) {
+                this.editor.on('cursorActivity', function (cm) {
+                    _this.props.onCursor(_this.editor, _this.editor.getCursor());
+                });
+            }
+            this.hydrate(this.props);
+            if (this.props.selection) {
+                var doc = this.editor.getDoc();
+                doc.setSelections(this.props.selection);
+            }
+            if (this.props.cursor) {
+                this.setCursor(this.props.cursor, this.props.autoScroll || false, this.props.autoFocus || false);
+            }
+            if (this.props.scroll) {
+                this.editor.scrollTo(this.props.scroll.x, this.props.scroll.y);
+            }
+            this.mounted = true;
+            if (this.props.editorDidMount) {
+                this.props.editorDidMount(this.editor, this.editor.getValue(), this.initCb);
+            }
         }
     };
     Controlled.prototype.componentWillReceiveProps = function (nextProps) {
@@ -318,122 +331,124 @@ var UnControlled = (function (_super) {
     };
     UnControlled.prototype.componentDidMount = function () {
         var _this = this;
-        if (this.props.defineMode) {
-            if (this.props.defineMode.name && this.props.defineMode.fn) {
-                codemirror.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
-            }
-        }
-        this.editor = codemirror(this.ref);
-        this.editor.on('beforeChange', function (cm, data) {
-            if (_this.props.onBeforeChange) {
-                _this.props.onBeforeChange(_this.editor, data, null, _this.onBeforeChangeCb);
-            }
-        });
-        this.editor.on('change', function (cm, data) {
-            if (!_this.mounted) {
-                return;
-            }
-            if (_this.props.onBeforeChange) {
-                if (_this.continueChange) {
-                    _this.props.onChange(_this.editor, data, _this.editor.getValue());
+        if (!IS_MOBILE) {
+            if (this.props.defineMode) {
+                if (this.props.defineMode.name && this.props.defineMode.fn) {
+                    codemirror.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
                 }
-                else {
+            }
+            this.editor = cm(this.ref);
+            this.editor.on('beforeChange', function (cm, data) {
+                if (_this.props.onBeforeChange) {
+                    _this.props.onBeforeChange(_this.editor, data, null, _this.onBeforeChangeCb);
+                }
+            });
+            this.editor.on('change', function (cm, data) {
+                if (!_this.mounted) {
                     return;
                 }
+                if (_this.props.onBeforeChange) {
+                    if (_this.continueChange) {
+                        _this.props.onChange(_this.editor, data, _this.editor.getValue());
+                    }
+                    else {
+                        return;
+                    }
+                }
+                else {
+                    _this.props.onChange(_this.editor, data, _this.editor.getValue());
+                }
+            });
+            if (this.props.onCursorActivity) {
+                this.editor.on('cursorActivity', function (cm) {
+                    _this.props.onCursorActivity(_this.editor);
+                });
             }
-            else {
-                _this.props.onChange(_this.editor, data, _this.editor.getValue());
+            if (this.props.onViewportChange) {
+                this.editor.on('viewportChange', function (cm, from, to) {
+                    _this.props.onViewportChange(_this.editor, from, to);
+                });
             }
-        });
-        if (this.props.onCursorActivity) {
-            this.editor.on('cursorActivity', function (cm) {
-                _this.props.onCursorActivity(_this.editor);
-            });
-        }
-        if (this.props.onViewportChange) {
-            this.editor.on('viewportChange', function (cm, from, to) {
-                _this.props.onViewportChange(_this.editor, from, to);
-            });
-        }
-        if (this.props.onGutterClick) {
-            this.editor.on('gutterClick', function (cm, lineNumber, gutter, event) {
-                _this.props.onGutterClick(_this.editor, lineNumber, gutter, event);
-            });
-        }
-        if (this.props.onFocus) {
-            this.editor.on('focus', function (cm, event) {
-                _this.props.onFocus(_this.editor, event);
-            });
-        }
-        if (this.props.onBlur) {
-            this.editor.on('blur', function (cm, event) {
-                _this.props.onBlur(_this.editor, event);
-            });
-        }
-        if (this.props.onUpdate) {
-            this.editor.on('update', function (cm) {
-                _this.props.onUpdate(_this.editor);
-            });
-        }
-        if (this.props.onKeyDown) {
-            this.editor.on('keydown', function (cm, event) {
-                _this.props.onKeyDown(_this.editor, event);
-            });
-        }
-        if (this.props.onKeyUp) {
-            this.editor.on('keyup', function (cm, event) {
-                _this.props.onKeyUp(_this.editor, event);
-            });
-        }
-        if (this.props.onKeyPress) {
-            this.editor.on('keypress', function (cm, event) {
-                _this.props.onKeyPress(_this.editor, event);
-            });
-        }
-        if (this.props.onDragEnter) {
-            this.editor.on('dragenter', function (cm, event) {
-                _this.props.onDragEnter(_this.editor, event);
-            });
-        }
-        if (this.props.onDragOver) {
-            this.editor.on('dragover', function (cm, event) {
-                _this.props.onDragOver(_this.editor, event);
-            });
-        }
-        if (this.props.onDrop) {
-            this.editor.on('drop', function (cm, event) {
-                _this.props.onDrop(_this.editor, event);
-            });
-        }
-        if (this.props.onSelection) {
-            this.editor.on('beforeSelectionChange', function (cm, data) {
-                _this.props.onSelection(_this.editor, data);
-            });
-        }
-        if (this.props.onScroll) {
-            this.editor.on('scroll', function (cm) {
-                _this.props.onScroll(_this.editor, _this.editor.getScrollInfo());
-            });
-        }
-        if (this.props.onCursor) {
-            this.editor.on('cursorActivity', function (cm) {
-                _this.props.onCursor(_this.editor, _this.editor.getCursor());
-            });
-        }
-        this.hydrate(this.props);
-        if (this.props.selection) {
-            var doc = this.editor.getDoc();
-            doc.setSelections(this.props.selection);
-        }
-        if (this.props.cursor) {
-            this.setCursor(this.props.cursor, this.props.autoScroll || false, this.props.autoFocus || false);
-        }
-        if (this.props.scroll) {
-            this.editor.scrollTo(this.props.scroll.x, this.props.scroll.y);
-        }
-        this.mounted = true;
-        if (this.props.editorDidMount) {
-            this.props.editorDidMount(this.editor, this.editor.getValue(), this.initCb);
+            if (this.props.onGutterClick) {
+                this.editor.on('gutterClick', function (cm, lineNumber, gutter, event) {
+                    _this.props.onGutterClick(_this.editor, lineNumber, gutter, event);
+                });
+            }
+            if (this.props.onFocus) {
+                this.editor.on('focus', function (cm, event) {
+                    _this.props.onFocus(_this.editor, event);
+                });
+            }
+            if (this.props.onBlur) {
+                this.editor.on('blur', function (cm, event) {
+                    _this.props.onBlur(_this.editor, event);
+                });
+            }
+            if (this.props.onUpdate) {
+                this.editor.on('update', function (cm) {
+                    _this.props.onUpdate(_this.editor);
+                });
+            }
+            if (this.props.onKeyDown) {
+                this.editor.on('keydown', function (cm, event) {
+                    _this.props.onKeyDown(_this.editor, event);
+                });
+            }
+            if (this.props.onKeyUp) {
+                this.editor.on('keyup', function (cm, event) {
+                    _this.props.onKeyUp(_this.editor, event);
+                });
+            }
+            if (this.props.onKeyPress) {
+                this.editor.on('keypress', function (cm, event) {
+                    _this.props.onKeyPress(_this.editor, event);
+                });
+            }
+            if (this.props.onDragEnter) {
+                this.editor.on('dragenter', function (cm, event) {
+                    _this.props.onDragEnter(_this.editor, event);
+                });
+            }
+            if (this.props.onDragOver) {
+                this.editor.on('dragover', function (cm, event) {
+                    _this.props.onDragOver(_this.editor, event);
+                });
+            }
+            if (this.props.onDrop) {
+                this.editor.on('drop', function (cm, event) {
+                    _this.props.onDrop(_this.editor, event);
+                });
+            }
+            if (this.props.onSelection) {
+                this.editor.on('beforeSelectionChange', function (cm, data) {
+                    _this.props.onSelection(_this.editor, data);
+                });
+            }
+            if (this.props.onScroll) {
+                this.editor.on('scroll', function (cm) {
+                    _this.props.onScroll(_this.editor, _this.editor.getScrollInfo());
+                });
+            }
+            if (this.props.onCursor) {
+                this.editor.on('cursorActivity', function (cm) {
+                    _this.props.onCursor(_this.editor, _this.editor.getCursor());
+                });
+            }
+            this.hydrate(this.props);
+            if (this.props.selection) {
+                var doc = this.editor.getDoc();
+                doc.setSelections(this.props.selection);
+            }
+            if (this.props.cursor) {
+                this.setCursor(this.props.cursor, this.props.autoScroll || false, this.props.autoFocus || false);
+            }
+            if (this.props.scroll) {
+                this.editor.scrollTo(this.props.scroll.x, this.props.scroll.y);
+            }
+            this.mounted = true;
+            if (this.props.editorDidMount) {
+                this.props.editorDidMount(this.editor, this.editor.getValue(), this.initCb);
+            }
         }
     };
     UnControlled.prototype.componentWillReceiveProps = function (nextProps) {

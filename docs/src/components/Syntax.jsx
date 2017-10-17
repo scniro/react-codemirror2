@@ -14,7 +14,7 @@ require('codemirror/theme/neat.css');
 require('codemirror/mode/xml/xml.js');
 require('codemirror/mode/javascript/javascript.js');
 
-import {Controlled as Codemirror} from 'react-codemirror2';
+import {Controlled as CodeMirror} from 'react-codemirror2';
 
 <CodeMirror
   value={this.state.value}
@@ -23,7 +23,7 @@ import {Controlled as Codemirror} from 'react-codemirror2';
     this.setState({value});
   }}
   onChange={(editor, value) => {
-    console.log('onChange', {value});
+    console.log('controlled', {value});
   }}
 />`.trim();
 
@@ -34,13 +34,13 @@ require('codemirror/theme/neat.css');
 require('codemirror/mode/xml/xml.js');
 require('codemirror/mode/javascript/javascript.js');
 
-import {UnControlled as Codemirror} from 'react-codemirror2';
+import {UnControlled as CodeMirror} from 'react-codemirror2';
 
 <CodeMirror
   value={value}
   options={options}
   onChange={(editor, value) => {
-    console.log('onChange', {value});
+    console.log('uncontrolled', {value});
   }}
 />`.trim();
   }

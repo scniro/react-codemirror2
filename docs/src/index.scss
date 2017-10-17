@@ -372,4 +372,8 @@ $toggle-container-width: 240px;
 .state-control {
   position: relative;
   top: 6px;
+
+  label {
+    cursor: pointer;
+  }
 }
