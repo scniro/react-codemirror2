@@ -12,7 +12,6 @@
     "transpile": "tsc",
     "posttranspile": "tsfmt -r index.js index.d.ts",
     "pretest": "npm run transpile",
-    "prepublish": "npm run transpile && npm run test && npm run webpack",
     "test": "jest"
   },
   "jest": {
@@ -78,6 +77,7 @@
     "node-sass": "4.5.3",
     "open": "0.0.5",
     "prismjs": "1.8.1",
+    "prop-types": "15.6.0",
     "raf": "3.4.0",
     "react": "16.0.0",
     "react-dom": "16.0.0",
