@@ -13,6 +13,8 @@ const IS_MOBILE = typeof navigator === 'undefined' || (
     || navigator.userAgent.match(/Windows Phone/i)
   );
 
+declare let require: any;
+
 if (!IS_MOBILE) {
   cm = require('codemirror');
 }
