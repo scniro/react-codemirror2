@@ -120,11 +120,11 @@ class Shared implements ICommon {
       console.warn('`resetCursorOnSet` has been deprecated. Use `autoCursor` instead\n\nSee https://github.com/scniro/react-codemirror2#props');
     }
 
-    if(this.props.onSet !== undefined) {
+    if (this.props.onSet !== undefined) {
       console.warn('`onSet` has been deprecated. User `editorDidMount` instead. See https://github.com/scniro/react-codemirror2#events');
     }
 
-    if(this.props.onBeforeSet !== undefined) {
+    if (this.props.onBeforeSet !== undefined) {
       console.warn('`onBeforeSet` has been deprecated. User `onBeforeChange` for `Controlled`. instead. See https://github.com/scniro/react-codemirror2#events');
     }
   }
@@ -319,7 +319,13 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
 
     this.emulating = true;
 
-    this.editor.setValue(value);
+    let lastLine = this.editor.lastLine();
+    let lastChar = this.editor.getLine(this.editor.lastLine()).length;
+
+    this.editor.replaceRange(value || '',
+      {line: 0, ch: 0},
+      {line: lastLine, ch: lastChar});
+
     this.mirror.setValue(value);
     this.editor.clearHistory();
     this.mirror.clearHistory();
@@ -331,13 +337,9 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
   private resolveChange() {
 
     this.editor.operation(() => {
-
       this.emulating = true;
-
       this.editor.replaceRange(this.deferred.text.join('\n'), this.deferred.from, this.deferred.to, this.deferred.origin);
-
       this.emulating = false;
-
       this.deferred = null;
     });
   }
@@ -559,7 +561,13 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
     Object.keys(props.options || {}).forEach(key => this.editor.setOption(key, props.options[key]));
 
     if (!this.hydrated) {
-      this.editor.setValue(props.value || '');
+      // this.editor.setValue(props.value || '');
+      let lastLine = this.editor.lastLine();
+      let lastChar = this.editor.getLine(this.editor.lastLine()).length;
+
+      this.editor.replaceRange(props.value || '',
+        {line: 0, ch: 0},
+        {line: lastLine, ch: lastChar});
     }
 
     this.hydrated = true;

@@ -1,6 +1,6 @@
 {
   "name": "react-codemirror2",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "a tiny react codemirror component wrapper",
   "main": "index.js",
   "typings": "index.d.ts",

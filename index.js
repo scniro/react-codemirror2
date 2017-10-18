@@ -214,7 +214,9 @@ var Controlled = (function(_super) {
   };
   Controlled.prototype.initChange = function(value) {
     this.emulating = true;
-    this.editor.setValue(value);
+    var lastLine = this.editor.lastLine();
+    var lastChar = this.editor.getLine(this.editor.lastLine()).length;
+    this.editor.replaceRange(value || '', { line: 0, ch: 0 }, { line: lastLine, ch: lastChar });
     this.mirror.setValue(value);
     this.editor.clearHistory();
     this.mirror.clearHistory();
@@ -389,7 +391,9 @@ var UnControlled = (function(_super) {
     var _this = this;
     Object.keys(props.options || {}).forEach(function(key) { return _this.editor.setOption(key, props.options[key]); });
     if (!this.hydrated) {
-      this.editor.setValue(props.value || '');
+      var lastLine = this.editor.lastLine();
+      var lastChar = this.editor.getLine(this.editor.lastLine()).length;
+      this.editor.replaceRange(props.value || '', { line: 0, ch: 0 }, { line: lastLine, ch: lastChar });
     }
     this.hydrated = true;
   };
