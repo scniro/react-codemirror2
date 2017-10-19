@@ -1,6 +1,6 @@
-let gulp = require('gulp');
-let replace = require('gulp-replace');
-let rimraf = require('rimraf');
+var gulp = require('gulp');
+var replace = require('gulp-replace');
+var rimraf = require('rimraf');
 
 gulp.task('ts-scrub:index', () => {
   return gulp.src('./.ts/index.js')
