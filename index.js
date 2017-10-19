@@ -45,9 +45,9 @@ var Shared = (function () {
     Shared.prototype.wire = function (name) {
         var _this = this;
         switch (name) {
-            case 'blur':
+            case 'onBlur':
                 {
-                    this.editor.on('onBlur', function (cm, event) {
+                    this.editor.on('blur', function (cm, event) {
                         _this.props.onBlur(_this.editor, event);
                     });
                 }
