@@ -132,8 +132,8 @@ class Shared implements ICommon {
   public wire(name: string) {
 
     switch (name) {
-      case 'blur': {
-        (this.editor as any).on('onBlur', (cm, event) => {
+      case 'onBlur': {
+        (this.editor as any).on('blur', (cm, event) => {
           this.props.onBlur(this.editor, event);
         });
       }
