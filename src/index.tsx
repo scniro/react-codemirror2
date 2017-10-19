@@ -367,7 +367,7 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
 
       if (this.props.defineMode) {
         if (this.props.defineMode.name && this.props.defineMode.fn) {
-          codemirror.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
+          cm.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
         }
       }
 
@@ -476,7 +476,7 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
   public componentWillUnmount() {
 
     if (this.props.editorWillUnmount) {
-      this.props.editorWillUnmount(codemirror);
+      this.props.editorWillUnmount(cm);
     }
   }
 
@@ -588,7 +588,7 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
 
       if (this.props.defineMode) {
         if (this.props.defineMode.name && this.props.defineMode.fn) {
-          codemirror.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
+          cm.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
         }
       }
 
@@ -684,7 +684,7 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
   public componentWillUnmount() {
 
     if (this.props.editorWillUnmount) {
-      this.props.editorWillUnmount(codemirror);
+      this.props.editorWillUnmount(cm);
     }
   }
 

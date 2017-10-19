@@ -8,3 +8,4 @@ coverage
 docs
 src
 test
+gulpfile.js

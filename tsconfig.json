@@ -3,7 +3,7 @@
     "module": "commonjs",
     "jsx": "React",
     "target": "es5",
-    "outDir": ".",
+    "outDir": "./.ts",
     "declaration": true,
     "stripInternal": true,
     "removeComments": true,

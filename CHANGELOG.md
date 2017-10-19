@@ -1,3 +1,11 @@
+3.0.2
+==================
+https://github.com/scniro/react-codemirror2/issues/22
+
+3.0.1
+==================
+* fixes https://github.com/scniro/react-codemirror2/issues/25
+
 3.0.0
 ==================
 * typings
