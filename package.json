@@ -16,6 +16,7 @@
   },
   "jest": {
     "collectCoverage": true,
+    "mapCoverage": true,
     "collectCoverageFrom": [
       "src/**"
     ],
