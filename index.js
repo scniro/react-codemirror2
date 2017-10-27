@@ -150,9 +150,6 @@ var Shared = (function () {
                     });
                 }
                 break;
-            default: {
-                break;
-            }
         }
     };
     return Shared;

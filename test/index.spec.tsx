@@ -8,8 +8,9 @@ import {Controlled, UnControlled} from '../src';
 Enzyme.configure({adapter: new Adapter()});
 
 global.console = {
-  warn: jest.fn()
-}
+  warn: jest.fn(),
+  log: console.log
+};
 
 describe('[temporary] deprecation notice', () => {
 
@@ -326,5 +327,37 @@ describe('Props', () => {
           expect.anything(data.ranges)
         }}/>
     );
+  });
+
+  it('[Controlled]: autoFocus', () => {
+    let wrapper = Enzyme.mount(
+      <Controlled
+        value='foo'
+        autoFocus={true}
+        cursor={{
+          line: 0,
+          ch: 3
+        }}/>
+    );
+
+    let editor = wrapper.instance().editor;
+
+    expect(editor.state.focused).toBe(true)
+  });
+
+  it('[UnControlled]: autoFocus', () => {
+    let wrapper = Enzyme.mount(
+      <UnControlled
+        value='foo'
+        autoFocus={true}
+        cursor={{
+          line: 0,
+          ch: 3
+        }}/>
+    );
+
+    let editor = wrapper.instance().editor;
+
+    expect(editor.state.focused).toBe(true)
   });
 });

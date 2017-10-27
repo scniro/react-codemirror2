@@ -222,9 +222,6 @@ class Shared implements ICommon {
         });
       }
         break;
-      default: {
-        break;
-      }
     }
   }
 }
