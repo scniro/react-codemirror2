@@ -222,13 +222,28 @@ var Controlled = (function (_super) {
         var _this = this;
         this.editor.operation(function () {
             _this.emulating = true;
+            if (_this.deferred.origin === 'redo') {
+                _this.editor.setCursor(_this.mirror.getCursor());
+            }
             _this.editor.replaceRange(_this.deferred.text.join('\n'), _this.deferred.from, _this.deferred.to, _this.deferred.origin);
+            _this.editor.setHistory(_this.mirror.getHistory());
+            if (_this.deferred.origin === 'undo') {
+                _this.editor.setCursor(_this.mirror.getCursor());
+            }
             _this.emulating = false;
             _this.deferred = null;
         });
     };
     Controlled.prototype.mirrorChange = function (deferred) {
-        this.mirror.replaceRange(deferred.text, deferred.from, deferred.to, deferred.origin);
+        if (deferred.origin === 'undo') {
+            this.mirror.undo();
+        }
+        else if (deferred.origin === 'redo') {
+            this.mirror.redo();
+        }
+        else {
+            this.mirror.replaceRange(deferred.text, deferred.from, deferred.to, deferred.origin);
+        }
         return this.mirror.getValue();
     };
     Controlled.prototype.componentWillMount = function () {
@@ -248,14 +263,12 @@ var Controlled = (function (_super) {
             this.shared = new Shared(this.editor, this.props);
             this.mirror = cm(function () {
             });
+            this.editor.on('cursorActivity', function () {
+                _this.mirror.setHistory(_this.editor.getHistory());
+                _this.mirror.setCursor(_this.editor.getCursor());
+            });
             this.editor.on('beforeChange', function (cm, data) {
                 if (_this.emulating) {
-                    return;
-                }
-                if (data.origin === 'undo') {
-                    return;
-                }
-                if (data.origin === 'redo') {
                     return;
                 }
                 data.cancel();

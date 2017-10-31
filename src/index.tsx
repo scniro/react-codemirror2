@@ -4,14 +4,14 @@ import * as codemirror from 'codemirror';
 let cm;
 
 const IS_MOBILE = typeof navigator === 'undefined' || (
-    navigator.userAgent.match(/Android/i)
-    || navigator.userAgent.match(/webOS/i)
-    || navigator.userAgent.match(/iPhone/i)
-    || navigator.userAgent.match(/iPad/i)
-    || navigator.userAgent.match(/iPod/i)
-    || navigator.userAgent.match(/BlackBerry/i)
-    || navigator.userAgent.match(/Windows Phone/i)
-  );
+  navigator.userAgent.match(/Android/i)
+  || navigator.userAgent.match(/webOS/i)
+  || navigator.userAgent.match(/iPhone/i)
+  || navigator.userAgent.match(/iPad/i)
+  || navigator.userAgent.match(/iPod/i)
+  || navigator.userAgent.match(/BlackBerry/i)
+  || navigator.userAgent.match(/Windows Phone/i)
+);
 
 declare let require: any;
 
@@ -335,7 +335,17 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
 
     this.editor.operation(() => {
       this.emulating = true;
+
+      if (this.deferred.origin === 'redo') {
+        this.editor.setCursor(this.mirror.getCursor());
+      }
+
       this.editor.replaceRange(this.deferred.text.join('\n'), this.deferred.from, this.deferred.to, this.deferred.origin);
+      this.editor.setHistory(this.mirror.getHistory());
+
+      if (this.deferred.origin === 'undo') {
+        this.editor.setCursor(this.mirror.getCursor());
+      }
       this.emulating = false;
       this.deferred = null;
     });
@@ -344,7 +354,13 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
   /** @internal */
   private mirrorChange(deferred) {
 
-    this.mirror.replaceRange(deferred.text, deferred.from, deferred.to, deferred.origin);
+    if (deferred.origin === 'undo') {
+      this.mirror.undo();
+    } else if (deferred.origin === 'redo') {
+      this.mirror.redo();
+    } else {
+      this.mirror.replaceRange(deferred.text, deferred.from, deferred.to, deferred.origin);
+    }
 
     return this.mirror.getValue();
   }
@@ -375,17 +391,14 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
       this.mirror = (cm as any)(() => {
       });
 
+      this.editor.on('cursorActivity', () => {
+        this.mirror.setHistory(this.editor.getHistory());
+        this.mirror.setCursor(this.editor.getCursor());
+      });
+
       this.editor.on('beforeChange', (cm, data) => {
 
         if (this.emulating) {
-          return;
-        }
-
-        if (data.origin === 'undo') {
-          return;
-        }
-
-        if (data.origin === 'redo') {
           return;
         }
 
@@ -398,6 +411,7 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
         if (this.props.onBeforeChange)
           this.props.onBeforeChange(this.editor, this.deferred, phantomChange);
       });
+
 
       this.editor.on('change', (cm, data) => {
 

@@ -42,27 +42,22 @@ describe('[Controlled, UnControlled]: editorWillMount', () => {
 
   it('editorWillMount(editor, next)', () => {
 
-    let uMounted, cMounted;
-
     Enzyme.shallow(
       <UnControlled
         editorWillMount={() => {
-          uMounted = true;
-        }}
-        editorDidMount={(editor, next) => {
-          expect(uMounted).toBe(true);
+          this.uMounted = true;
         }}/>
     );
 
     Enzyme.shallow(
       <Controlled
         editorWillMount={() => {
-          cMounted = true;
-        }}
-        editorDidMount={(editor, next) => {
-          expect(cMounted).toBe(true);
+          this.cMounted = true;
         }}/>
     );
+
+    expect(this.cMounted).toBe(true);
+    expect(this.uMounted).toBe(true);
   });
 });
 
@@ -70,40 +65,32 @@ describe('[Controlled, UnControlled]: editorDidConfigure', () => {
 
   it('editorDidConfigure(editor)', () => {
 
-    let uConfigured, uCallback, cContigured, cCallback;
-
-    let uWrapper = Enzyme.shallow(
+    Enzyme.shallow(
       <UnControlled
         editorDidMount={(editor, value, next) => {
-          uCallback = sinon.spy(next);
-          uCallback();
+          this.uCallback = sinon.spy(next);
+          this.uCallback();
         }}
         editorDidConfigure={(editor) => {
-          uConfigured = true;
-        }}
-        editorWillUnmount={(editor) => {
-          expect(uConfigured).toBe(true);
-          expect(uCallback.called).toBe(true);
+          this.uConfigured = true;
         }}/>
     );
 
-    let cWrapper = Enzyme.shallow(
+    Enzyme.shallow(
       <Controlled
         editorDidMount={(editor, value, next) => {
-          uCallback = sinon.spy(next);
-          uCallback();
+          this.cCallback = sinon.spy(next);
+          this.cCallback();
         }}
         editorDidConfigure={(editor) => {
-          uConfigured = true;
-        }}
-        editorWillUnmount={(editor) => {
-          expect(uConfigured).toBe(true);
-          expect(uCallback.called).toBe(true);
+          this.cConfigured = true;
         }}/>
     );
 
-    uWrapper.unmount();
-    cWrapper.unmount();
+    expect(this.uConfigured).toBe(true);
+    expect(this.uCallback.called).toBe(true);
+    expect(this.cConfigured).toBe(true);
+    expect(this.cCallback.called).toBe(true);
   });
 });
 
@@ -157,15 +144,12 @@ describe('DOM Events', () => {
         onFocus={() => {
           callback = sinon.spy();
           callback();
-        }}
-        editorWillUnmount={(editor) => {
-          expect(callback.called).toBe(true);
         }}/>
     );
 
     wrapper.instance().editor.focus();
 
-    wrapper.unmount();
+    expect(callback.called).toBeTruthy();
   });
 
   it('onBlur(editor, event)', () => {
@@ -178,15 +162,12 @@ describe('DOM Events', () => {
         onBlur={(editor, event) => {
           callback = sinon.spy();
           callback();
-        }}
-        editorWillUnmount={(editor) => {
-          expect(callback.called).toBe(true);
         }}/>
     );
 
     wrapper.instance().editor.focus();
     wrapper.instance().editor.getInputField().blur();
-    wrapper.unmount();
+    expect(callback.called).toBeTruthy();
   });
 });
 
@@ -202,17 +183,12 @@ describe('Change', () => {
         onChange={(editor, data, value) => {
           callback = sinon.spy();
           callback();
-        }}
-        editorWillUnmount={(editor) => {
-          expect(callback.called).toBe(true);
         }}/>
     );
 
     let doc = wrapper.instance().editor.getDoc();
-
     doc.replaceRange('bar', {line: 1, ch: 1});
-
-    wrapper.unmount();
+    expect(callback.called).toBeTruthy();
   });
 
   it('[UnControlled] onBeforeChange(editor, event)', () => {
@@ -229,18 +205,13 @@ describe('Change', () => {
         onChange={(editor, data, value) => {
           callback = sinon.spy();
           callback();
-        }}
-        editorWillUnmount={(editor) => {
-          expect(callback.called).toBe(true);
-          expect(beforeCallback.called).toBe(true);
         }}/>
     );
 
     let doc = wrapper.instance().editor.getDoc();
-
     doc.replaceRange('bar', {line: 1, ch: 1});
-
-    wrapper.unmount();
+    expect(callback.called).toBeTruthy();
+    expect(beforeCallback.called).toBeTruthy();
   });
 
   it('[Controlled] onChange(editor, event)', () => {
@@ -258,18 +229,13 @@ describe('Change', () => {
         onChange={(editor, data, value) => {
           callback = sinon.spy();
           callback();
-        }}
-        editorWillUnmount={(editor) => {
-          expect(callback.called).toBe(true);
-          expect(beforeCallback.called).toBe(true);
         }}/>
     );
 
     let doc = wrapper.instance().editor.getDoc();
-
     doc.replaceRange('bar', {line: 1, ch: 1});
-
-    wrapper.unmount();
+    expect(callback.called).toBeTruthy();
+    expect(beforeCallback.called).toBeTruthy();
   });
 });
 
@@ -342,7 +308,7 @@ describe('Props', () => {
 
     let editor = wrapper.instance().editor;
 
-    expect(editor.state.focused).toBe(true)
+    expect(editor.state.focused).toBeTruthy();
   });
 
   it('[UnControlled]: autoFocus', () => {
@@ -358,6 +324,6 @@ describe('Props', () => {
 
     let editor = wrapper.instance().editor;
 
-    expect(editor.state.focused).toBe(true)
+    expect(editor.state.focused).toBeTruthy();
   });
 });
