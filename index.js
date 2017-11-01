@@ -192,7 +192,10 @@ var Controlled = (function (_super) {
     };
     Controlled.prototype.hydrate = function (props) {
         var _this = this;
-        Object.keys(props.options || {}).forEach(function (key) { return _this.editor.setOption(key, props.options[key]); });
+        Object.keys(props.options || {}).forEach(function (key) {
+            _this.editor.setOption(key, props.options[key]);
+            _this.mirror.setOption(key, props.options[key]);
+        });
         if (!this.hydrated) {
             if (!this.mounted) {
                 this.initChange(props.value || '');
@@ -219,26 +222,26 @@ var Controlled = (function (_super) {
         this.emulating = false;
     };
     Controlled.prototype.resolveChange = function () {
-        var _this = this;
-        this.editor.operation(function () {
-            _this.emulating = true;
-            if (_this.deferred.origin === 'redo') {
-                _this.editor.setCursor(_this.mirror.getCursor());
-            }
-            _this.editor.replaceRange(_this.deferred.text.join('\n'), _this.deferred.from, _this.deferred.to, _this.deferred.origin);
-            _this.editor.setHistory(_this.mirror.getHistory());
-            if (_this.deferred.origin === 'undo') {
-                _this.editor.setCursor(_this.mirror.getCursor());
-            }
-            _this.emulating = false;
-            _this.deferred = null;
-        });
+        this.emulating = true;
+        if (this.deferred.origin === 'undo') {
+            this.editor.undo();
+        }
+        else if (this.deferred.origin === 'redo') {
+            this.editor.redo();
+        }
+        else {
+            this.editor.replaceRange(this.deferred.text, this.deferred.from, this.deferred.to, this.deferred.origin);
+        }
+        this.emulating = false;
+        this.deferred = null;
     };
     Controlled.prototype.mirrorChange = function (deferred) {
         if (deferred.origin === 'undo') {
+            this.editor.setHistory(this.mirror.getHistory());
             this.mirror.undo();
         }
         else if (deferred.origin === 'redo') {
+            this.editor.setHistory(this.mirror.getHistory());
             this.mirror.redo();
         }
         else {
@@ -263,8 +266,10 @@ var Controlled = (function (_super) {
             this.shared = new Shared(this.editor, this.props);
             this.mirror = cm(function () {
             });
-            this.editor.on('cursorActivity', function () {
+            this.editor.on('electricInput', function () {
                 _this.mirror.setHistory(_this.editor.getHistory());
+            });
+            this.editor.on('cursorActivity', function () {
                 _this.mirror.setCursor(_this.editor.getCursor());
             });
             this.editor.on('beforeChange', function (cm, data) {
@@ -484,6 +489,7 @@ var UnControlled = (function (_super) {
                 this.editor.scrollTo(this.props.scroll.x, this.props.scroll.y);
             }
             this.mounted = true;
+            this.editor.clearHistory();
             if (this.props.editorDidMount) {
                 this.props.editorDidMount(this.editor, this.editor.getValue(), this.initCb);
             }

@@ -293,7 +293,10 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
   /** @internal */
   private hydrate(props) {
 
-    Object.keys(props.options || {}).forEach(key => this.editor.setOption(key, props.options[key]));
+    Object.keys(props.options || {}).forEach(key => {
+      this.editor.setOption(key, props.options[key]);
+      this.mirror.setOption(key, props.options[key]);
+    });
 
     if (!this.hydrated) {
 
@@ -333,30 +336,28 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
   /** @internal */
   private resolveChange() {
 
-    this.editor.operation(() => {
-      this.emulating = true;
+    this.emulating = true;
 
-      if (this.deferred.origin === 'redo') {
-        this.editor.setCursor(this.mirror.getCursor());
-      }
+    if (this.deferred.origin === 'undo') {
+      this.editor.undo();
+    } else if (this.deferred.origin === 'redo') {
+      this.editor.redo();
+    } else {
+      this.editor.replaceRange(this.deferred.text, this.deferred.from, this.deferred.to, this.deferred.origin);
+    }
 
-      this.editor.replaceRange(this.deferred.text.join('\n'), this.deferred.from, this.deferred.to, this.deferred.origin);
-      this.editor.setHistory(this.mirror.getHistory());
-
-      if (this.deferred.origin === 'undo') {
-        this.editor.setCursor(this.mirror.getCursor());
-      }
-      this.emulating = false;
-      this.deferred = null;
-    });
+    this.emulating = false;
+    this.deferred = null;
   }
 
   /** @internal */
   private mirrorChange(deferred) {
 
     if (deferred.origin === 'undo') {
+      this.editor.setHistory(this.mirror.getHistory());
       this.mirror.undo();
     } else if (deferred.origin === 'redo') {
+      this.editor.setHistory(this.mirror.getHistory());
       this.mirror.redo();
     } else {
       this.mirror.replaceRange(deferred.text, deferred.from, deferred.to, deferred.origin);
@@ -391,8 +392,11 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
       this.mirror = (cm as any)(() => {
       });
 
-      this.editor.on('cursorActivity', () => {
+      this.editor.on('electricInput', () => {
         this.mirror.setHistory(this.editor.getHistory());
+      });
+
+      this.editor.on('cursorActivity', () => {
         this.mirror.setCursor(this.editor.getCursor());
       });
 
@@ -411,7 +415,6 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
         if (this.props.onBeforeChange)
           this.props.onBeforeChange(this.editor, this.deferred, phantomChange);
       });
-
 
       this.editor.on('change', (cm, data) => {
 
@@ -663,6 +666,8 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
       }
 
       this.mounted = true;
+
+      this.editor.clearHistory();
 
       if (this.props.editorDidMount) {
         this.props.editorDidMount(this.editor, this.editor.getValue(), this.initCb);

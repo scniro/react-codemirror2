@@ -1,3 +1,7 @@
+3.0.5
+==================
+* https://github.com/scniro/react-codemirror2/issues/31 (take 2)
+
 3.0.4
 ==================
 * https://github.com/scniro/react-codemirror2/issues/31
