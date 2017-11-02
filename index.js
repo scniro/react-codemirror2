@@ -12,14 +12,9 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, '__esModule', { value: true });
 var React = require('react');
 var cm;
-var IS_MOBILE = typeof navigator === 'undefined' || (navigator.userAgent.match(/Android/i)
-    || navigator.userAgent.match(/webOS/i)
-    || navigator.userAgent.match(/iPhone/i)
-    || navigator.userAgent.match(/iPad/i)
-    || navigator.userAgent.match(/iPod/i)
-    || navigator.userAgent.match(/BlackBerry/i)
-    || navigator.userAgent.match(/Windows Phone/i));
-if (!IS_MOBILE) {
+var SERVER_RENDERED = typeof navigator === 'undefined';
+console.log(SERVER_RENDERED);
+if (!SERVER_RENDERED) {
     cm = require('codemirror');
 }
 var Shared = (function () {
@@ -158,6 +153,8 @@ var Controlled = (function (_super) {
     __extends(Controlled, _super);
     function Controlled(props) {
         var _this = _super.call(this, props) || this;
+        if (SERVER_RENDERED)
+            return _this;
         _this.deferred = null;
         _this.emulating = false;
         _this.hydrated = false;
@@ -250,94 +247,98 @@ var Controlled = (function (_super) {
         return this.mirror.getValue();
     };
     Controlled.prototype.componentWillMount = function () {
+        if (SERVER_RENDERED)
+            return;
         if (this.props.editorWillMount) {
             this.props.editorWillMount();
         }
     };
     Controlled.prototype.componentDidMount = function () {
         var _this = this;
-        if (!IS_MOBILE) {
-            if (this.props.defineMode) {
-                if (this.props.defineMode.name && this.props.defineMode.fn) {
-                    cm.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
-                }
+        if (SERVER_RENDERED)
+            return;
+        if (this.props.defineMode) {
+            if (this.props.defineMode.name && this.props.defineMode.fn) {
+                cm.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
             }
-            this.editor = cm(this.ref);
-            this.shared = new Shared(this.editor, this.props);
-            this.mirror = cm(function () {
-            });
-            this.editor.on('electricInput', function () {
-                _this.mirror.setHistory(_this.editor.getHistory());
-            });
-            this.editor.on('cursorActivity', function () {
-                _this.mirror.setCursor(_this.editor.getCursor());
-            });
-            this.editor.on('beforeChange', function (cm, data) {
-                if (_this.emulating) {
-                    return;
-                }
-                data.cancel();
-                _this.deferred = data;
-                var phantomChange = _this.mirrorChange(_this.deferred);
-                if (_this.props.onBeforeChange)
-                    _this.props.onBeforeChange(_this.editor, _this.deferred, phantomChange);
-            });
-            this.editor.on('change', function (cm, data) {
-                if (!_this.mounted) {
-                    return;
-                }
-                if (_this.props.onChange) {
-                    _this.props.onChange(_this.editor, data, _this.editor.getValue());
-                }
-            });
-            if (this.props.onBlur)
-                this.shared.wire('onBlur');
-            if (this.props.onCursor)
-                this.shared.wire('onCursor');
-            if (this.props.onCursorActivity)
-                this.shared.wire('onCursorActivity');
-            if (this.props.onDragEnter)
-                this.shared.wire('onDragEnter');
-            if (this.props.onDragOver)
-                this.shared.wire('onDragOver');
-            if (this.props.onDrop)
-                this.shared.wire('onDrop');
-            if (this.props.onFocus)
-                this.shared.wire('onFocus');
-            if (this.props.onGutterClick)
-                this.shared.wire('onGutterClick');
-            if (this.props.onKeyDown)
-                this.shared.wire('onKeyDown');
-            if (this.props.onKeyPress)
-                this.shared.wire('onKeyPress');
-            if (this.props.onKeyUp)
-                this.shared.wire('onKeyUp');
-            if (this.props.onScroll)
-                this.shared.wire('onScroll');
-            if (this.props.onSelection)
-                this.shared.wire('onSelection');
-            if (this.props.onUpdate)
-                this.shared.wire('onUpdate');
-            if (this.props.onViewportChange)
-                this.shared.wire('onViewportChange');
-            this.hydrate(this.props);
-            if (this.props.selection) {
-                var doc = this.editor.getDoc();
-                doc.setSelections(this.props.selection);
+        }
+        this.editor = cm(this.ref);
+        this.shared = new Shared(this.editor, this.props);
+        this.mirror = cm(function () {
+        });
+        this.editor.on('electricInput', function () {
+            _this.mirror.setHistory(_this.editor.getHistory());
+        });
+        this.editor.on('cursorActivity', function () {
+            _this.mirror.setCursor(_this.editor.getCursor());
+        });
+        this.editor.on('beforeChange', function (cm, data) {
+            if (_this.emulating) {
+                return;
             }
-            if (this.props.cursor) {
-                this.setCursor(this.props.cursor, this.props.autoScroll || false, this.props.autoFocus || false);
+            data.cancel();
+            _this.deferred = data;
+            var phantomChange = _this.mirrorChange(_this.deferred);
+            if (_this.props.onBeforeChange)
+                _this.props.onBeforeChange(_this.editor, _this.deferred, phantomChange);
+        });
+        this.editor.on('change', function (cm, data) {
+            if (!_this.mounted) {
+                return;
             }
-            if (this.props.scroll) {
-                this.editor.scrollTo(this.props.scroll.x, this.props.scroll.y);
+            if (_this.props.onChange) {
+                _this.props.onChange(_this.editor, data, _this.editor.getValue());
             }
-            this.mounted = true;
-            if (this.props.editorDidMount) {
-                this.props.editorDidMount(this.editor, this.editor.getValue(), this.initCb);
-            }
+        });
+        if (this.props.onBlur)
+            this.shared.wire('onBlur');
+        if (this.props.onCursor)
+            this.shared.wire('onCursor');
+        if (this.props.onCursorActivity)
+            this.shared.wire('onCursorActivity');
+        if (this.props.onDragEnter)
+            this.shared.wire('onDragEnter');
+        if (this.props.onDragOver)
+            this.shared.wire('onDragOver');
+        if (this.props.onDrop)
+            this.shared.wire('onDrop');
+        if (this.props.onFocus)
+            this.shared.wire('onFocus');
+        if (this.props.onGutterClick)
+            this.shared.wire('onGutterClick');
+        if (this.props.onKeyDown)
+            this.shared.wire('onKeyDown');
+        if (this.props.onKeyPress)
+            this.shared.wire('onKeyPress');
+        if (this.props.onKeyUp)
+            this.shared.wire('onKeyUp');
+        if (this.props.onScroll)
+            this.shared.wire('onScroll');
+        if (this.props.onSelection)
+            this.shared.wire('onSelection');
+        if (this.props.onUpdate)
+            this.shared.wire('onUpdate');
+        if (this.props.onViewportChange)
+            this.shared.wire('onViewportChange');
+        this.hydrate(this.props);
+        if (this.props.selection) {
+            var doc = this.editor.getDoc();
+            doc.setSelections(this.props.selection);
+        }
+        if (this.props.cursor) {
+            this.setCursor(this.props.cursor, this.props.autoScroll || false, this.props.autoFocus || false);
+        }
+        if (this.props.scroll) {
+            this.editor.scrollTo(this.props.scroll.x, this.props.scroll.y);
+        }
+        this.mounted = true;
+        if (this.props.editorDidMount) {
+            this.props.editorDidMount(this.editor, this.editor.getValue(), this.initCb);
         }
     };
     Controlled.prototype.componentWillReceiveProps = function (nextProps) {
+        if (SERVER_RENDERED)
+            return;
         var cursorPos;
         if (nextProps.value !== this.props.value) {
             this.hydrated = false;
@@ -351,12 +352,19 @@ var Controlled = (function (_super) {
         }
     };
     Controlled.prototype.componentWillUnmount = function () {
+        if (SERVER_RENDERED)
+            return;
         if (this.props.editorWillUnmount) {
             this.props.editorWillUnmount(cm);
         }
     };
+    Controlled.prototype.shouldComponentUpdate = function (nextProps, nextState) {
+        return !SERVER_RENDERED;
+    };
     Controlled.prototype.render = function () {
         var _this = this;
+        if (SERVER_RENDERED)
+            return null;
         var className = this.props.className ? 'react-codemirror2 ' + this.props.className : 'react-codemirror2';
         return (React.createElement('div', { className: className, ref: function (self) { return _this.ref = self; } }));
     };
@@ -367,6 +375,8 @@ var UnControlled = (function (_super) {
     __extends(UnControlled, _super);
     function UnControlled(props) {
         var _this = _super.call(this, props) || this;
+        if (SERVER_RENDERED)
+            return _this;
         _this.continueChange = false;
         _this.hydrated = false;
         _this.initCb = function () {
@@ -412,90 +422,94 @@ var UnControlled = (function (_super) {
         this.hydrated = true;
     };
     UnControlled.prototype.componentWillMount = function () {
+        if (SERVER_RENDERED)
+            return;
         if (this.props.editorWillMount) {
             this.props.editorWillMount();
         }
     };
     UnControlled.prototype.componentDidMount = function () {
         var _this = this;
-        if (!IS_MOBILE) {
-            if (this.props.defineMode) {
-                if (this.props.defineMode.name && this.props.defineMode.fn) {
-                    cm.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
-                }
+        if (SERVER_RENDERED)
+            return;
+        if (this.props.defineMode) {
+            if (this.props.defineMode.name && this.props.defineMode.fn) {
+                cm.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
             }
-            this.editor = cm(this.ref);
-            this.shared = new Shared(this.editor, this.props);
-            this.editor.on('beforeChange', function (cm, data) {
-                if (_this.props.onBeforeChange) {
-                    _this.props.onBeforeChange(_this.editor, data, null, _this.onBeforeChangeCb);
-                }
-            });
-            this.editor.on('change', function (cm, data) {
-                if (!_this.mounted) {
-                    return;
-                }
-                if (_this.props.onBeforeChange) {
-                    if (_this.continueChange) {
-                        _this.props.onChange(_this.editor, data, _this.editor.getValue());
-                    }
-                    else {
-                        return;
-                    }
-                }
-                else {
+        }
+        this.editor = cm(this.ref);
+        this.shared = new Shared(this.editor, this.props);
+        this.editor.on('beforeChange', function (cm, data) {
+            if (_this.props.onBeforeChange) {
+                _this.props.onBeforeChange(_this.editor, data, null, _this.onBeforeChangeCb);
+            }
+        });
+        this.editor.on('change', function (cm, data) {
+            if (!_this.mounted) {
+                return;
+            }
+            if (_this.props.onBeforeChange) {
+                if (_this.continueChange) {
                     _this.props.onChange(_this.editor, data, _this.editor.getValue());
                 }
-            });
-            if (this.props.onBlur)
-                this.shared.wire('onBlur');
-            if (this.props.onCursor)
-                this.shared.wire('onCursor');
-            if (this.props.onCursorActivity)
-                this.shared.wire('onCursorActivity');
-            if (this.props.onDragEnter)
-                this.shared.wire('onDragEnter');
-            if (this.props.onDragOver)
-                this.shared.wire('onDragOver');
-            if (this.props.onDrop)
-                this.shared.wire('onDrop');
-            if (this.props.onFocus)
-                this.shared.wire('onFocus');
-            if (this.props.onGutterClick)
-                this.shared.wire('onGutterClick');
-            if (this.props.onKeyDown)
-                this.shared.wire('onKeyDown');
-            if (this.props.onKeyPress)
-                this.shared.wire('onKeyPress');
-            if (this.props.onKeyUp)
-                this.shared.wire('onKeyUp');
-            if (this.props.onScroll)
-                this.shared.wire('onScroll');
-            if (this.props.onSelection)
-                this.shared.wire('onSelection');
-            if (this.props.onUpdate)
-                this.shared.wire('onUpdate');
-            if (this.props.onViewportChange)
-                this.shared.wire('onViewportChange');
-            this.hydrate(this.props);
-            if (this.props.selection) {
-                var doc = this.editor.getDoc();
-                doc.setSelections(this.props.selection);
+                else {
+                    return;
+                }
             }
-            if (this.props.cursor) {
-                this.setCursor(this.props.cursor, this.props.autoScroll || false, this.props.autoFocus || false);
+            else {
+                _this.props.onChange(_this.editor, data, _this.editor.getValue());
             }
-            if (this.props.scroll) {
-                this.editor.scrollTo(this.props.scroll.x, this.props.scroll.y);
-            }
-            this.mounted = true;
-            this.editor.clearHistory();
-            if (this.props.editorDidMount) {
-                this.props.editorDidMount(this.editor, this.editor.getValue(), this.initCb);
-            }
+        });
+        if (this.props.onBlur)
+            this.shared.wire('onBlur');
+        if (this.props.onCursor)
+            this.shared.wire('onCursor');
+        if (this.props.onCursorActivity)
+            this.shared.wire('onCursorActivity');
+        if (this.props.onDragEnter)
+            this.shared.wire('onDragEnter');
+        if (this.props.onDragOver)
+            this.shared.wire('onDragOver');
+        if (this.props.onDrop)
+            this.shared.wire('onDrop');
+        if (this.props.onFocus)
+            this.shared.wire('onFocus');
+        if (this.props.onGutterClick)
+            this.shared.wire('onGutterClick');
+        if (this.props.onKeyDown)
+            this.shared.wire('onKeyDown');
+        if (this.props.onKeyPress)
+            this.shared.wire('onKeyPress');
+        if (this.props.onKeyUp)
+            this.shared.wire('onKeyUp');
+        if (this.props.onScroll)
+            this.shared.wire('onScroll');
+        if (this.props.onSelection)
+            this.shared.wire('onSelection');
+        if (this.props.onUpdate)
+            this.shared.wire('onUpdate');
+        if (this.props.onViewportChange)
+            this.shared.wire('onViewportChange');
+        this.hydrate(this.props);
+        if (this.props.selection) {
+            var doc = this.editor.getDoc();
+            doc.setSelections(this.props.selection);
+        }
+        if (this.props.cursor) {
+            this.setCursor(this.props.cursor, this.props.autoScroll || false, this.props.autoFocus || false);
+        }
+        if (this.props.scroll) {
+            this.editor.scrollTo(this.props.scroll.x, this.props.scroll.y);
+        }
+        this.mounted = true;
+        this.editor.clearHistory();
+        if (this.props.editorDidMount) {
+            this.props.editorDidMount(this.editor, this.editor.getValue(), this.initCb);
         }
     };
     UnControlled.prototype.componentWillReceiveProps = function (nextProps) {
+        if (SERVER_RENDERED)
+            return;
         var cursorPos;
         if (nextProps.value !== this.props.value) {
             this.hydrated = false;
@@ -509,12 +523,19 @@ var UnControlled = (function (_super) {
         }
     };
     UnControlled.prototype.componentWillUnmount = function () {
+        if (SERVER_RENDERED)
+            return;
         if (this.props.editorWillUnmount) {
             this.props.editorWillUnmount(cm);
         }
     };
+    UnControlled.prototype.shouldComponentUpdate = function (nextProps, nextState) {
+        return !SERVER_RENDERED;
+    };
     UnControlled.prototype.render = function () {
         var _this = this;
+        if (SERVER_RENDERED)
+            return null;
         var className = this.props.className ? 'react-codemirror2 ' + this.props.className : 'react-codemirror2';
         return (React.createElement('div', { className: className, ref: function (self) { return _this.ref = self; } }));
     };

@@ -3,19 +3,11 @@ import * as codemirror from 'codemirror';
 
 let cm;
 
-const IS_MOBILE = typeof navigator === 'undefined' || (
-  navigator.userAgent.match(/Android/i)
-  || navigator.userAgent.match(/webOS/i)
-  || navigator.userAgent.match(/iPhone/i)
-  || navigator.userAgent.match(/iPad/i)
-  || navigator.userAgent.match(/iPod/i)
-  || navigator.userAgent.match(/BlackBerry/i)
-  || navigator.userAgent.match(/Windows Phone/i)
-);
+const SERVER_RENDERED = typeof navigator === 'undefined';
 
 declare let require: any;
 
-if (!IS_MOBILE) {
+if (!SERVER_RENDERED) {
   cm = require('codemirror');
 }
 
@@ -251,6 +243,8 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
   constructor(props: IControlledCodeMirror) {
     super(props);
 
+    if (SERVER_RENDERED) return;
+
     this.deferred = null;
     this.emulating = false;
     this.hydrated = false;
@@ -369,6 +363,8 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
   /** @internal */
   public componentWillMount() {
 
+    if (SERVER_RENDERED) return;
+
     if (this.props.editorWillMount) {
       this.props.editorWillMount();
     }
@@ -377,97 +373,98 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
   /** @internal */
   public componentDidMount() {
 
-    if (!IS_MOBILE) {
+    if (SERVER_RENDERED) return;
 
-      if (this.props.defineMode) {
-        if (this.props.defineMode.name && this.props.defineMode.fn) {
-          cm.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
-        }
+    if (this.props.defineMode) {
+      if (this.props.defineMode.name && this.props.defineMode.fn) {
+        cm.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
+      }
+    }
+
+    this.editor = cm(this.ref) as IInstance;
+
+    this.shared = new Shared(this.editor, this.props);
+
+    this.mirror = (cm as any)(() => {
+    });
+
+    this.editor.on('electricInput', () => {
+      this.mirror.setHistory(this.editor.getHistory());
+    });
+
+    this.editor.on('cursorActivity', () => {
+      this.mirror.setCursor(this.editor.getCursor());
+    });
+
+    this.editor.on('beforeChange', (cm, data) => {
+
+      if (this.emulating) {
+        return;
       }
 
-      this.editor = cm(this.ref) as IInstance;
+      data.cancel();
 
-      this.shared = new Shared(this.editor, this.props);
+      this.deferred = data;
 
-      this.mirror = (cm as any)(() => {
-      });
+      let phantomChange = this.mirrorChange(this.deferred);
 
-      this.editor.on('electricInput', () => {
-        this.mirror.setHistory(this.editor.getHistory());
-      });
+      if (this.props.onBeforeChange)
+        this.props.onBeforeChange(this.editor, this.deferred, phantomChange);
+    });
 
-      this.editor.on('cursorActivity', () => {
-        this.mirror.setCursor(this.editor.getCursor());
-      });
+    this.editor.on('change', (cm, data) => {
 
-      this.editor.on('beforeChange', (cm, data) => {
-
-        if (this.emulating) {
-          return;
-        }
-
-        data.cancel();
-
-        this.deferred = data;
-
-        let phantomChange = this.mirrorChange(this.deferred);
-
-        if (this.props.onBeforeChange)
-          this.props.onBeforeChange(this.editor, this.deferred, phantomChange);
-      });
-
-      this.editor.on('change', (cm, data) => {
-
-        if (!this.mounted) {
-          return;
-        }
-
-        if (this.props.onChange) {
-          this.props.onChange(this.editor, data, this.editor.getValue());
-        }
-      });
-
-      if (this.props.onBlur) this.shared.wire('onBlur');
-      if (this.props.onCursor) this.shared.wire('onCursor');
-      if (this.props.onCursorActivity) this.shared.wire('onCursorActivity');
-      if (this.props.onDragEnter) this.shared.wire('onDragEnter');
-      if (this.props.onDragOver) this.shared.wire('onDragOver');
-      if (this.props.onDrop) this.shared.wire('onDrop');
-      if (this.props.onFocus) this.shared.wire('onFocus');
-      if (this.props.onGutterClick) this.shared.wire('onGutterClick');
-      if (this.props.onKeyDown) this.shared.wire('onKeyDown');
-      if (this.props.onKeyPress) this.shared.wire('onKeyPress');
-      if (this.props.onKeyUp) this.shared.wire('onKeyUp');
-      if (this.props.onScroll) this.shared.wire('onScroll');
-      if (this.props.onSelection) this.shared.wire('onSelection');
-      if (this.props.onUpdate) this.shared.wire('onUpdate');
-      if (this.props.onViewportChange) this.shared.wire('onViewportChange');
-
-      this.hydrate(this.props);
-
-      if (this.props.selection) {
-        let doc = this.editor.getDoc() as IDoc;
-        doc.setSelections(this.props.selection);
+      if (!this.mounted) {
+        return;
       }
 
-      if (this.props.cursor) {
-        this.setCursor(this.props.cursor, this.props.autoScroll || false, this.props.autoFocus || false);
+      if (this.props.onChange) {
+        this.props.onChange(this.editor, data, this.editor.getValue());
       }
+    });
 
-      if (this.props.scroll) {
-        this.editor.scrollTo(this.props.scroll.x, this.props.scroll.y);
-      }
+    if (this.props.onBlur) this.shared.wire('onBlur');
+    if (this.props.onCursor) this.shared.wire('onCursor');
+    if (this.props.onCursorActivity) this.shared.wire('onCursorActivity');
+    if (this.props.onDragEnter) this.shared.wire('onDragEnter');
+    if (this.props.onDragOver) this.shared.wire('onDragOver');
+    if (this.props.onDrop) this.shared.wire('onDrop');
+    if (this.props.onFocus) this.shared.wire('onFocus');
+    if (this.props.onGutterClick) this.shared.wire('onGutterClick');
+    if (this.props.onKeyDown) this.shared.wire('onKeyDown');
+    if (this.props.onKeyPress) this.shared.wire('onKeyPress');
+    if (this.props.onKeyUp) this.shared.wire('onKeyUp');
+    if (this.props.onScroll) this.shared.wire('onScroll');
+    if (this.props.onSelection) this.shared.wire('onSelection');
+    if (this.props.onUpdate) this.shared.wire('onUpdate');
+    if (this.props.onViewportChange) this.shared.wire('onViewportChange');
 
-      this.mounted = true;
+    this.hydrate(this.props);
 
-      if (this.props.editorDidMount) {
-        this.props.editorDidMount(this.editor, this.editor.getValue(), this.initCb);
-      }
+    if (this.props.selection) {
+      let doc = this.editor.getDoc() as IDoc;
+      doc.setSelections(this.props.selection);
+    }
+
+    if (this.props.cursor) {
+      this.setCursor(this.props.cursor, this.props.autoScroll || false, this.props.autoFocus || false);
+    }
+
+    if (this.props.scroll) {
+      this.editor.scrollTo(this.props.scroll.x, this.props.scroll.y);
+    }
+
+    this.mounted = true;
+
+    if (this.props.editorDidMount) {
+      this.props.editorDidMount(this.editor, this.editor.getValue(), this.initCb);
     }
   }
 
   /** @internal */
   public componentWillReceiveProps(nextProps) {
+
+    if (SERVER_RENDERED) return;
 
     let cursorPos: codemirror.Position;
 
@@ -489,13 +486,22 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
   /** @internal */
   public componentWillUnmount() {
 
+    if (SERVER_RENDERED) return;
+
     if (this.props.editorWillUnmount) {
       this.props.editorWillUnmount(cm);
     }
   }
 
   /** @internal */
+  public shouldComponentUpdate(nextProps, nextState) {
+    return !SERVER_RENDERED
+  }
+
+  /** @internal */
   public render() {
+
+    if (SERVER_RENDERED) return null;
 
     let className = this.props.className ? `react-codemirror2 ${this.props.className}` : 'react-codemirror2';
 
@@ -528,13 +534,15 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
   constructor(props: IUnControlledCodeMirror) {
     super(props);
 
+    if (SERVER_RENDERED) return;
+
     this.continueChange = false;
     this.hydrated = false;
     this.initCb = () => {
       if (this.props.editorDidConfigure) {
         this.props.editorDidConfigure(this.editor);
       }
-    }
+    };
     this.mounted = false;
     this.onBeforeChangeCb = () => {
       this.continueChange = true;
@@ -590,6 +598,8 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
   /** @internal */
   public componentWillMount() {
 
+    if (SERVER_RENDERED) return;
+
     if (this.props.editorWillMount) {
       this.props.editorWillMount();
     }
@@ -598,92 +608,92 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
   /** @internal */
   public componentDidMount() {
 
-    if (!IS_MOBILE) {
+    if (SERVER_RENDERED) return;
 
-      if (this.props.defineMode) {
-        if (this.props.defineMode.name && this.props.defineMode.fn) {
-          cm.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
-        }
+    if (this.props.defineMode) {
+      if (this.props.defineMode.name && this.props.defineMode.fn) {
+        cm.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
+      }
+    }
+
+    this.editor = cm(this.ref) as IInstance;
+
+    this.shared = new Shared(this.editor, this.props);
+
+    this.editor.on('beforeChange', (cm, data) => {
+
+      if (this.props.onBeforeChange) {
+        this.props.onBeforeChange(this.editor, data, null, this.onBeforeChangeCb)
+      }
+    });
+
+    this.editor.on('change', (cm, data) => {
+
+      if (!this.mounted) {
+        return;
       }
 
-      this.editor = cm(this.ref) as IInstance;
-
-      this.shared = new Shared(this.editor, this.props);
-
-      this.editor.on('beforeChange', (cm, data) => {
-
-        if (this.props.onBeforeChange) {
-          this.props.onBeforeChange(this.editor, data, null, this.onBeforeChangeCb)
-        }
-      });
-
-      this.editor.on('change', (cm, data) => {
-
-        if (!this.mounted) {
+      if (this.props.onBeforeChange) {
+        if (this.continueChange) {
+          this.props.onChange(this.editor, data, this.editor.getValue())
+        } else {
           return;
         }
-
-        if (this.props.onBeforeChange) {
-          if (this.continueChange) {
-            this.props.onChange(this.editor, data, this.editor.getValue())
-          } else {
-            return;
-          }
-        } else {
-          this.props.onChange(this.editor, data, this.editor.getValue())
-        }
-      });
-
-      if (this.props.onBlur) this.shared.wire('onBlur');
-      if (this.props.onCursor) this.shared.wire('onCursor');
-      if (this.props.onCursorActivity) this.shared.wire('onCursorActivity');
-      if (this.props.onDragEnter) this.shared.wire('onDragEnter');
-      if (this.props.onDragOver) this.shared.wire('onDragOver');
-      if (this.props.onDrop) this.shared.wire('onDrop');
-      if (this.props.onFocus) this.shared.wire('onFocus');
-      if (this.props.onGutterClick) this.shared.wire('onGutterClick');
-      if (this.props.onKeyDown) this.shared.wire('onKeyDown');
-      if (this.props.onKeyPress) this.shared.wire('onKeyPress');
-      if (this.props.onKeyUp) this.shared.wire('onKeyUp');
-      if (this.props.onScroll) this.shared.wire('onScroll');
-      if (this.props.onSelection) this.shared.wire('onSelection');
-      if (this.props.onUpdate) this.shared.wire('onUpdate');
-      if (this.props.onViewportChange) this.shared.wire('onViewportChange');
-
-      this.hydrate(this.props);
-
-      if (this.props.selection) {
-        let doc = this.editor.getDoc() as IDoc;
-        doc.setSelections(this.props.selection);
+      } else {
+        this.props.onChange(this.editor, data, this.editor.getValue())
       }
+    });
 
-      if (this.props.cursor) {
-        this.setCursor(this.props.cursor, this.props.autoScroll || false, this.props.autoFocus || false);
-      }
+    if (this.props.onBlur) this.shared.wire('onBlur');
+    if (this.props.onCursor) this.shared.wire('onCursor');
+    if (this.props.onCursorActivity) this.shared.wire('onCursorActivity');
+    if (this.props.onDragEnter) this.shared.wire('onDragEnter');
+    if (this.props.onDragOver) this.shared.wire('onDragOver');
+    if (this.props.onDrop) this.shared.wire('onDrop');
+    if (this.props.onFocus) this.shared.wire('onFocus');
+    if (this.props.onGutterClick) this.shared.wire('onGutterClick');
+    if (this.props.onKeyDown) this.shared.wire('onKeyDown');
+    if (this.props.onKeyPress) this.shared.wire('onKeyPress');
+    if (this.props.onKeyUp) this.shared.wire('onKeyUp');
+    if (this.props.onScroll) this.shared.wire('onScroll');
+    if (this.props.onSelection) this.shared.wire('onSelection');
+    if (this.props.onUpdate) this.shared.wire('onUpdate');
+    if (this.props.onViewportChange) this.shared.wire('onViewportChange');
 
-      if (this.props.scroll) {
-        this.editor.scrollTo(this.props.scroll.x, this.props.scroll.y);
-      }
+    this.hydrate(this.props);
 
-      this.mounted = true;
+    if (this.props.selection) {
+      let doc = this.editor.getDoc() as IDoc;
+      doc.setSelections(this.props.selection);
+    }
 
-      this.editor.clearHistory();
+    if (this.props.cursor) {
+      this.setCursor(this.props.cursor, this.props.autoScroll || false, this.props.autoFocus || false);
+    }
 
-      if (this.props.editorDidMount) {
-        this.props.editorDidMount(this.editor, this.editor.getValue(), this.initCb);
-      }
+    if (this.props.scroll) {
+      this.editor.scrollTo(this.props.scroll.x, this.props.scroll.y);
+    }
+
+    this.mounted = true;
+
+    this.editor.clearHistory();
+
+    if (this.props.editorDidMount) {
+      this.props.editorDidMount(this.editor, this.editor.getValue(), this.initCb);
     }
   }
 
   /** @internal */
   public componentWillReceiveProps(nextProps) {
 
+    if (SERVER_RENDERED) return;
+
     let cursorPos: codemirror.Position;
 
     if (nextProps.value !== this.props.value) {
       this.hydrated = false;
     }
-
 
     if (!this.props.autoCursor && this.props.autoCursor !== undefined) {
       cursorPos = this.editor.getCursor();
@@ -699,13 +709,22 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
   /** @internal */
   public componentWillUnmount() {
 
+    if (SERVER_RENDERED) return;
+
     if (this.props.editorWillUnmount) {
       this.props.editorWillUnmount(cm);
     }
   }
 
   /** @internal */
+  public shouldComponentUpdate(nextProps, nextState) {
+    return !SERVER_RENDERED
+  }
+
+  /** @internal */
   public render() {
+
+    if (SERVER_RENDERED) return null;
 
     let className = this.props.className ? `react-codemirror2 ${this.props.className}` : 'react-codemirror2';
 
