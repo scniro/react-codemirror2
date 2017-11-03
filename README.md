@@ -25,7 +25,7 @@ import {UnControlled as CodeMirror} from 'react-codemirror2'
     theme: 'material',
     lineNumbers: true
   }}
-  onChange={(editor, metadata, value) => {
+  onChange={(editor, data, value) => {
   }}
 />
 ```
@@ -40,7 +40,7 @@ import {Controlled as CodeMirror} from 'react-codemirror2'
   onBeforeChange={(editor, data, value) => {
     this.setState({value});
   }}
-  onChange={(editor, metadata, value) => {
+  onChange={(editor, data, value) => {
   }}
 />
 ```
