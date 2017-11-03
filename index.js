@@ -126,8 +126,7 @@ var Shared = (function () {
             case 'onSelection':
                 {
                     this.editor.on('beforeSelectionChange', function (cm, data) {
-                        var _data = Object.assign({}, data);
-                        _this.props.onSelection(_this.editor, _data);
+                        _this.props.onSelection(_this.editor, data);
                     });
                 }
                 break;

@@ -32,10 +32,9 @@ export interface IGetSelectionOptions {
   update: (ranges: Array<ISetSelectionOptions>) => void;
 }
 
+/* tshacks: laundry list of incorrect typings in @types/codemirror */
 export interface IDoc extends codemirror.Doc {
-  /* tshack: `setCursor` has incorrect/missing overloaded signature in @types/codemirror */
   setCursor: (pos: codemirror.Position, ch?: number, options?: {}) => void;
-  /* tshack: `setSelections` missing in @types/codemirror */
   setSelections: (ranges: Array<ISetSelectionOptions>) => void;
 }
 
@@ -203,12 +202,8 @@ class Shared implements ICommon {
       }
         break;
       case 'onSelection': {
-        this.editor.on('beforeSelectionChange', (cm, data) => {
-
-          /* tshack: `beforeSelectionChange` return wrong type in @types/codemirror */
-          let _data = Object.assign<any, any>({}, data) as IGetSelectionOptions;
-
-          this.props.onSelection(this.editor, _data);
+        this.editor.on('beforeSelectionChange', (cm, data: any) => {
+          this.props.onSelection(this.editor, data);
         });
       }
         break;
