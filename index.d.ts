@@ -14,6 +14,11 @@ export interface ISetSelectionOptions {
     anchor: codemirror.Position;
     head: codemirror.Position;
 }
+export interface IGetSelectionOptions {
+    ranges: Array<ISetSelectionOptions>;
+    origin: string;
+    update: (ranges: Array<ISetSelectionOptions>) => void;
+}
 export interface IDoc extends codemirror.Doc {
     setCursor: (pos: codemirror.Position, ch?: number, options?: {}) => void;
     setSelections: (ranges: Array<ISetSelectionOptions>) => void;
@@ -44,7 +49,7 @@ export interface ICodeMirror {
     onKeyPress?: (editor: IInstance, event: Event) => void;
     onKeyUp?: (editor: IInstance, event: Event) => void;
     onScroll?: (editor: IInstance, data: codemirror.ScrollInfo) => void;
-    onSelection?: (editor: IInstance, ranges: ISetSelectionOptions) => void;
+    onSelection?: (editor: IInstance, data: IGetSelectionOptions) => void;
     onUpdate?: (editor: IInstance) => void;
     onViewportChange?: (editor: IInstance, start: number, end: number) => void;
     options?: codemirror.EditorConfiguration;

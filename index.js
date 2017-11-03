@@ -13,7 +13,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var React = require('react');
 var cm;
 var SERVER_RENDERED = typeof navigator === 'undefined';
-console.log(SERVER_RENDERED);
 if (!SERVER_RENDERED) {
     cm = require('codemirror');
 }
@@ -127,7 +126,8 @@ var Shared = (function () {
             case 'onSelection':
                 {
                     this.editor.on('beforeSelectionChange', function (cm, data) {
-                        _this.props.onSelection(_this.editor, data);
+                        var _data = Object.assign({}, data);
+                        _this.props.onSelection(_this.editor, _data);
                     });
                 }
                 break;

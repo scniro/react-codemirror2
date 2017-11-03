@@ -22,8 +22,14 @@ export interface ISetScrollOptions {
 }
 
 export interface ISetSelectionOptions {
-  anchor: codemirror.Position,
-  head: codemirror.Position
+  anchor: codemirror.Position;
+  head: codemirror.Position;
+}
+
+export interface IGetSelectionOptions {
+  ranges: Array<ISetSelectionOptions>;
+  origin: string;
+  update: (ranges: Array<ISetSelectionOptions>) => void;
 }
 
 export interface IDoc extends codemirror.Doc {
@@ -61,7 +67,7 @@ export interface ICodeMirror {
   onKeyPress?: (editor: IInstance, event: Event) => void;
   onKeyUp?: (editor: IInstance, event: Event) => void;
   onScroll?: (editor: IInstance, data: codemirror.ScrollInfo) => void;
-  onSelection?: (editor: IInstance, ranges: ISetSelectionOptions) => void;
+  onSelection?: (editor: IInstance, data: IGetSelectionOptions) => void;
   onUpdate?: (editor: IInstance) => void;
   onViewportChange?: (editor: IInstance, start: number, end: number) => void;
   options?: codemirror.EditorConfiguration
@@ -198,7 +204,11 @@ class Shared implements ICommon {
         break;
       case 'onSelection': {
         this.editor.on('beforeSelectionChange', (cm, data) => {
-          this.props.onSelection(this.editor, data);
+
+          /* tshack: `beforeSelectionChange` return wrong type in @types/codemirror */
+          let _data = Object.assign<any, any>({}, data) as IGetSelectionOptions;
+
+          this.props.onSelection(this.editor, _data);
         });
       }
         break;
