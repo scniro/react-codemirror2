@@ -118,11 +118,11 @@ class Shared implements ICommon {
     }
 
     if (this.props.onSet !== undefined) {
-      console.warn('`onSet` has been deprecated. User `editorDidMount` instead. See https://github.com/scniro/react-codemirror2#events');
+      console.warn('`onSet` has been deprecated. Use `editorDidMount` instead. See https://github.com/scniro/react-codemirror2#events');
     }
 
     if (this.props.onBeforeSet !== undefined) {
-      console.warn('`onBeforeSet` has been deprecated. User `onBeforeChange` for `Controlled`. instead. See https://github.com/scniro/react-codemirror2#events');
+      console.warn('`onBeforeSet` has been deprecated. Use `onBeforeChange` for `Controlled`. instead. See https://github.com/scniro/react-codemirror2#events');
     }
   }
 
