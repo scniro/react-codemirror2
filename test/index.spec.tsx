@@ -12,20 +12,6 @@ global.console = {
   log: console.log
 };
 
-describe('[temporary] deprecation notice', () => {
-
-  Enzyme.shallow(<UnControlled
-    autoScrollCursorOnSet={true}
-    resetCursorOnSet={true}
-    onSet={() => {
-    }}
-    onBeforeSet={() => {
-    }}/>
-  );
-
-  expect(global.console.warn).toHaveBeenCalled()
-});
-
 describe('[Controlled, UnControlled]: init', () => {
 
   it('should render | props: {}', () => {
@@ -241,7 +227,7 @@ describe('Change', () => {
 
 describe('Props', () => {
 
-  it('[Controlled, UnControlled]: selection', () => {
+  it('[Controlled, UnControlled]: selection | set', () => {
 
     Enzyme.mount(
       <Controlled
@@ -268,7 +254,66 @@ describe('Props', () => {
     );
   });
 
-  it('[Controlled, UnControlled]: cursor', () => {
+  it('[Controlled: selection | dynamic', () => {
+
+    let set = false;
+
+    let expectedRanges = [{
+      anchor: {ch: 1, line: 1},
+      head: {ch: 3, line: 1}
+    }];
+
+    let wrapper = Enzyme.mount(
+      <Controlled
+        value='foo\nbar\nbaz'
+        onSelection={(editor, data) => {
+
+          if (set) {
+            expect(data.ranges).toEqual(expectedRanges);
+          }
+
+          set = true;
+        }}/>
+    );
+
+    wrapper.setProps({
+      selection: [{
+        anchor: {ch: 1, line: 1},
+        head: {ch: 3, line: 1}
+      }]
+    });
+
+    wrapper.unmount();
+  });
+
+  it('[UnControlled: selection | dynamic', () => {
+
+    let set = false;
+
+    let expectedRanges = [{
+      anchor: {ch: 1, line: 1},
+      head: {ch: 3, line: 1}
+    }];
+
+    let wrapper = Enzyme.mount(
+      <UnControlled
+        value='foo\nbar\nbaz'
+        onSelection={(editor, data) => {
+          expect(data.ranges).toEqual(expectedRanges);
+        }}/>
+    );
+
+    wrapper.setProps({
+      selection: [{
+        anchor: {ch: 1, line: 1},
+        head: {ch: 3, line: 1}
+      }]
+    });
+
+    wrapper.unmount();
+  });
+
+  it('[Controlled, UnControlled]: cursor | set', () => {
 
     Enzyme.mount(
       <Controlled

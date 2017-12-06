@@ -49,7 +49,11 @@ class Editor extends React.Component {
 
     this.exampleCustomModeStrings = 'only "double quotes" will be tokenized\n\nsee http://marijnhaverbeke.nl/blog/codemirror-mode-system.html'
     this.state = {
-      value: this.defaultHTML
+      value: this.defaultHTML,
+      cursor: {
+        line: 5,
+        ch: 10
+      }
     };
   }
 
@@ -96,9 +100,21 @@ class Editor extends React.Component {
 
     if (controlled) {
       return (
+        <div>
+          <button onClick={() => {
+
+            this.setState({
+              cursor: {
+                line: 5,
+                ch: 11
+              }
+            })
+
+          }}>cursor</button>
         <Controlled
           value={this.state.value}
           defineMode={{name: 'strings', fn: sampleMode}}
+          cursor={this.state.cursor}
           options={{
             mode: this.props.mode,
             theme: this.props.theme,
@@ -110,7 +126,11 @@ class Editor extends React.Component {
           onChange={(editor, data, value) => {
             console.log('controlled', {value});
           }}
+          editorDidMount={(editor) => {
+            window.editor = editor;
+          }}
         />
+        </div>
       )
     } else {
       return (

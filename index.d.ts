@@ -7,8 +7,8 @@ export interface IDefineModeOptions {
     name: string;
 }
 export interface ISetScrollOptions {
-    x: number;
-    y: number;
+    x?: number | null;
+    y?: number | null;
 }
 export interface ISetSelectionOptions {
     anchor: codemirror.Position;
@@ -55,10 +55,6 @@ export interface ICodeMirror {
     options?: codemirror.EditorConfiguration;
     selection?: Array<ISetSelectionOptions>;
     scroll?: ISetScrollOptions;
-    autoScrollCursorOnSet?: any;
-    onBeforeSet?: any;
-    onSet?: any;
-    resetCursorOnSet?: any;
 }
 export interface IControlledCodeMirror extends ICodeMirror {
     onBeforeChange: (editor: IInstance, data: codemirror.EditorChange, value: string) => void;

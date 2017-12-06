@@ -17,8 +17,8 @@ export interface IDefineModeOptions {
 }
 
 export interface ISetScrollOptions {
-  x: number;
-  y: number;
+  x?: number | null;
+  y?: number | null;
 }
 
 export interface ISetSelectionOptions {
@@ -72,12 +72,6 @@ export interface ICodeMirror {
   options?: codemirror.EditorConfiguration
   selection?: Array<ISetSelectionOptions>;
   scroll?: ISetScrollOptions;
-  /* <deprecated> */
-  autoScrollCursorOnSet?: any;
-  onBeforeSet?: any;
-  onSet?: any;
-  resetCursorOnSet?: any;
-  /* </deprecated> */
 }
 
 export interface IControlledCodeMirror extends ICodeMirror {
@@ -92,7 +86,9 @@ export interface IUnControlledCodeMirror extends ICodeMirror {
 
 declare interface ICommon {
   wire: (name: string) => void;
-  notifyOfDeprecation: () => void;
+  delegateScroll: (coordinates: ISetScrollOptions) => void;
+  delegateSelection: (ranges: Array<ISetSelectionOptions>) => void;
+  delegateCursor: (position: codemirror.Position, autoScroll?: boolean, autoFocus?: boolean) => void;
 }
 
 class Shared implements ICommon {
@@ -101,29 +97,8 @@ class Shared implements ICommon {
   private props: ICodeMirror;
 
   constructor(editor, props) {
-
     this.editor = editor;
     this.props = props;
-
-    this.notifyOfDeprecation();
-  }
-
-  public notifyOfDeprecation() {
-    if (this.props.autoScrollCursorOnSet !== undefined) {
-      console.warn('`autoScrollCursorOnSet` has been deprecated. Use `autoScroll` instead\n\nSee https://github.com/scniro/react-codemirror2#props');
-    }
-
-    if (this.props.resetCursorOnSet !== undefined) {
-      console.warn('`resetCursorOnSet` has been deprecated. Use `autoCursor` instead\n\nSee https://github.com/scniro/react-codemirror2#props');
-    }
-
-    if (this.props.onSet !== undefined) {
-      console.warn('`onSet` has been deprecated. User `editorDidMount` instead. See https://github.com/scniro/react-codemirror2#events');
-    }
-
-    if (this.props.onBeforeSet !== undefined) {
-      console.warn('`onBeforeSet` has been deprecated. User `onBeforeChange` for `Controlled`. instead. See https://github.com/scniro/react-codemirror2#events');
-    }
   }
 
   public wire(name: string) {
@@ -221,6 +196,24 @@ class Shared implements ICommon {
         break;
     }
   }
+
+  public delegateScroll(coordinates: ISetScrollOptions) {
+    this.editor.scrollTo(coordinates.x, coordinates.y)
+  }
+
+  public delegateSelection(ranges: Array<ISetSelectionOptions>) {
+    this.editor.setSelections(ranges);
+  }
+
+  public delegateCursor(position: codemirror.Position, autoScroll?: boolean, autoFocus?: boolean) {
+
+    let doc = this.editor.getDoc() as IDoc;
+
+    if (autoFocus)
+      this.editor.focus();
+
+    autoScroll ? doc.setCursor(position) : doc.setCursor(position, null, {scroll: false});
+  }
 }
 
 export class Controlled extends React.Component<IControlledCodeMirror, any> {
@@ -262,34 +255,6 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
   }
 
   /** @internal */
-  private setCursor(cursorPos: codemirror.Position, scroll: boolean, focus?: boolean) {
-
-    let doc = this.editor.getDoc() as IDoc;
-
-    if (focus) {
-      this.editor.focus();
-    }
-
-    if (scroll) {
-      doc.setCursor(cursorPos);
-    } else {
-      doc.setCursor(cursorPos, null, {scroll: false});
-    }
-  }
-
-  /** @internal */
-  private moveCursor(cursorPos: codemirror.Position, scroll: boolean) {
-
-    let doc = this.editor.getDoc() as IDoc;
-
-    if (scroll) {
-      doc.setCursor(cursorPos);
-    } else {
-      doc.setCursor(cursorPos, null, {scroll: false});
-    }
-  }
-
-  /** @internal */
   private hydrate(props) {
 
     Object.keys(props.options || {}).forEach(key => {
@@ -298,7 +263,6 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
     });
 
     if (!this.hydrated) {
-
       if (!this.mounted) {
         this.initChange(props.value || '');
       } else {
@@ -428,6 +392,22 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
       }
     });
 
+    this.hydrate(this.props);
+
+    if (this.props.selection) {
+      this.shared.delegateSelection(this.props.selection);
+    }
+
+    if (this.props.cursor) {
+      this.shared.delegateCursor(this.props.cursor, (this.props.autoScroll || false), (this.props.autoFocus || false));
+    }
+
+    if (this.props.scroll) {
+      this.shared.delegateScroll(this.props.scroll);
+    }
+
+    this.mounted = true;
+
     if (this.props.onBlur) this.shared.wire('onBlur');
     if (this.props.onCursor) this.shared.wire('onCursor');
     if (this.props.onCursorActivity) this.shared.wire('onCursorActivity');
@@ -444,23 +424,6 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
     if (this.props.onUpdate) this.shared.wire('onUpdate');
     if (this.props.onViewportChange) this.shared.wire('onViewportChange');
 
-    this.hydrate(this.props);
-
-    if (this.props.selection) {
-      let doc = this.editor.getDoc() as IDoc;
-      doc.setSelections(this.props.selection);
-    }
-
-    if (this.props.cursor) {
-      this.setCursor(this.props.cursor, this.props.autoScroll || false, this.props.autoFocus || false);
-    }
-
-    if (this.props.scroll) {
-      this.editor.scrollTo(this.props.scroll.x, this.props.scroll.y);
-    }
-
-    this.mounted = true;
-
     if (this.props.editorDidMount) {
       this.props.editorDidMount(this.editor, this.editor.getValue(), this.initCb);
     }
@@ -471,20 +434,34 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
 
     if (SERVER_RENDERED) return;
 
-    let cursorPos: codemirror.Position;
+    let preservedCursor: codemirror.Position = null;
 
     if (nextProps.value !== this.props.value) {
       this.hydrated = false;
     }
 
     if (!this.props.autoCursor && this.props.autoCursor !== undefined) {
-      cursorPos = this.editor.getCursor();
+      preservedCursor = this.editor.getCursor();
     }
 
     this.hydrate(nextProps);
 
-    if (!this.props.autoCursor && this.props.autoCursor !== undefined) {
-      this.moveCursor(cursorPos, this.props.autoScroll || false);
+    if (nextProps.scroll) {
+      if (JSON.stringify(this.props.scroll) !== JSON.stringify(nextProps.scroll)) {
+        this.shared.delegateScroll(nextProps.scroll);
+      }
+    }
+
+    if (nextProps.selection) {
+      if (JSON.stringify(this.props.selection) !== JSON.stringify(nextProps.selection)) {
+        this.shared.delegateSelection(nextProps.selection);
+      }
+    }
+
+    if (nextProps.cursor) {
+      if (JSON.stringify(this.props.cursor) !== JSON.stringify(nextProps.cursor)) {
+        this.shared.delegateCursor(preservedCursor || nextProps.cursor, (nextProps.autoScroll || false), (nextProps.autoCursor || false));
+      }
     }
   }
 
@@ -555,34 +532,6 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
   }
 
   /** @internal */
-  private setCursor(cursorPos: codemirror.Position, scroll: boolean, focus?: boolean) {
-
-    let doc = this.editor.getDoc() as IDoc;
-
-    if (focus) {
-      this.editor.focus();
-    }
-
-    if (scroll) {
-      doc.setCursor(cursorPos);
-    } else {
-      doc.setCursor(cursorPos, null, {scroll: false});
-    }
-  }
-
-  /** @internal */
-  private moveCursor(cursorPos: codemirror.Position, scroll: boolean) {
-
-    let doc = this.editor.getDoc() as IDoc;
-
-    if (scroll) {
-      doc.setCursor(cursorPos);
-    } else {
-      doc.setCursor(cursorPos, null, {scroll: false});
-    }
-  }
-
-  /** @internal */
   private hydrate(props) {
 
     Object.keys(props.options || {}).forEach(key => this.editor.setOption(key, props.options[key]));
@@ -649,6 +598,22 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
       }
     });
 
+    this.hydrate(this.props);
+
+    if (this.props.selection) {
+      this.shared.delegateSelection(this.props.selection);
+    }
+
+    if (this.props.cursor) {
+      this.shared.delegateCursor(this.props.cursor, (this.props.autoScroll || false), (this.props.autoFocus || false));
+    }
+
+    if (this.props.scroll) {
+      this.shared.delegateScroll(this.props.scroll);
+    }
+
+    this.mounted = true;
+
     if (this.props.onBlur) this.shared.wire('onBlur');
     if (this.props.onCursor) this.shared.wire('onCursor');
     if (this.props.onCursorActivity) this.shared.wire('onCursorActivity');
@@ -665,23 +630,6 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
     if (this.props.onUpdate) this.shared.wire('onUpdate');
     if (this.props.onViewportChange) this.shared.wire('onViewportChange');
 
-    this.hydrate(this.props);
-
-    if (this.props.selection) {
-      let doc = this.editor.getDoc() as IDoc;
-      doc.setSelections(this.props.selection);
-    }
-
-    if (this.props.cursor) {
-      this.setCursor(this.props.cursor, this.props.autoScroll || false, this.props.autoFocus || false);
-    }
-
-    if (this.props.scroll) {
-      this.editor.scrollTo(this.props.scroll.x, this.props.scroll.y);
-    }
-
-    this.mounted = true;
-
     this.editor.clearHistory();
 
     if (this.props.editorDidMount) {
@@ -694,20 +642,35 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
 
     if (SERVER_RENDERED) return;
 
-    let cursorPos: codemirror.Position;
+    let preservedCursor: codemirror.Position = null;
 
     if (nextProps.value !== this.props.value) {
       this.hydrated = false;
     }
 
     if (!this.props.autoCursor && this.props.autoCursor !== undefined) {
-      cursorPos = this.editor.getCursor();
+      preservedCursor = this.editor.getCursor();
     }
 
     this.hydrate(nextProps);
 
-    if (!this.props.autoCursor && this.props.autoCursor !== undefined) {
-      this.moveCursor(cursorPos, this.props.autoScroll || false);
+    if (nextProps.scroll) {
+      if (JSON.stringify(this.props.scroll) !== JSON.stringify(nextProps.scroll)) {
+        this.shared.delegateScroll(nextProps.scroll);
+      }
+    }
+
+    if (nextProps.selection) {
+      if (JSON.stringify(this.props.selection) !== JSON.stringify(nextProps.selection)) {
+        this.shared.delegateSelection(nextProps.selection);
+      }
+    }
+
+    if (nextProps.cursor) {
+
+      if (JSON.stringify(this.props.cursor) !== JSON.stringify(nextProps.cursor)) {
+        this.shared.delegateCursor(preservedCursor || nextProps.cursor, (nextProps.autoScroll || false), (nextProps.autoCursor || false));
+      }
     }
   }
 
