@@ -3,7 +3,7 @@ import * as codemirror from 'codemirror';
 
 let cm;
 
-const SERVER_RENDERED = typeof navigator === 'undefined';
+const SERVER_RENDERED = (typeof navigator === 'undefined' || global['PREVENT_CODEMIRROR_RENDER'] === true);
 
 declare let require: any;
 
@@ -590,8 +590,6 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
       if (this.props.onBeforeChange) {
         if (this.continueChange) {
           this.props.onChange(this.editor, data, this.editor.getValue())
-        } else {
-          return;
         }
       } else {
         this.props.onChange(this.editor, data, this.editor.getValue())

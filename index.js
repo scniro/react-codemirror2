@@ -12,7 +12,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, '__esModule', { value: true });
 var React = require('react');
 var cm;
-var SERVER_RENDERED = typeof navigator === 'undefined';
+var SERVER_RENDERED = (typeof navigator === 'undefined' || global['PREVENT_CODEMIRROR_RENDER'] === true);
 if (!SERVER_RENDERED) {
     cm = require('codemirror');
 }
@@ -416,9 +416,6 @@ var UnControlled = (function (_super) {
             if (_this.props.onBeforeChange) {
                 if (_this.continueChange) {
                     _this.props.onChange(_this.editor, data, _this.editor.getValue());
-                }
-                else {
-                    return;
                 }
             }
             else {
