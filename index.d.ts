@@ -53,7 +53,10 @@ export interface ICodeMirror {
     onUpdate?: (editor: IInstance) => void;
     onViewportChange?: (editor: IInstance, start: number, end: number) => void;
     options?: codemirror.EditorConfiguration;
-    selection?: Array<ISetSelectionOptions>;
+    selection?: {
+        ranges: Array<ISetSelectionOptions>;
+        focus?: boolean;
+    };
     scroll?: ISetScrollOptions;
 }
 export interface IControlledCodeMirror extends ICodeMirror {

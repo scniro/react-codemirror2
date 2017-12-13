@@ -70,7 +70,7 @@ export interface ICodeMirror {
   onUpdate?: (editor: IInstance) => void;
   onViewportChange?: (editor: IInstance, start: number, end: number) => void;
   options?: codemirror.EditorConfiguration
-  selection?: Array<ISetSelectionOptions>;
+  selection?: { ranges: Array<ISetSelectionOptions>, focus?: boolean };
   scroll?: ISetScrollOptions;
 }
 
@@ -86,9 +86,21 @@ export interface IUnControlledCodeMirror extends ICodeMirror {
 
 declare interface ICommon {
   wire: (name: string) => void;
-  delegateScroll: (coordinates: ISetScrollOptions) => void;
-  delegateSelection: (ranges: Array<ISetSelectionOptions>) => void;
-  delegateCursor: (position: codemirror.Position, autoScroll?: boolean, autoFocus?: boolean) => void;
+  apply: (props: IControlledCodeMirror | IUnControlledCodeMirror, next?: IControlledCodeMirror | IUnControlledCodeMirror, preserved?: IPreservedOptions) => void;
+}
+
+declare interface IPreservedOptions {
+  cursor?: codemirror.Position
+}
+
+abstract class Helper {
+  public static equals(x: {}, y: {}) {
+    const ok = Object.keys, tx = typeof x, ty = typeof y;
+    return x && y && tx === 'object' && tx === ty ? (
+      ok(x).length === ok(y).length &&
+      ok(x).every(key => this.equals(x[key], y[key]))
+    ) : (x === y);
+  }
 }
 
 class Shared implements ICommon {
@@ -99,6 +111,75 @@ class Shared implements ICommon {
   constructor(editor, props) {
     this.editor = editor;
     this.props = props;
+  }
+
+  delegateCursor(position: codemirror.Position, scroll?: boolean, focus?: boolean) {
+
+    let doc = this.editor.getDoc() as IDoc;
+
+    if (focus) {
+      this.editor.focus();
+    }
+
+    scroll ? doc.setCursor(position) : doc.setCursor(position, null, {scroll: false});
+  }
+
+  delegateScroll(coordinates: ISetScrollOptions) {
+    this.editor.scrollTo(coordinates.x, coordinates.y)
+  }
+
+  delegateSelection(ranges: Array<ISetSelectionOptions>, focus?: boolean) {
+    this.editor.setSelections(ranges);
+
+    if (focus) {
+      this.editor.focus();
+    }
+  }
+
+  public apply(props: IControlledCodeMirror | IUnControlledCodeMirror, next?: IControlledCodeMirror | IUnControlledCodeMirror, preserved?: any) {
+
+    if (next) {
+      if (next.selection) {
+        if (next.selection.ranges) {
+          if (props.selection) {
+            if (!Helper.equals(props.selection.ranges, next.selection.ranges)) {
+              this.delegateSelection(next.selection.ranges, next.selection.focus || false);
+            }
+          } else {
+            this.delegateSelection(next.selection.ranges, next.selection.focus || false);
+          }
+        }
+      }
+
+      if (next.cursor) {
+        if (props.cursor) {
+          if (!Helper.equals(props.cursor, next.cursor)) {
+            this.delegateCursor(preserved.cursor || next.cursor, (next.autoScroll || false), (next.autoCursor || false));
+          }
+        } else {
+          this.delegateCursor(preserved.cursor || next.cursor, (next.autoScroll || false), (next.autoCursor || false));
+        }
+      }
+
+      if (next.scroll) {
+        this.delegateScroll(next.scroll);
+      }
+
+    } else {
+      if (props.selection) {
+        if (props.selection.ranges) {
+          this.delegateSelection(props.selection.ranges, props.selection.focus || false);
+        }
+      }
+
+      if (props.cursor) {
+        this.delegateCursor(props.cursor, (props.autoScroll || false), (props.autoFocus || false));
+      }
+
+      if (props.scroll) {
+        this.delegateScroll(props.scroll);
+      }
+    }
   }
 
   public wire(name: string) {
@@ -195,24 +276,6 @@ class Shared implements ICommon {
       }
         break;
     }
-  }
-
-  public delegateScroll(coordinates: ISetScrollOptions) {
-    this.editor.scrollTo(coordinates.x, coordinates.y)
-  }
-
-  public delegateSelection(ranges: Array<ISetSelectionOptions>) {
-    this.editor.setSelections(ranges);
-  }
-
-  public delegateCursor(position: codemirror.Position, autoScroll?: boolean, autoFocus?: boolean) {
-
-    let doc = this.editor.getDoc() as IDoc;
-
-    if (autoFocus)
-      this.editor.focus();
-
-    autoScroll ? doc.setCursor(position) : doc.setCursor(position, null, {scroll: false});
   }
 }
 
@@ -394,17 +457,7 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
 
     this.hydrate(this.props);
 
-    if (this.props.selection) {
-      this.shared.delegateSelection(this.props.selection);
-    }
-
-    if (this.props.cursor) {
-      this.shared.delegateCursor(this.props.cursor, (this.props.autoScroll || false), (this.props.autoFocus || false));
-    }
-
-    if (this.props.scroll) {
-      this.shared.delegateScroll(this.props.scroll);
-    }
+    this.shared.apply(this.props);
 
     this.mounted = true;
 
@@ -434,35 +487,19 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
 
     if (SERVER_RENDERED) return;
 
-    let preservedCursor: codemirror.Position = null;
+    let preserved: IPreservedOptions = {cursor: null};
 
     if (nextProps.value !== this.props.value) {
       this.hydrated = false;
     }
 
     if (!this.props.autoCursor && this.props.autoCursor !== undefined) {
-      preservedCursor = this.editor.getCursor();
+      preserved.cursor = this.editor.getCursor();
     }
 
     this.hydrate(nextProps);
 
-    if (nextProps.scroll) {
-      if (JSON.stringify(this.props.scroll) !== JSON.stringify(nextProps.scroll)) {
-        this.shared.delegateScroll(nextProps.scroll);
-      }
-    }
-
-    if (nextProps.selection) {
-      if (JSON.stringify(this.props.selection) !== JSON.stringify(nextProps.selection)) {
-        this.shared.delegateSelection(nextProps.selection);
-      }
-    }
-
-    if (nextProps.cursor) {
-      if (JSON.stringify(this.props.cursor) !== JSON.stringify(nextProps.cursor)) {
-        this.shared.delegateCursor(preservedCursor || nextProps.cursor, (nextProps.autoScroll || false), (nextProps.autoCursor || false));
-      }
-    }
+    this.shared.apply(this.props, nextProps, preserved);
   }
 
   /** @internal */
@@ -537,7 +574,6 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
     Object.keys(props.options || {}).forEach(key => this.editor.setOption(key, props.options[key]));
 
     if (!this.hydrated) {
-      // this.editor.setValue(props.value || '');
       let lastLine = this.editor.lastLine();
       let lastChar = this.editor.getLine(this.editor.lastLine()).length;
 
@@ -598,17 +634,7 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
 
     this.hydrate(this.props);
 
-    if (this.props.selection) {
-      this.shared.delegateSelection(this.props.selection);
-    }
-
-    if (this.props.cursor) {
-      this.shared.delegateCursor(this.props.cursor, (this.props.autoScroll || false), (this.props.autoFocus || false));
-    }
-
-    if (this.props.scroll) {
-      this.shared.delegateScroll(this.props.scroll);
-    }
+    this.shared.apply(this.props);
 
     this.mounted = true;
 
@@ -640,36 +666,19 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
 
     if (SERVER_RENDERED) return;
 
-    let preservedCursor: codemirror.Position = null;
+    let preserved: IPreservedOptions = {cursor: null};
 
     if (nextProps.value !== this.props.value) {
       this.hydrated = false;
     }
 
     if (!this.props.autoCursor && this.props.autoCursor !== undefined) {
-      preservedCursor = this.editor.getCursor();
+      preserved.cursor = this.editor.getCursor();
     }
 
     this.hydrate(nextProps);
 
-    if (nextProps.scroll) {
-      if (JSON.stringify(this.props.scroll) !== JSON.stringify(nextProps.scroll)) {
-        this.shared.delegateScroll(nextProps.scroll);
-      }
-    }
-
-    if (nextProps.selection) {
-      if (JSON.stringify(this.props.selection) !== JSON.stringify(nextProps.selection)) {
-        this.shared.delegateSelection(nextProps.selection);
-      }
-    }
-
-    if (nextProps.cursor) {
-
-      if (JSON.stringify(this.props.cursor) !== JSON.stringify(nextProps.cursor)) {
-        this.shared.delegateCursor(preservedCursor || nextProps.cursor, (nextProps.autoScroll || false), (nextProps.autoCursor || false));
-      }
-    }
+    this.shared.apply(this.props, nextProps, preserved);
   }
 
   /** @internal */

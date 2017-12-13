@@ -325,34 +325,75 @@ describe('Props', () => {
   // <selection>
   it('[Controlled, UnControlled]: selection', () => {
 
+    let expected = ['oo'];
+
     Enzyme.mount(
       <Controlled
         value='foo'
-        selection={[{
-          anchor: {ch: 1, line: 0},
-          head: {ch: 3, line: 0}
-        }]}
-        onSelection={(editor, data) => {
-          expect.anything(data.ranges)
+        selection={{
+          ranges: [{
+            anchor: {ch: 1, line: 0},
+            head: {ch: 3, line: 0}
+          }]
+        }}
+        editorDidMount={(editor) => {
+          expect(editor.getSelections()).toEqual(expected)
         }}/>
     );
 
     Enzyme.mount(
       <UnControlled
         value='foo'
-        selection={[{
-          anchor: {ch: 1, line: 0},
-          head: {ch: 3, line: 0}
-        }]}
-        onSelection={(editor, data) => {
-          expect.anything(data.ranges)
+        selection={{
+          ranges: [{
+            anchor: {ch: 1, line: 0},
+            head: {ch: 3, line: 0}
+          }]
+        }}
+        editorDidMount={(editor) => {
+          expect(editor.getSelections()).toEqual(expected)
+        }}/>
+    );
+  });
+
+  it('[Controlled, UnControlled]: selection: focus', () => {
+
+    let expected = ['oo'];
+
+    Enzyme.mount(
+      <Controlled
+        value='foo'
+        selection={{
+          focus: true,
+          ranges: [{
+            anchor: {ch: 1, line: 0},
+            head: {ch: 3, line: 0}
+          }]
+        }}
+        editorDidMount={(editor) => {
+          expect(editor.state.focused).toBeTruthy();
+          expect(editor.getSelections()).toEqual(expected);
+        }}/>
+    );
+
+    Enzyme.mount(
+      <UnControlled
+        value='foo'
+        selection={{
+          focus: true,
+          ranges: [{
+            anchor: {ch: 1, line: 0},
+            head: {ch: 3, line: 0}
+          }]
+        }}
+        editorDidMount={(editor) => {
+          expect(editor.state.focused).toBeTruthy();
+          expect(editor.getSelections()).toEqual(expected);
         }}/>
     );
   });
 
   it('[Controlled: selection | newProps', () => {
-
-    let set = false;
 
     let expectedRanges = [{
       anchor: {ch: 1, line: 1},
@@ -363,28 +404,23 @@ describe('Props', () => {
       <Controlled
         value='foo\nbar\nbaz'
         onSelection={(editor, data) => {
-
-          if (set) {
-            expect(data.ranges).toEqual(expectedRanges);
-          }
-
-          set = true;
+          expect(data.ranges).toEqual(expectedRanges);
         }}/>
     );
 
     wrapper.setProps({
-      selection: [{
-        anchor: {ch: 1, line: 1},
-        head: {ch: 3, line: 1}
-      }]
+      selection: {
+        ranges: [{
+          anchor: {ch: 1, line: 1},
+          head: {ch: 3, line: 1}
+        }]
+      }
     });
 
     wrapper.unmount();
   });
 
   it('[UnControlled: selection | newProps', () => {
-
-    let set = false;
 
     let expectedRanges = [{
       anchor: {ch: 1, line: 1},
@@ -400,10 +436,89 @@ describe('Props', () => {
     );
 
     wrapper.setProps({
-      selection: [{
-        anchor: {ch: 1, line: 1},
-        head: {ch: 3, line: 1}
-      }]
+      selection: {
+        ranges: [{
+          anchor: {ch: 1, line: 1},
+          head: {ch: 3, line: 1}
+        }]
+      }
+    });
+
+    wrapper.unmount();
+  });
+
+  it('[Controlled: selection | newProps & props', () => {
+
+    let currentRanges = [{
+      anchor: {ch: 1, line: 1},
+      head: {ch: 2, line: 1}
+    }];
+
+    let expectedRanges = [{
+      anchor: {ch: 1, line: 1},
+      head: {ch: 3, line: 1}
+    }];
+
+    let wrapper = Enzyme.mount(
+      <Controlled
+        value='foo\nbar\nbaz'
+        selection={{ranges: currentRanges}}
+        editorDidMount={(editor) => {
+          expect(editor.doc.sel.ranges).toEqual(currentRanges);
+        }}
+        onSelection={(editor, data) => {
+          expect(data.ranges).toEqual(expectedRanges);
+        }}/>
+    );
+
+    wrapper.setProps({
+      selection: {
+        ranges: [{
+          anchor: {ch: 1, line: 1},
+          head: {ch: 3, line: 1}
+        }]
+      }
+    });
+
+    wrapper.unmount();
+  });
+
+  it('[UnControlled: selection | newProps & props', () => {
+
+    let currentRanges = [{
+      anchor: {ch: 1, line: 1},
+      head: {ch: 2, line: 1}
+    }];
+
+    let expectedRanges = [{
+      anchor: {ch: 1, line: 1},
+      head: {ch: 3, line: 1}
+    }];
+
+    let wrapper = Enzyme.mount(
+      <UnControlled
+        selection={{
+          ranges: [{
+            anchor: {ch: 1, line: 1},
+            head: {ch: 2, line: 1}
+          }]
+        }}
+        value='foo\nbar\nbaz'
+        editorDidMount={(editor) => {
+          expect(editor.doc.sel.ranges).toEqual(currentRanges);
+        }}
+        onSelection={(editor, data) => {
+          expect(data.ranges).toEqual(expectedRanges);
+        }}/>
+    );
+
+    wrapper.setProps({
+      selection: {
+        ranges: [{
+          anchor: {ch: 1, line: 1},
+          head: {ch: 3, line: 1}
+        }]
+      }
     });
 
     wrapper.unmount();
@@ -444,6 +559,48 @@ describe('Props', () => {
     let wrapper = Enzyme.mount(
       <Controlled
         value='foo'
+        onCursor={(editor, data) => {
+          console.log('oncursor')
+        }}/>
+    );
+
+    wrapper.setProps({
+      cursor: {
+        line: 1,
+        ch: 2
+      }
+    });
+
+    wrapper.unmount();
+  });
+
+  it('[UnControlled]: cursor | newProps', () => {
+
+    // todo can't find way to actually invoke a DOM cursor => `onCursor`
+    let wrapper = Enzyme.mount(
+      <UnControlled
+        value='foo'
+        onCursor={(editor, data) => {
+          console.log('oncursor')
+        }}/>
+    );
+
+    wrapper.setProps({
+      cursor: {
+        line: 1,
+        ch: 2
+      }
+    });
+
+    wrapper.unmount();
+  });
+
+  it('[Controlled]: cursor | newProps & props', () => {
+
+    // todo can't find way to actually invoke a DOM cursor => `onCursor`
+    let wrapper = Enzyme.mount(
+      <Controlled
+        value='foo'
         cursor={{
           line: 1,
           ch: 1
@@ -463,7 +620,7 @@ describe('Props', () => {
     wrapper.unmount();
   });
 
-  it('[UnControlled]: cursor | newProps', () => {
+  it('[UnControlled]: cursor | newProps & props', () => {
 
     // todo can't find way to actually invoke a DOM cursor => `onCursor`
     let wrapper = Enzyme.mount(

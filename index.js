@@ -16,11 +16,80 @@ var SERVER_RENDERED = (typeof navigator === 'undefined' || global['PREVENT_CODEM
 if (!SERVER_RENDERED) {
     cm = require('codemirror');
 }
+var Helper = (function () {
+    function Helper() {
+    }
+    Helper.equals = function (x, y) {
+        var _this = this;
+        var ok = Object.keys, tx = typeof x, ty = typeof y;
+        return x && y && tx === 'object' && tx === ty ? (ok(x).length === ok(y).length &&
+            ok(x).every(function (key) { return _this.equals(x[key], y[key]); })) : (x === y);
+    };
+    return Helper;
+}());
 var Shared = (function () {
     function Shared(editor, props) {
         this.editor = editor;
         this.props = props;
     }
+    Shared.prototype.delegateCursor = function (position, scroll, focus) {
+        var doc = this.editor.getDoc();
+        if (focus) {
+            this.editor.focus();
+        }
+        scroll ? doc.setCursor(position) : doc.setCursor(position, null, { scroll: false });
+    };
+    Shared.prototype.delegateScroll = function (coordinates) {
+        this.editor.scrollTo(coordinates.x, coordinates.y);
+    };
+    Shared.prototype.delegateSelection = function (ranges, focus) {
+        this.editor.setSelections(ranges);
+        if (focus) {
+            this.editor.focus();
+        }
+    };
+    Shared.prototype.apply = function (props, next, preserved) {
+        if (next) {
+            if (next.selection) {
+                if (next.selection.ranges) {
+                    if (props.selection) {
+                        if (!Helper.equals(props.selection.ranges, next.selection.ranges)) {
+                            this.delegateSelection(next.selection.ranges, next.selection.focus || false);
+                        }
+                    }
+                    else {
+                        this.delegateSelection(next.selection.ranges, next.selection.focus || false);
+                    }
+                }
+            }
+            if (next.cursor) {
+                if (props.cursor) {
+                    if (!Helper.equals(props.cursor, next.cursor)) {
+                        this.delegateCursor(preserved.cursor || next.cursor, (next.autoScroll || false), (next.autoCursor || false));
+                    }
+                }
+                else {
+                    this.delegateCursor(preserved.cursor || next.cursor, (next.autoScroll || false), (next.autoCursor || false));
+                }
+            }
+            if (next.scroll) {
+                this.delegateScroll(next.scroll);
+            }
+        }
+        else {
+            if (props.selection) {
+                if (props.selection.ranges) {
+                    this.delegateSelection(props.selection.ranges, props.selection.focus || false);
+                }
+            }
+            if (props.cursor) {
+                this.delegateCursor(props.cursor, (props.autoScroll || false), (props.autoFocus || false));
+            }
+            if (props.scroll) {
+                this.delegateScroll(props.scroll);
+            }
+        }
+    };
     Shared.prototype.wire = function (name) {
         var _this = this;
         switch (name) {
@@ -130,18 +199,6 @@ var Shared = (function () {
                 }
                 break;
         }
-    };
-    Shared.prototype.delegateScroll = function (coordinates) {
-        this.editor.scrollTo(coordinates.x, coordinates.y);
-    };
-    Shared.prototype.delegateSelection = function (ranges) {
-        this.editor.setSelections(ranges);
-    };
-    Shared.prototype.delegateCursor = function (position, autoScroll, autoFocus) {
-        var doc = this.editor.getDoc();
-        if (autoFocus)
-            this.editor.focus();
-        autoScroll ? doc.setCursor(position) : doc.setCursor(position, null, { scroll: false });
     };
     return Shared;
 }());
@@ -266,15 +323,7 @@ var Controlled = (function (_super) {
             }
         });
         this.hydrate(this.props);
-        if (this.props.selection) {
-            this.shared.delegateSelection(this.props.selection);
-        }
-        if (this.props.cursor) {
-            this.shared.delegateCursor(this.props.cursor, (this.props.autoScroll || false), (this.props.autoFocus || false));
-        }
-        if (this.props.scroll) {
-            this.shared.delegateScroll(this.props.scroll);
-        }
+        this.shared.apply(this.props);
         this.mounted = true;
         if (this.props.onBlur)
             this.shared.wire('onBlur');
@@ -313,29 +362,15 @@ var Controlled = (function (_super) {
     Controlled.prototype.componentWillReceiveProps = function (nextProps) {
         if (SERVER_RENDERED)
             return;
-        var preservedCursor = null;
+        var preserved = { cursor: null };
         if (nextProps.value !== this.props.value) {
             this.hydrated = false;
         }
         if (!this.props.autoCursor && this.props.autoCursor !== undefined) {
-            preservedCursor = this.editor.getCursor();
+            preserved.cursor = this.editor.getCursor();
         }
         this.hydrate(nextProps);
-        if (nextProps.scroll) {
-            if (JSON.stringify(this.props.scroll) !== JSON.stringify(nextProps.scroll)) {
-                this.shared.delegateScroll(nextProps.scroll);
-            }
-        }
-        if (nextProps.selection) {
-            if (JSON.stringify(this.props.selection) !== JSON.stringify(nextProps.selection)) {
-                this.shared.delegateSelection(nextProps.selection);
-            }
-        }
-        if (nextProps.cursor) {
-            if (JSON.stringify(this.props.cursor) !== JSON.stringify(nextProps.cursor)) {
-                this.shared.delegateCursor(preservedCursor || nextProps.cursor, (nextProps.autoScroll || false), (nextProps.autoCursor || false));
-            }
-        }
+        this.shared.apply(this.props, nextProps, preserved);
     };
     Controlled.prototype.componentWillUnmount = function () {
         if (SERVER_RENDERED)
@@ -423,15 +458,7 @@ var UnControlled = (function (_super) {
             }
         });
         this.hydrate(this.props);
-        if (this.props.selection) {
-            this.shared.delegateSelection(this.props.selection);
-        }
-        if (this.props.cursor) {
-            this.shared.delegateCursor(this.props.cursor, (this.props.autoScroll || false), (this.props.autoFocus || false));
-        }
-        if (this.props.scroll) {
-            this.shared.delegateScroll(this.props.scroll);
-        }
+        this.shared.apply(this.props);
         this.mounted = true;
         if (this.props.onBlur)
             this.shared.wire('onBlur');
@@ -471,29 +498,15 @@ var UnControlled = (function (_super) {
     UnControlled.prototype.componentWillReceiveProps = function (nextProps) {
         if (SERVER_RENDERED)
             return;
-        var preservedCursor = null;
+        var preserved = { cursor: null };
         if (nextProps.value !== this.props.value) {
             this.hydrated = false;
         }
         if (!this.props.autoCursor && this.props.autoCursor !== undefined) {
-            preservedCursor = this.editor.getCursor();
+            preserved.cursor = this.editor.getCursor();
         }
         this.hydrate(nextProps);
-        if (nextProps.scroll) {
-            if (JSON.stringify(this.props.scroll) !== JSON.stringify(nextProps.scroll)) {
-                this.shared.delegateScroll(nextProps.scroll);
-            }
-        }
-        if (nextProps.selection) {
-            if (JSON.stringify(this.props.selection) !== JSON.stringify(nextProps.selection)) {
-                this.shared.delegateSelection(nextProps.selection);
-            }
-        }
-        if (nextProps.cursor) {
-            if (JSON.stringify(this.props.cursor) !== JSON.stringify(nextProps.cursor)) {
-                this.shared.delegateCursor(preservedCursor || nextProps.cursor, (nextProps.autoScroll || false), (nextProps.autoCursor || false));
-            }
-        }
+        this.shared.apply(this.props, nextProps, preserved);
     };
     UnControlled.prototype.componentWillUnmount = function () {
         if (SERVER_RENDERED)

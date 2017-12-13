@@ -154,4 +154,9 @@ require('codemirror/mode/javascript/javascript');
 - `onUpdate(editor, event)` - *[update](https://codemirror.net/doc/manual.html#event_update)*
 - `onViewportChange(editor, from, to)` - *[viewportChange](https://codemirror.net/doc/manual.html#event_viewportChange)*
 
+## misc. notes
+- server rendering
+react-codemirror2 will prevent rendering in absence of `navigator` that is typical of a server environment. In case of any issue, you may be able to force the component to not render via a `PREVENT_CODEMIRROR_RENDER` global variable that this wrapper will respect.
+
+
 [MIT](./LICENSE) © 2017 [scniro](https://github.com/scniro)
