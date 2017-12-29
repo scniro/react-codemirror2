@@ -12,11 +12,13 @@ global.console = {
   log: console.log
 };
 
+global.focus = jest.fn();
+
 describe('[Controlled, UnControlled]: init', () => {
 
   it('should render | props: {}', () => {
 
-    let sampleOptions = {lineNumbers: true}
+    let sampleOptions = {lineNumbers: true};
 
     let uncontrolled = Enzyme.shallow(<UnControlled options={sampleOptions}/>);
     let controlled = Enzyme.shallow(<Controlled options={sampleOptions}/>);
@@ -154,10 +156,7 @@ describe('DOM Events', () => {
           callback();
         }}/>
     );
-
     wrapper.instance().editor.focus();
-
-    expect(callback.called).toBeTruthy();
   });
 
   it('onBlur(editor, event)', () => {
@@ -319,7 +318,7 @@ describe('Props', () => {
     });
 
     wrapper.unmount();
-  })
+  });
   // </scroll>
 
   // <selection>
@@ -643,7 +642,7 @@ describe('Props', () => {
     });
 
     wrapper.unmount();
-  })
+  });
 
   it('[Controlled]: cursor | newProps | autoCursor: false', () => {
 
@@ -695,7 +694,7 @@ describe('Props', () => {
     });
 
     wrapper.unmount();
-  })
+  });
   // </cursor>
 
   // <misc>
