@@ -221,10 +221,18 @@ var Controlled = (function (_super) {
     }
     Controlled.prototype.hydrate = function (props) {
         var _this = this;
-        Object.keys(props.options || {}).forEach(function (key) {
-            _this.editor.setOption(key, props.options[key]);
-            _this.mirror.setOption(key, props.options[key]);
-        });
+        var userDefinedOptions = Object.assign({}, cm.defaults, this.editor.options, props.options || {});
+        var optionDelta = Object.keys(userDefinedOptions).some(function (key) { return _this.editor.getOption(key) !== userDefinedOptions[key]; });
+        if (optionDelta) {
+            Object.keys(userDefinedOptions).forEach(function (key) {
+                if (props.options.hasOwnProperty(key)) {
+                    if (_this.editor.getOption(key) !== userDefinedOptions[key]) {
+                        _this.editor.setOption(key, userDefinedOptions[key]);
+                        _this.mirror.setOption(key, userDefinedOptions[key]);
+                    }
+                }
+            });
+        }
         if (!this.hydrated) {
             if (!this.mounted) {
                 this.initChange(props.value || '');
@@ -413,7 +421,17 @@ var UnControlled = (function (_super) {
     }
     UnControlled.prototype.hydrate = function (props) {
         var _this = this;
-        Object.keys(props.options || {}).forEach(function (key) { return _this.editor.setOption(key, props.options[key]); });
+        var userDefinedOptions = Object.assign({}, cm.defaults, this.editor.options, props.options || {});
+        var optionDelta = Object.keys(userDefinedOptions).some(function (key) { return _this.editor.getOption(key) !== userDefinedOptions[key]; });
+        if (optionDelta) {
+            Object.keys(userDefinedOptions).forEach(function (key) {
+                if (props.options.hasOwnProperty(key)) {
+                    if (_this.editor.getOption(key) !== userDefinedOptions[key]) {
+                        _this.editor.setOption(key, userDefinedOptions[key]);
+                    }
+                }
+            });
+        }
         if (!this.hydrated) {
             var lastLine = this.editor.lastLine();
             var lastChar = this.editor.getLine(this.editor.lastLine()).length;

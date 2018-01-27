@@ -32,14 +32,17 @@ export interface IGetSelectionOptions {
   update: (ranges: Array<ISetSelectionOptions>) => void;
 }
 
-/* tshacks: laundry list of incorrect typings in @types/codemirror */
+/* <tshacks>: laundry list of incorrect typings in @types/codemirror */
 export interface IDoc extends codemirror.Doc {
   setCursor: (pos: codemirror.Position, ch?: number, options?: {}) => void;
   setSelections: (ranges: Array<ISetSelectionOptions>) => void;
 }
 
 export interface IInstance extends codemirror.Editor, IDoc {
+  options: codemirror.EditorConfiguration
 }
+
+/* </tshacks> */
 
 export interface ICodeMirror {
 
@@ -320,10 +323,19 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
   /** @internal */
   private hydrate(props) {
 
-    Object.keys(props.options || {}).forEach(key => {
-      this.editor.setOption(key, props.options[key]);
-      this.mirror.setOption(key, props.options[key]);
-    });
+    let userDefinedOptions = Object.assign({}, cm.defaults, this.editor.options, props.options || {});
+    let optionDelta = Object.keys(userDefinedOptions).some(key => this.editor.getOption(key) !== userDefinedOptions[key]);
+
+    if (optionDelta) {
+      Object.keys(userDefinedOptions).forEach(key => {
+        if (props.options.hasOwnProperty(key)) {
+          if (this.editor.getOption(key) !== userDefinedOptions[key]) {
+            this.editor.setOption(key, userDefinedOptions[key]);
+            this.mirror.setOption(key, userDefinedOptions[key]);
+          }
+        }
+      });
+    }
 
     if (!this.hydrated) {
       if (!this.mounted) {
@@ -571,7 +583,18 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
   /** @internal */
   private hydrate(props) {
 
-    Object.keys(props.options || {}).forEach(key => this.editor.setOption(key, props.options[key]));
+    let userDefinedOptions = Object.assign({}, cm.defaults, this.editor.options, props.options || {});
+    let optionDelta = Object.keys(userDefinedOptions).some(key => this.editor.getOption(key) !== userDefinedOptions[key]);
+
+    if (optionDelta) {
+      Object.keys(userDefinedOptions).forEach(key => {
+        if (props.options.hasOwnProperty(key)) {
+          if (this.editor.getOption(key) !== userDefinedOptions[key]) {
+            this.editor.setOption(key, userDefinedOptions[key]);
+          }
+        }
+      });
+    }
 
     if (!this.hydrated) {
       let lastLine = this.editor.lastLine();

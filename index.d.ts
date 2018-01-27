@@ -24,6 +24,7 @@ export interface IDoc extends codemirror.Doc {
     setSelections: (ranges: Array<ISetSelectionOptions>) => void;
 }
 export interface IInstance extends codemirror.Editor, IDoc {
+    options: codemirror.EditorConfiguration;
 }
 export interface ICodeMirror {
     autoCursor?: boolean;
