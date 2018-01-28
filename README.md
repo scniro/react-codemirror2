@@ -2,17 +2,16 @@
 [![Dependency Status](https://img.shields.io/david/scniro/react-codemirror2.svg?label=deps&style=flat-square)](https://david-dm.org/scniro/react-codemirror2)
 [![DevDependency Status](https://img.shields.io/david/dev/scniro/react-codemirror2.svg?label=devDeps&style=flat-square)](https://david-dm.org/scniro/react-codemirror2#info=devDependencies)
 [![Coverage](https://img.shields.io/coveralls/scniro/react-codemirror2.svg?style=flat-square)](https://coveralls.io/github/scniro/react-codemirror2)
+[![Downloads](https://img.shields.io/npm/dm/react-codemirror2.svg?style=flat-square)](https://www.npmjs.com/package/react-codemirror2)
 [![NPM Version](https://img.shields.io/npm/v/react-codemirror2.svg?style=flat-square)](https://www.npmjs.com/package/react-codemirror2)
 
 ### react-codemirror2
 
 demo @ [scniro.github.io/react-codemirror2](https://scniro.github.io/react-codemirror2/)
 
-> npm install react-codemirror2
+> npm install react-codemirror2 codemirror --save
 
-## new in 3.0.0
-
-`react-codemirror2` now ships with the notion of an [uncontrolled](https://reactjs.org/docs/uncontrolled-components.html) and [controlled](https://reactjs.org/docs/forms.html#controlled-components) component. `UnControlled` consists of a simple wrapper largely powered by the inner workings of `codemirror` itself, while `Controlled` will demand state management from the user, preventing codemirror changes unless properly handled via `value`. The latter will offer more control and likely be more appropriate with [redux](http://redux.js.org/) heavy apps.
+`react-codemirror2` ships with the notion of an [uncontrolled](https://reactjs.org/docs/uncontrolled-components.html) and [controlled](https://reactjs.org/docs/forms.html#controlled-components) component. `UnControlled` consists of a simple wrapper largely powered by the inner workings of `codemirror` itself, while `Controlled` will demand state management from the user, preventing codemirror changes unless properly handled via `value`. The latter will offer more control and likely be more appropriate with [redux](http://redux.js.org/) heavy apps.
 
 ## uncontrolled usage
 ```jsx
@@ -135,7 +134,6 @@ require('codemirror/mode/javascript/javascript');
 > optional - if defined, `next()` must be invoked to trigger `onChange`.
 - `onChange(editor, data, value)`
 
-
 ## events cont. [wrapped codemirror events](https://codemirror.net/doc/manual.html#events)
 
 - `onBlur(editor, event)` - *[blur](https://codemirror.net/doc/manual.html#event_blur)*
@@ -155,8 +153,22 @@ require('codemirror/mode/javascript/javascript');
 - `onViewportChange(editor, from, to)` - *[viewportChange](https://codemirror.net/doc/manual.html#event_viewportChange)*
 
 ## misc. notes
+
 - server rendering
 react-codemirror2 will prevent rendering in absence of `navigator` that is typical of a server environment. In case of any issue, you may be able to force the component to not render via a `PREVENT_CODEMIRROR_RENDER` global variable that this wrapper will respect.
 
+- getting the instance
+getting the instance uf the underlying editor can be done via the event callbacks where `editor` is returned. There is no static method to get it on demand, e.g. `CodeMirror.getInstance()`. The recommended approach can be observed as follows...
 
-[MIT](./LICENSE) © 2017 [scniro](https://github.com/scniro)
+```jsx
+constructor() {
+  this.instance = null;
+}
+
+render() {
+  <CodeMirror editorDidMount={editor => { this.instance = editor }}/>
+}
+```
+
+
+[MIT](./LICENSE) © 2018 [scniro](https://github.com/scniro)

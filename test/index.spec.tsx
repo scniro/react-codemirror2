@@ -46,6 +46,16 @@ describe('[Controlled, UnControlled]: init', () => {
     expect(uUnmounted).toBeTruthy();
     expect(cUnmounted).toBeTruthy();
   });
+
+  it('should append a class name', () => {
+
+    let uWrapper = Enzyme.mount(<UnControlled className={'class-uncontrolled'}/>);
+    let cWrapper = Enzyme.mount(<Controlled className={'class-controlled'}/>);
+
+    // todo maybe bring in cheerio
+    expect(/react-codemirror2 class-uncontrolled/g.test(uWrapper.html())).toBeTruthy();
+    expect(/react-codemirror2 class-controlled/g.test(cWrapper.html())).toBeTruthy();
+  });
 });
 
 describe('[Controlled, UnControlled]: editorWillMount', () => {

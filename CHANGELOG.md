@@ -1,3 +1,13 @@
+4.0.0
+==================
+* cursor, scroll, and selection events occur after an internal hydrate
+* cursor, scroll, and selection events have more strict checking and are more responsive for changed valued
+* added `PREVENT_CODEMIRROR_RENDER` global for rendering bypass
+* selections managed via props now have and isolated autofocus option
+* optimization of setting instance options when updated via props
+* https://github.com/scniro/react-codemirror2/issues/49
+* test coverage
+
 3.0.6
 ==================
 * https://github.com/scniro/react-codemirror2/issues/28
