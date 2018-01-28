@@ -12,6 +12,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, '__esModule', { value: true });
 var React = require('react');
 var SERVER_RENDERED = (typeof navigator === 'undefined' || global['PREVENT_CODEMIRROR_RENDER'] === true);
+var cm;
 if (!SERVER_RENDERED) {
     cm = require('codemirror');
 }
