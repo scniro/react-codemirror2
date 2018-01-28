@@ -1,12 +1,12 @@
 import * as React from 'react';
 import * as codemirror from 'codemirror';
 
-declare let cm: any;
 declare let global: any;
 declare let require: any;
 
 const SERVER_RENDERED = (typeof navigator === 'undefined' || global['PREVENT_CODEMIRROR_RENDER'] === true);
 
+let cm;
 if (!SERVER_RENDERED) {
   cm = require('codemirror');
 }
