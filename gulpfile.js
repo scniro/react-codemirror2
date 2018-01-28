@@ -1,5 +1,3 @@
-'use strict';
-
 const gulp = require('gulp');
 const replace = require('gulp-replace');
 const rimraf = require('rimraf');

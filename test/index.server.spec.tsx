@@ -14,7 +14,7 @@ describe('Server Rendering', () => {
   it('should not render', () => {
 
     let uWrapper = Enzyme.mount(<UnControlled/>);
-    let cWrapper = Enzyme.mount(<Controlled/>);
+    let cWrapper = Enzyme.mount(<Controlled value='' onBeforeChange={() => {}}/>);
 
     cWrapper.setProps({value: 'nomatter'});
     uWrapper.setProps({value: 'nomatter'});
