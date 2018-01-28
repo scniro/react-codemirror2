@@ -155,10 +155,12 @@ require('codemirror/mode/javascript/javascript');
 ## misc. notes
 
 - server rendering
-react-codemirror2 will prevent rendering in absence of `navigator` that is typical of a server environment. In case of any issue, you may be able to force the component to not render via a `PREVENT_CODEMIRROR_RENDER` global variable that this wrapper will respect.
+
+react-codemirror2 will prevent rendering in absence of `navigator` that is typical of a server environment. In case of any issue, you can force the component to not render via a `PREVENT_CODEMIRROR_RENDER` global variable that this wrapper respond to.
 
 - getting the instance
-getting the instance uf the underlying editor can be done via the event callbacks where `editor` is returned. There is no static method to get it on demand, e.g. `CodeMirror.getInstance()`. The recommended approach can be observed as follows...
+
+getting the instance of the underlying editor can be done via the event callbacks where `editor` is returned. There is no static method to get it on demand, e.g. `CodeMirror.getInstance()`. The recommended approach can be observed as follows...
 
 ```jsx
 constructor() {
