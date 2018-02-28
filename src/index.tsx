@@ -8,7 +8,11 @@ const SERVER_RENDERED = (typeof navigator === 'undefined' || global['PREVENT_COD
 
 let cm;
 if (!SERVER_RENDERED) {
-  cm = require('codemirror');
+  if (window && (window as any).CodeMirror) {
+    cm = (window as any).CodeMirror;
+  } else {
+    cm = require('codemirror');
+  }
 }
 
 export interface IDefineModeOptions {

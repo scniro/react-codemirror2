@@ -14,7 +14,12 @@ var React = require('react');
 var SERVER_RENDERED = (typeof navigator === 'undefined' || global['PREVENT_CODEMIRROR_RENDER'] === true);
 var cm;
 if (!SERVER_RENDERED) {
-    cm = require('codemirror');
+    if (window && window.CodeMirror) {
+        cm = window.CodeMirror;
+    }
+    else {
+        cm = require('codemirror');
+    }
 }
 var Helper = (function () {
     function Helper() {
