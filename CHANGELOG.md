@@ -1,3 +1,7 @@
+4.0.1
+==================
+https://github.com/scniro/react-codemirror2/issues/61
+
 4.0.0
 ==================
 * cursor, scroll, and selection events occur after an internal hydrate
