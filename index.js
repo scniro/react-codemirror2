@@ -459,7 +459,7 @@ var UnControlled = (function (_super) {
         this.shared = new Shared(this.editor, this.props);
         this.editor.on('beforeChange', function (cm, data) {
             if (_this.props.onBeforeChange) {
-                _this.props.onBeforeChange(_this.editor, data, null, _this.onBeforeChangeCb);
+                _this.props.onBeforeChange(_this.editor, data, _this.editor.getValue(), _this.onBeforeChangeCb);
             }
         });
         this.editor.on('change', function (cm, data) {

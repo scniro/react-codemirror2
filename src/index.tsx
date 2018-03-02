@@ -636,7 +636,7 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
     this.editor.on('beforeChange', (cm, data) => {
 
       if (this.props.onBeforeChange) {
-        this.props.onBeforeChange(this.editor, data, null, this.onBeforeChangeCb)
+        this.props.onBeforeChange(this.editor, data, this.editor.getValue(), this.onBeforeChangeCb)
       }
     });
 
