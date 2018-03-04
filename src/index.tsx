@@ -91,7 +91,7 @@ declare interface ICommon {
   wire: (name: string) => void;
   apply: (props: IControlledCodeMirror | IUnControlledCodeMirror) => void;
   applyNext: (props: IControlledCodeMirror | IUnControlledCodeMirror, next?: IControlledCodeMirror | IUnControlledCodeMirror, preserved?: IPreservedOptions) => void;
-  applyStatic: (props: IControlledCodeMirror | IUnControlledCodeMirror, preserved?: IPreservedOptions) => void;
+  applyUserDefined: (props: IControlledCodeMirror | IUnControlledCodeMirror, preserved?: IPreservedOptions) => void;
 }
 
 declare interface IPreservedOptions {
@@ -163,29 +163,29 @@ class Shared implements ICommon {
 
     // handle new ranges
     if (props && props.selection && props.selection.ranges) {
-      next && next.selection && next.selection.ranges && !Helper.equals(props.selection.ranges, next.selection.ranges) ?
-        this.delegateSelection(next.selection.ranges, next.selection.focus || false) :
-        this.delegateSelection(props.selection.ranges, props.selection.focus || false);
+      if (next && next.selection && next.selection.ranges && !Helper.equals(props.selection.ranges, next.selection.ranges)) {
+        this.delegateSelection(next.selection.ranges, next.selection.focus || false);
+      }
     }
 
     // handle new cursor
     if (props && props.cursor) {
-      next && next.cursor && !Helper.equals(props.cursor, next.cursor) ?
-        this.delegateCursor(preserved.cursor || next.cursor, (next.autoScroll || false), (next.autoCursor || false)) :
-        this.delegateCursor(preserved.cursor || props.cursor, (props.autoScroll || false), (props.autoFocus || false));
+      if (next && next.cursor && !Helper.equals(props.cursor, next.cursor)) {
+        this.delegateCursor(preserved.cursor || next.cursor, (next.autoScroll || false), (next.autoCursor || false));
+      }
     }
 
     // handle new scroll
     if (props && props.scroll) {
-      next && next.scroll && !Helper.equals(props.scroll, next.scroll) ?
-        this.delegateScroll(next.scroll) :
-        this.delegateScroll(props.scroll);
+      if (next && next.scroll && !Helper.equals(props.scroll, next.scroll)) {
+        this.delegateScroll(next.scroll)
+      }
     }
   }
 
-  public applyStatic(props: IControlledCodeMirror | IUnControlledCodeMirror, preserved?: any) {
+  public applyUserDefined(props: IControlledCodeMirror | IUnControlledCodeMirror, preserved?: any) {
     if (preserved && preserved.cursor) {
-      this.delegateCursor(preserved.cursor || props.cursor, (props.autoScroll || false), (props.autoFocus || false));
+      this.delegateCursor(preserved.cursor, (props.autoScroll || false), (props.autoFocus || false));
     }
   }
 
@@ -289,6 +289,12 @@ class Shared implements ICommon {
 export class Controlled extends React.Component<IControlledCodeMirror, any> {
 
   /** @internal */
+  private applied: boolean;
+  /** @internal */
+  private appliedNext: boolean;
+  /** @internal */
+  private appliedUserDefined: boolean;
+  /** @internal */
   private deferred: any;
   /** @internal */
   private editor: IInstance;
@@ -313,6 +319,9 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
 
     if (SERVER_RENDERED) return;
 
+    this.applied = false;
+    this.appliedNext = false;
+    this.appliedUserDefined = false;
     this.deferred = null;
     this.emulating = false;
     this.hydrated = false;
@@ -475,6 +484,8 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
 
     this.shared.apply(this.props);
 
+    this.applied = true;
+
     this.mounted = true;
 
     if (this.props.onBlur) this.shared.wire('onBlur');
@@ -515,9 +526,13 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
 
     this.hydrate(nextProps);
 
-    this.shared.applyNext(this.props, nextProps, preserved);
+    if(!this.appliedNext) {
+      this.shared.applyNext(this.props, nextProps, preserved);
+      this.appliedNext = true;
+    }
 
-    this.shared.applyStatic(this.props, preserved);
+    this.shared.applyUserDefined(this.props, preserved);
+    this.appliedUserDefined = true;
   }
 
   /** @internal */
@@ -551,6 +566,10 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
 export class UnControlled extends React.Component<IUnControlledCodeMirror, any> {
 
   /** @internal */
+  private applied: boolean;
+  /** @internal */
+  private appliedUserDefined: boolean;
+  /** @internal */
   private continueChange: boolean;
   /** @internal */
   private editor: IInstance;
@@ -566,10 +585,6 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
   private ref: HTMLElement;
   /** @internal */
   private shared: Shared;
-  /** @internal */
-  private applied: boolean;
-  /** @internal */
-  private appliedStatic: boolean;
 
   /** @internal */
   constructor(props: IUnControlledCodeMirror) {
@@ -578,7 +593,7 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
     if (SERVER_RENDERED) return;
 
     this.applied = false;
-    this.appliedStatic = false;
+    this.appliedUserDefined = false;
     this.continueChange = false;
     this.hydrated = false;
     this.initCb = () => {
@@ -708,7 +723,7 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
     if (nextProps.value !== this.props.value) {
       this.hydrated = false;
       this.applied = false;
-      this.appliedStatic = false;
+      this.appliedUserDefined = false;
     }
 
     if (!this.props.autoCursor && this.props.autoCursor !== undefined) {
@@ -722,9 +737,9 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
       this.applied = true;
     }
 
-    if (!this.appliedStatic) {
-      this.shared.applyStatic(this.props, preserved);
-      this.appliedStatic = true;
+    if (!this.appliedUserDefined) {
+      this.shared.applyUserDefined(this.props, preserved);
+      this.appliedUserDefined = true;
     }
   }
 

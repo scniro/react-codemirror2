@@ -274,7 +274,6 @@ describe('Change', () => {
     editor.redo();
     expect(editor.getValue()).toEqual('foobar');
   });
-
 });
 
 describe('Props', () => {
@@ -666,7 +665,7 @@ describe('Props', () => {
           ch: 1
         }}
         onCursor={(editor, data) => {
-          console.log('oncursor')
+          // todo
         }}/>
     );
 
@@ -692,7 +691,109 @@ describe('Props', () => {
           ch: 1
         }}
         onCursor={(editor, data) => {
-          console.log('oncursor')
+          // todo
+        }}/>
+    );
+
+    wrapper.setProps({
+      cursor: {
+        line: 1,
+        ch: 2
+      }
+    });
+
+    wrapper.unmount();
+  });
+
+  it('[Controlled]: cursor | newProps | autoCursor: true', () => {
+
+    // todo can't find way to actually invoke a DOM cursor => `onCursor`
+    let wrapper = Enzyme.mount(
+      <Controlled
+        value='foo'
+        cursor={{
+          line: 1,
+          ch: 1
+        }}
+        onCursor={(editor, data) => {
+          // todo
+        }}/>
+    );
+
+    wrapper.setProps({
+      cursor: {
+        line: 1,
+        ch: 2
+      }
+    });
+
+    wrapper.unmount();
+  });
+
+  it('[UnControlled]: cursor | newProps | autoCursor: true', () => {
+
+    // todo can't find way to actually invoke a DOM cursor => `onCursor`
+    let wrapper = Enzyme.mount(
+      <UnControlled
+        value='foo'
+        cursor={{
+          line: 1,
+          ch: 1
+        }}
+        onCursor={(editor, data) => {
+          // todo
+        }}/>
+    );
+
+    wrapper.setProps({
+      cursor: {
+        line: 1,
+        ch: 2
+      }
+    });
+
+    wrapper.unmount();
+  });
+
+  it('[Controlled]: cursor | newProps | autoCursor: true, autoScroll: true', () => {
+
+    // todo can't find way to actually invoke a DOM cursor => `onCursor`
+    let wrapper = Enzyme.mount(
+      <Controlled
+        value='foo'
+        autoScroll={true}
+        cursor={{
+          line: 1,
+          ch: 1
+        }}
+        onCursor={(editor, data) => {
+          // todo
+        }}/>
+    );
+
+    wrapper.setProps({
+      cursor: {
+        line: 1,
+        ch: 2
+      }
+    });
+
+    wrapper.unmount();
+  });
+
+  it('[UnControlled]: cursor | newProps | autoCursor: true, autoScroll: true', () => {
+
+    // todo can't find way to actually invoke a DOM cursor => `onCursor`
+    let wrapper = Enzyme.mount(
+      <UnControlled
+        value='foo'
+        autoScroll={true}
+        cursor={{
+          line: 1,
+          ch: 1
+        }}
+        onCursor={(editor, data) => {
+          // todo
         }}/>
     );
 
@@ -706,6 +807,49 @@ describe('Props', () => {
     wrapper.unmount();
   });
   // </cursor>
+
+  // <value>
+  it('[UnControlled]: new value | invoke apply pipeline accordingly`', () => {
+    let wrapper = Enzyme.mount(
+      <UnControlled
+        value='foo'
+        onChange={(editor, data) => {
+        }}/>
+    );
+
+    expect(wrapper.instance().appliedUserDefined).toBeFalsy();
+
+    wrapper.setProps({
+      value: 'bar'
+    });
+
+    expect(wrapper.instance().appliedUserDefined).toBeTruthy();
+
+    wrapper.unmount();
+  });
+
+  it('[Controlled]: new value | invoke apply pipeline accordingly`', () => {
+    let wrapper = Enzyme.mount(
+      <Controlled
+        value='foo'
+        onChange={(editor, data) => {
+        }}/>
+    );
+
+    expect(wrapper.instance().applied).toBeTruthy();
+    expect(wrapper.instance().appliedUserDefined).toBeFalsy();
+    expect(wrapper.instance().appliedNext).toBeFalsy();
+
+    wrapper.setProps({
+      value: 'bar'
+    });
+
+    expect(wrapper.instance().appliedUserDefined).toBeTruthy();
+    expect(wrapper.instance().appliedNext).toBeTruthy();
+
+    wrapper.unmount();
+  });
+  // </value>
 
   // <misc>
   it('[Controlled]: autoFocus', () => {
