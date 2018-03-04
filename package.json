@@ -19,6 +19,7 @@
     "collectCoverageFrom": [
       "src/**"
     ],
+    "mapCoverage": true,
     "setupFiles": [
       "@nteract/mockument",
       "raf/polyfill"
