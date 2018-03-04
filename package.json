@@ -16,7 +16,6 @@
   },
   "jest": {
     "collectCoverage": true,
-    "mapCoverage": true,
     "collectCoverageFrom": [
       "src/**"
     ],
@@ -60,7 +59,7 @@
   "devDependencies": {
     "@nteract/mockument": "1.0.4",
     "@types/codemirror": "0.0.55",
-    "@types/jest": "21.1.5",
+    "@types/jest": "22.1.4",
     "@types/react": "16.0.40",
     "babel-core": "6.26.0",
     "babel-loader": "7.1.3",
@@ -74,7 +73,7 @@
     "express": "4.16.2",
     "gulp": "3.9.1",
     "gulp-replace": "0.6.1",
-    "jest": "21.2.1",
+    "jest": "22.4.2",
     "js-beautify": "1.7.5",
     "node-sass": "4.7.2",
     "open": "0.0.5",
@@ -89,7 +88,7 @@
     "sass-loader": "6.0.7",
     "sinon": "4.4.2",
     "style-loader": "0.20.2",
-    "ts-jest": "21.1.4",
+    "ts-jest": "22.4.1",
     "typescript": "2.7.2",
     "typescript-formatter": "7.1.0",
     "webpack": "4.1.0",

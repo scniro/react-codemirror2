@@ -9,7 +9,8 @@ Enzyme.configure({adapter: new Adapter()});
 
 global.console = {
   warn: jest.fn(),
-  log: console.log
+  log: console.log,
+  error: console.error
 };
 
 global.focus = jest.fn();
@@ -458,18 +459,18 @@ describe('Props', () => {
   it('[Controlled: selection | newProps & props', () => {
 
     let currentRanges = [{
-      anchor: {ch: 1, line: 1},
-      head: {ch: 2, line: 1}
+      anchor: {ch: 1, line: 0},
+      head: {ch: 2, line: 0}
     }];
 
     let expectedRanges = [{
-      anchor: {ch: 1, line: 1},
-      head: {ch: 3, line: 1}
+      anchor: {ch: 1, line: 0},
+      head: {ch: 3, line: 0}
     }];
 
     let wrapper = Enzyme.mount(
       <Controlled
-        value='foo\nbar\nbaz'
+        value='foobar'
         selection={{ranges: currentRanges}}
         editorDidMount={(editor) => {
           expect(editor.doc.sel.ranges).toEqual(currentRanges);
@@ -482,8 +483,8 @@ describe('Props', () => {
     wrapper.setProps({
       selection: {
         ranges: [{
-          anchor: {ch: 1, line: 1},
-          head: {ch: 3, line: 1}
+          anchor: {ch: 1, line: 0},
+          head: {ch: 3, line: 0}
         }]
       }
     });
@@ -494,24 +495,24 @@ describe('Props', () => {
   it('[UnControlled: selection | newProps & props', () => {
 
     let currentRanges = [{
-      anchor: {ch: 1, line: 1},
-      head: {ch: 2, line: 1}
+      anchor: {ch: 1, line: 0},
+      head: {ch: 2, line: 0}
     }];
 
     let expectedRanges = [{
-      anchor: {ch: 1, line: 1},
-      head: {ch: 3, line: 1}
+      anchor: {ch: 1, line: 0},
+      head: {ch: 3, line: 0}
     }];
 
     let wrapper = Enzyme.mount(
       <UnControlled
         selection={{
           ranges: [{
-            anchor: {ch: 1, line: 1},
-            head: {ch: 2, line: 1}
+            anchor: {ch: 1, line: 0},
+            head: {ch: 2, line: 0}
           }]
         }}
-        value='foo\nbar\nbaz'
+        value='foobar'
         editorDidMount={(editor) => {
           expect(editor.doc.sel.ranges).toEqual(currentRanges);
         }}
@@ -523,8 +524,8 @@ describe('Props', () => {
     wrapper.setProps({
       selection: {
         ranges: [{
-          anchor: {ch: 1, line: 1},
-          head: {ch: 3, line: 1}
+          anchor: {ch: 1, line: 0},
+          head: {ch: 3, line: 0}
         }]
       }
     });
