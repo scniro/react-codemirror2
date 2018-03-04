@@ -1,6 +1,10 @@
+4.0.2
+==================
+* https://github.com/scniro/react-codemirror2/issues/63
+
 4.0.1
 ==================
-https://github.com/scniro/react-codemirror2/issues/61
+* https://github.com/scniro/react-codemirror2/issues/61
 
 4.0.0
 ==================
