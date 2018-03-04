@@ -48,46 +48,37 @@ var Shared = (function () {
             this.editor.focus();
         }
     };
-    Shared.prototype.apply = function (props, next, preserved) {
-        if (next) {
-            if (next.selection) {
-                if (next.selection.ranges) {
-                    if (props.selection) {
-                        if (!Helper.equals(props.selection.ranges, next.selection.ranges)) {
-                            this.delegateSelection(next.selection.ranges, next.selection.focus || false);
-                        }
-                    }
-                    else {
-                        this.delegateSelection(next.selection.ranges, next.selection.focus || false);
-                    }
-                }
-            }
-            if (next.cursor) {
-                if (props.cursor) {
-                    if (!Helper.equals(props.cursor, next.cursor)) {
-                        this.delegateCursor(preserved.cursor || next.cursor, (next.autoScroll || false), (next.autoCursor || false));
-                    }
-                }
-                else {
-                    this.delegateCursor(preserved.cursor || next.cursor, (next.autoScroll || false), (next.autoCursor || false));
-                }
-            }
-            if (next.scroll) {
-                this.delegateScroll(next.scroll);
-            }
+    Shared.prototype.apply = function (props) {
+        if (props && props.selection && props.selection.ranges) {
+            this.delegateSelection(props.selection.ranges, props.selection.focus || false);
         }
-        else {
-            if (props.selection) {
-                if (props.selection.ranges) {
-                    this.delegateSelection(props.selection.ranges, props.selection.focus || false);
-                }
-            }
-            if (props.cursor) {
-                this.delegateCursor(props.cursor, (props.autoScroll || false), (props.autoFocus || false));
-            }
-            if (props.scroll) {
+        if (props && props.cursor) {
+            this.delegateCursor(props.cursor, (props.autoScroll || false), (props.autoFocus || false));
+        }
+        if (props && props.scroll) {
+            this.delegateScroll(props.scroll);
+        }
+    };
+    Shared.prototype.applyNext = function (props, next, preserved) {
+        if (props && props.selection && props.selection.ranges) {
+            next && next.selection && next.selection.ranges && !Helper.equals(props.selection.ranges, next.selection.ranges) ?
+                this.delegateSelection(next.selection.ranges, next.selection.focus || false) :
+                this.delegateSelection(props.selection.ranges, props.selection.focus || false);
+        }
+        if (props && props.cursor) {
+            next && next.cursor && !Helper.equals(props.cursor, next.cursor) ?
+                this.delegateCursor(preserved.cursor || next.cursor, (next.autoScroll || false), (next.autoCursor || false)) :
+                this.delegateCursor(preserved.cursor || props.cursor, (props.autoScroll || false), (props.autoFocus || false));
+        }
+        if (props && props.scroll) {
+            next && next.scroll && !Helper.equals(props.scroll, next.scroll) ?
+                this.delegateScroll(next.scroll) :
                 this.delegateScroll(props.scroll);
-            }
+        }
+    };
+    Shared.prototype.applyStatic = function (props, preserved) {
+        if (preserved && preserved.cursor) {
+            this.delegateCursor(preserved.cursor || props.cursor, (props.autoScroll || false), (props.autoFocus || false));
         }
     };
     Shared.prototype.wire = function (name) {
@@ -378,7 +369,8 @@ var Controlled = (function (_super) {
             preserved.cursor = this.editor.getCursor();
         }
         this.hydrate(nextProps);
-        this.shared.apply(this.props, nextProps, preserved);
+        this.shared.applyNext(this.props, nextProps, preserved);
+        this.shared.applyStatic(this.props, preserved);
     };
     Controlled.prototype.componentWillUnmount = function () {
         if (SERVER_RENDERED)
@@ -406,6 +398,8 @@ var UnControlled = (function (_super) {
         var _this = _super.call(this, props) || this;
         if (SERVER_RENDERED)
             return _this;
+        _this.applied = false;
+        _this.appliedStatic = false;
         _this.continueChange = false;
         _this.hydrated = false;
         _this.initCb = function () {
@@ -477,6 +471,7 @@ var UnControlled = (function (_super) {
         });
         this.hydrate(this.props);
         this.shared.apply(this.props);
+        this.applied = true;
         this.mounted = true;
         if (this.props.onBlur)
             this.shared.wire('onBlur');
@@ -519,12 +514,21 @@ var UnControlled = (function (_super) {
         var preserved = { cursor: null };
         if (nextProps.value !== this.props.value) {
             this.hydrated = false;
+            this.applied = false;
+            this.appliedStatic = false;
         }
         if (!this.props.autoCursor && this.props.autoCursor !== undefined) {
             preserved.cursor = this.editor.getCursor();
         }
         this.hydrate(nextProps);
-        this.shared.apply(this.props, nextProps, preserved);
+        if (!this.applied) {
+            this.shared.apply(this.props);
+            this.applied = true;
+        }
+        if (!this.appliedStatic) {
+            this.shared.applyStatic(this.props, preserved);
+            this.appliedStatic = true;
+        }
     };
     UnControlled.prototype.componentWillUnmount = function () {
         if (SERVER_RENDERED)

@@ -89,7 +89,9 @@ export interface IUnControlledCodeMirror extends ICodeMirror {
 
 declare interface ICommon {
   wire: (name: string) => void;
-  apply: (props: IControlledCodeMirror | IUnControlledCodeMirror, next?: IControlledCodeMirror | IUnControlledCodeMirror, preserved?: IPreservedOptions) => void;
+  apply: (props: IControlledCodeMirror | IUnControlledCodeMirror) => void;
+  applyNext: (props: IControlledCodeMirror | IUnControlledCodeMirror, next?: IControlledCodeMirror | IUnControlledCodeMirror, preserved?: IPreservedOptions) => void;
+  applyStatic: (props: IControlledCodeMirror | IUnControlledCodeMirror, preserved?: IPreservedOptions) => void;
 }
 
 declare interface IPreservedOptions {
@@ -139,49 +141,51 @@ class Shared implements ICommon {
     }
   }
 
-  public apply(props: IControlledCodeMirror | IUnControlledCodeMirror, next?: IControlledCodeMirror | IUnControlledCodeMirror, preserved?: any) {
+  public apply(props: IControlledCodeMirror | IUnControlledCodeMirror) {
 
-    if (next) {
-      if (next.selection) {
-        if (next.selection.ranges) {
-          if (props.selection) {
-            if (!Helper.equals(props.selection.ranges, next.selection.ranges)) {
-              this.delegateSelection(next.selection.ranges, next.selection.focus || false);
-            }
-          } else {
-            this.delegateSelection(next.selection.ranges, next.selection.focus || false);
-          }
-        }
-      }
+    // init ranges
+    if (props && props.selection && props.selection.ranges) {
+      this.delegateSelection(props.selection.ranges, props.selection.focus || false);
+    }
 
-      if (next.cursor) {
-        if (props.cursor) {
-          if (!Helper.equals(props.cursor, next.cursor)) {
-            this.delegateCursor(preserved.cursor || next.cursor, (next.autoScroll || false), (next.autoCursor || false));
-          }
-        } else {
-          this.delegateCursor(preserved.cursor || next.cursor, (next.autoScroll || false), (next.autoCursor || false));
-        }
-      }
+    // init cursor
+    if (props && props.cursor) {
+      this.delegateCursor(props.cursor, (props.autoScroll || false), (props.autoFocus || false));
+    }
 
-      if (next.scroll) {
-        this.delegateScroll(next.scroll);
-      }
+    // init scroll
+    if (props && props.scroll) {
+      this.delegateScroll(props.scroll);
+    }
+  }
 
-    } else {
-      if (props.selection) {
-        if (props.selection.ranges) {
-          this.delegateSelection(props.selection.ranges, props.selection.focus || false);
-        }
-      }
+  public applyNext(props: IControlledCodeMirror | IUnControlledCodeMirror, next?: IControlledCodeMirror | IUnControlledCodeMirror, preserved?: any) {
 
-      if (props.cursor) {
-        this.delegateCursor(props.cursor, (props.autoScroll || false), (props.autoFocus || false));
-      }
+    // handle new ranges
+    if (props && props.selection && props.selection.ranges) {
+      next && next.selection && next.selection.ranges && !Helper.equals(props.selection.ranges, next.selection.ranges) ?
+        this.delegateSelection(next.selection.ranges, next.selection.focus || false) :
+        this.delegateSelection(props.selection.ranges, props.selection.focus || false);
+    }
 
-      if (props.scroll) {
+    // handle new cursor
+    if (props && props.cursor) {
+      next && next.cursor && !Helper.equals(props.cursor, next.cursor) ?
+        this.delegateCursor(preserved.cursor || next.cursor, (next.autoScroll || false), (next.autoCursor || false)) :
+        this.delegateCursor(preserved.cursor || props.cursor, (props.autoScroll || false), (props.autoFocus || false));
+    }
+
+    // handle new scroll
+    if (props && props.scroll) {
+      next && next.scroll && !Helper.equals(props.scroll, next.scroll) ?
+        this.delegateScroll(next.scroll) :
         this.delegateScroll(props.scroll);
-      }
+    }
+  }
+
+  public applyStatic(props: IControlledCodeMirror | IUnControlledCodeMirror, preserved?: any) {
+    if (preserved && preserved.cursor) {
+      this.delegateCursor(preserved.cursor || props.cursor, (props.autoScroll || false), (props.autoFocus || false));
     }
   }
 
@@ -511,7 +515,9 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
 
     this.hydrate(nextProps);
 
-    this.shared.apply(this.props, nextProps, preserved);
+    this.shared.applyNext(this.props, nextProps, preserved);
+
+    this.shared.applyStatic(this.props, preserved);
   }
 
   /** @internal */
@@ -560,6 +566,10 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
   private ref: HTMLElement;
   /** @internal */
   private shared: Shared;
+  /** @internal */
+  private applied: boolean;
+  /** @internal */
+  private appliedStatic: boolean;
 
   /** @internal */
   constructor(props: IUnControlledCodeMirror) {
@@ -567,6 +577,8 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
 
     if (SERVER_RENDERED) return;
 
+    this.applied = false;
+    this.appliedStatic = false;
     this.continueChange = false;
     this.hydrated = false;
     this.initCb = () => {
@@ -659,6 +671,8 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
 
     this.shared.apply(this.props);
 
+    this.applied = true;
+
     this.mounted = true;
 
     if (this.props.onBlur) this.shared.wire('onBlur');
@@ -693,6 +707,8 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
 
     if (nextProps.value !== this.props.value) {
       this.hydrated = false;
+      this.applied = false;
+      this.appliedStatic = false;
     }
 
     if (!this.props.autoCursor && this.props.autoCursor !== undefined) {
@@ -701,7 +717,15 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
 
     this.hydrate(nextProps);
 
-    this.shared.apply(this.props, nextProps, preserved);
+    if (!this.applied) {
+      this.shared.apply(this.props);
+      this.applied = true;
+    }
+
+    if (!this.appliedStatic) {
+      this.shared.applyStatic(this.props, preserved);
+      this.appliedStatic = true;
+    }
   }
 
   /** @internal */
