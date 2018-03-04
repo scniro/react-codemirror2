@@ -1,6 +1,8 @@
-4.0.2
+4.1.0
 ==================
 * https://github.com/scniro/react-codemirror2/issues/63
+* add internal notion of `applied`, `appliedUserDefined`, `appliedNext` to isolate update flows for controlled v. uncontrolled
+* test coverage
 
 4.0.1
 ==================

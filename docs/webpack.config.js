@@ -42,14 +42,6 @@ let config = {
       'process.env': {
         'BUILD': process.env['BUILD']
       }
-    }),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false
-      },
-      output: {
-        comments: false
-      }
     })
   ]
 };
