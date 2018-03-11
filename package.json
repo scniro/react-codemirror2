@@ -20,7 +20,6 @@
     "collectCoverageFrom": [
       "src/**"
     ],
-    "mapCoverage": true,
     "setupFiles": [
       "@nteract/mockument",
       "raf/polyfill"
@@ -61,7 +60,7 @@
   "devDependencies": {
     "@nteract/mockument": "1.0.4",
     "@types/codemirror": "0.0.55",
-    "@types/jest": "21.1.5",
+    "@types/jest": "22.2.0",
     "@types/react": "16.0.40",
     "babel-core": "6.26.0",
     "babel-loader": "7.1.4",
@@ -75,7 +74,7 @@
     "express": "4.16.2",
     "gulp": "3.9.1",
     "gulp-replace": "0.6.1",
-    "jest": "21.2.1",
+    "jest": "22.4.2",
     "js-beautify": "1.7.5",
     "node-sass": "4.7.2",
     "open": "0.0.5",
