@@ -121,15 +121,15 @@ require('codemirror/mode/javascript/javascript');
 
 ## events
 
-| event                                                        | components                       | description                                                                                                 |
-|--------------------------------------------------------------|----------------------------------|-------------------------------------------------------------------------------------------------------------|
-| editorDidAttach(editor)                                      | `UnControlled`                   | component is now **responding** to new props                                                                |
-| editorDidConfigure(editor)                                   | `Controlled`&nbsp;`UnControlled` | component configuration has been set                                                                        |
-| editorDidDetach(editor)                                      | `UnControlled`                   | component is now **ignoring** new props                                                                     |
-| editorDidMount(editor,&nbsp;*[next]*)                        | `Controlled`&nbsp;`UnControlled` | * invoking optional `next` will trigger `editorDidConfigure`                                                |
-| editorWillUnmount(editor)                                    | `Controlled`&nbsp;`UnControlled` | invoked before [`componentWillUnmount`](https://reactjs.org/docs/react-component.html#componentwillunmount) |
-| onBeforeChange(editor,&nbsp;data,&nbsp;value,&nbsp;*[next]*) | `Controlled`&nbsp;`UnControlled` | * if used, `next` is returned via `UnControlled` and *must* be invoked to trigger onChange                  |
-| onChange(editor,&nbsp;data,&nbsp;value)                      | `Controlled`&nbsp;`UnControlled` | the component value has been changed                                                                        |
+| event                                                            | components                       | description                                                                                                 |
+|------------------------------------------------------------------|----------------------------------|-------------------------------------------------------------------------------------------------------------|
+| **editorDidAttach(editor)**                                      | `UnControlled`                   | component is now **responding** to new props                                                                |
+| **editorDidConfigure(editor)**                                   | `Controlled`&nbsp;`UnControlled` | component configuration has been set                                                                        |
+| **editorDidDetach(editor)**                                      | `UnControlled`                   | component is now **ignoring** new props                                                                     |
+| **editorDidMount(editor,&nbsp;_[next]_)**                        | `Controlled`&nbsp;`UnControlled` | * invoking optional `next` will trigger `editorDidConfigure`                                                |
+| **editorWillUnmount(editor)**                                    | `Controlled`&nbsp;`UnControlled` | invoked before [`componentWillUnmount`](https://reactjs.org/docs/react-component.html#componentwillunmount) |
+| **onBeforeChange(editor,&nbsp;data,&nbsp;value,&nbsp;_[next]_)** | `Controlled`&nbsp;`UnControlled` | * if used, `next` is returned via `UnControlled` and *must* be invoked to trigger onChange                  |
+| **onChange(editor,&nbsp;data,&nbsp;value)**                      | `Controlled`&nbsp;`UnControlled` | the component value has been changed                                                                        |
 
 ## events cont. [wrapped codemirror events](https://codemirror.net/doc/manual.html#events)
 
