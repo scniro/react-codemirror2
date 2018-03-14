@@ -69,16 +69,16 @@ require('codemirror/mode/javascript/javascript');
 
 ## props
 
-| prop         | type *`default`*  | components                        | description                                                                                                           |
-|--------------|-------------------|-----------------------------------|-----------------------------------------------------------------------------------------------------------------------|
-| `autoCursor` | boolean *`true`*  | `Controlled` `UnControlled`       | should component cursor position correct when `value` changed                                                         |
-| `autoFocus`  | boolean *`false`* | `Controlled` `UnControlled`       | should component focus on mount                                                                                       |
-| `autoScroll` | boolean *`true`*  | `Controlled` `UnControlled`       | should component scroll cursor position into view when `value` changed                                                |
-| `className`  | string            | `Controlled` `UnControlled`       | pass through class *`class="react-codemirror2 className"`*                                                            |
-| `defineMode` | object            | `Controlled` `UnControlled`       | pass a [custom mode](http://marijnhaverbeke.nl/blog/codemirror-mode-system.html) via `{name: 'custom', fn: myModeFn}` |
-| `detach`     | boolean           | `UnControlled`                    | should component ignore new props                                                                                     |
-| `options`    | object            | `Controlled` `UnControlled`       | [codemirror configuration](https://codemirror.net/doc/manual.html#config)                                             |
-| `value`      | string            | _**`Controlled`**_ `UnControlled` | component value _**must be managed for controlled components**_                                                       |
+| prop         | type&nbsp;*`default`*  | components                        | description                                                                                                           |
+|--------------|------------------------|-----------------------------------|-----------------------------------------------------------------------------------------------------------------------|
+| `autoCursor` | boolean&nbsp;*`true`*  | `Controlled`&nbsp;`UnControlled`  | should component cursor position correct when `value` changed                                                         |
+| `autoFocus`  | boolean&nbsp;*`false`* | `Controlled`&nbsp;`UnControlled`  | should component focus on mount                                                                                       |
+| `autoScroll` | boolean&nbsp;*`true`*  | `Controlled`&nbsp;`UnControlled`  | should component scroll cursor position into view when `value` changed                                                |
+| `className`  | string                 | `Controlled`&nbsp;`UnControlled`  | pass through class *`class="react-codemirror2 className"`*                                                            |
+| `defineMode` | object                 | `Controlled`&nbsp;`UnControlled`  | pass a [custom mode](http://marijnhaverbeke.nl/blog/codemirror-mode-system.html) via `{name: 'custom', fn: myModeFn}` |
+| `detach`     | boolean                | `UnControlled`                    | should component ignore new props                                                                                     |
+| `options`    | object                 | `Controlled`&nbsp;`UnControlled`  | [codemirror configuration](https://codemirror.net/doc/manual.html#config)                                             |
+| `value`      | string                 | *`Controlled`&nbsp;`UnControlled` | * component value _**must be managed for controlled components**_                                                     |
 
 ## props cont. (wrapped codemirror [programming api](https://codemirror.net/doc/manual.html#api))
 
