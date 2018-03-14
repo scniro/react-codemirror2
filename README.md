@@ -69,18 +69,16 @@ require('codemirror/mode/javascript/javascript');
 
 ## props
 
-- `autoCursor`
-> `boolean` if `false`, allow the defaulted internal codemirror cursor position to reset should a new `value` prop be set. Default: `true`
-- `autoFocus`
-> `boolean` if `true`, set focus to the instance `onSet`. Will be invoked within the `componentDidMount` lifecycle stage. Default: `false`
-- `autoScroll`
-> `boolean` if `true`, scroll the cursor position into view automatically. Default: `false`
-- `className` - sets `class="react-codemirror2 yourClassName"`
-- `defineMode`
-> pass a custom mode object `{name: 'custom', fn: myModeFn}`
-- `options` - see codemirror [configuration](https://codemirror.net/doc/manual.html#config)
-- `value` - set component value through props
-> must be managed for controlled components
+| prop         | type *`default`*  | components                        | description                                                                                                           |
+|--------------|-------------------|-----------------------------------|-----------------------------------------------------------------------------------------------------------------------|
+| `autoCursor` | boolean *`true`*  | `Controlled` `UnControlled`       | should component cursor position correct when `value` changed                                                         |
+| `autoFocus`  | boolean *`false`* | `Controlled` `UnControlled`       | should component focus on mount                                                                                       |
+| `autoScroll` | boolean *`true`*  | `Controlled` `UnControlled`       | should component scroll cursor position into view when `value` changed                                                |
+| `className`  | string            | `Controlled` `UnControlled`       | pass through class *`class="react-codemirror2 className"`*                                                            |
+| `defineMode` | object            | `Controlled` `UnControlled`       | pass a [custom mode](http://marijnhaverbeke.nl/blog/codemirror-mode-system.html) via `{name: 'custom', fn: myModeFn}` |
+| `detach`     | boolean           | `UnControlled`                    | should component ignore new props                                                                                     |
+| `options`    | object            | `Controlled` `UnControlled`       | [codemirror configuration](https://codemirror.net/doc/manual.html#config)                                             |
+| `value`      | string            | _**`Controlled`**_ `UnControlled` | component value _**must be managed for controlled components**_                                                       |
 
 ## props cont. (wrapped codemirror [programming api](https://codemirror.net/doc/manual.html#api))
 
@@ -123,16 +121,15 @@ require('codemirror/mode/javascript/javascript');
 
 ## events
 
-- `editorDidConfigure(editor)`
-- `editorDidMount(editor, next)`
-> invoking optional `next()` will trigger `editorDidConfigure`
-- `editorWillMount()`
-- `editorWillUnmount(editor)`
-- `onBeforeChange(editor, data, value)` **[controlled]**
-> required - hook to manage state and update `value`
-- `onBeforeChange(editor, data, value, next)` **[uncontrolled]**
-> optional - if defined, `next()` must be invoked to trigger `onChange`.
-- `onChange(editor, data, value)`
+| event                | returns                         | components                        | description                                                                                                 |
+|----------------------|---------------------------------|-----------------------------------|-------------------------------------------------------------------------------------------------------------|
+| `editorDidAttach`    | editor                          | `UnControlled`                    | component is now **responding** to new props                                                                |
+| `editorDidConfigure` | editor                          | `Controlled` `UnControlled`       | component configuration has been set                                                                        |
+| `editorDidDetach`    | editor                          | `UnControlled`                    | component is now **ignoring** new props                                                                     |
+| `editorDidMount`     | editor, _**next**_              | `Controlled` `UnControlled`       | **invoking optional `next` will trigger `editorDidConfigure`**                                              |
+| `editorWillUnmount`  | editor                          | `Controlled` `UnControlled`       | invoked before [`componentWillUnmount`](https://reactjs.org/docs/react-component.html#componentwillunmount) |
+| `onBeforeChange`     | editor, data, value, _**next**_ | `Controlled` _**`UnControlled`**_ | if used, `next` is returned via `UnControlled` and *must* be invoked to trigger onChange                    |
+| `onChange`           | editor, data, value             | `Controlled` `UnControlled`       | the component value has been changed                                                                        |
 
 ## events cont. [wrapped codemirror events](https://codemirror.net/doc/manual.html#events)
 

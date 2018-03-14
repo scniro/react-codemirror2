@@ -884,5 +884,90 @@ describe('Props', () => {
 
     expect(editor.state.focused).toBeTruthy();
   });
+
+  it('[UnControlled]: detached | should detach', () => {
+    const spy = sinon.spy();
+    const wrapper = Enzyme.mount(
+      <UnControlled detach={false} editorDidDetach={() => spy()}/>
+    );
+
+    expect(spy.called).toBeFalsy();
+    wrapper.setProps({detach: true});
+    expect(spy.called).toBeTruthy();
+    wrapper.unmount();
+  });
+
+  it('[UnControlled]: detached | should attach', () => {
+    const spy = sinon.spy();
+    const wrapper = Enzyme.mount(
+      <UnControlled detach={true} editorDidAttach={() => spy()}/>
+    );
+
+    expect(spy.called).toBeFalsy();
+    wrapper.setProps({detach: false});
+    expect(spy.called).toBeTruthy();
+    wrapper.unmount();
+  });
+
+  it('[UnControlled]: detached:false | should update', done => {
+    let instance;
+    const spy = sinon.spy();
+    const wrapper = Enzyme.mount(
+      <UnControlled
+        editorDidMount={editor => instance = editor}/>
+    );
+
+    instance.on('optionChange', () => spy());
+
+    wrapper.setProps({options: {lineNumbers: true}});
+
+    // force lose `.on` race
+    setTimeout(() => {
+      expect(spy.called).toBeTruthy();
+      wrapper.unmount();
+      done();
+    }, 200);
+  });
+
+  it('[UnControlled]: detached:false | should *not* update | on mount', done => {
+    let instance;
+    const spy = sinon.spy();
+    const wrapper = Enzyme.mount(
+      <UnControlled
+        detach={true}
+        editorDidMount={editor => instance = editor}/>
+    );
+
+    instance.on('optionChange', () => spy());
+
+    wrapper.setProps({options: {lineNumbers: true}});
+
+    // force lose `.on` race
+    setTimeout(() => {
+      expect(spy.called).toBeFalsy();
+      wrapper.unmount();
+      done();
+    }, 200);
+  });
+
+  it('[UnControlled]: detached:false | should *not* update | on props', done => {
+    let instance;
+    const spy = sinon.spy();
+    const wrapper = Enzyme.mount(
+      <UnControlled
+        editorDidMount={editor => instance = editor}/>
+    );
+
+    instance.on('optionChange', () => spy());
+
+    wrapper.setProps({detach: true, options: {lineNumbers: true}});
+
+    // force lose `.on` race
+    setTimeout(() => {
+      expect(instance.getOption('lineNumbers')).toBeFalsy();
+      wrapper.unmount();
+      done();
+    }, 200);
+  });
   // </misc>
 });

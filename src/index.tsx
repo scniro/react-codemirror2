@@ -45,7 +45,6 @@ export interface IInstance extends codemirror.Editor, IDoc {
 /* </tshacks> */
 
 export interface ICodeMirror {
-
   autoCursor?: boolean; // default: true
   autoFocus?: boolean; // default: false
   autoScroll?: boolean; // default: false
@@ -83,6 +82,9 @@ export interface IControlledCodeMirror extends ICodeMirror {
 }
 
 export interface IUnControlledCodeMirror extends ICodeMirror {
+  detach?: boolean;
+  editorDidAttach?: (editor: IInstance) => void;
+  editorDidDetach?: (editor: IInstance) => void;
   onBeforeChange?: (editor: IInstance, data: codemirror.EditorChange, value: string, next: () => void) => void;
   value?: string;
 }
@@ -526,7 +528,7 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
 
     this.hydrate(nextProps);
 
-    if(!this.appliedNext) {
+    if (!this.appliedNext) {
       this.shared.applyNext(this.props, nextProps, preserved);
       this.appliedNext = true;
     }
@@ -572,6 +574,8 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
   /** @internal */
   private continueChange: boolean;
   /** @internal */
+  private detached: boolean;
+  /** @internal */
   private editor: IInstance;
   /** @internal */
   private hydrated: boolean;
@@ -595,6 +599,7 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
     this.applied = false;
     this.appliedUserDefined = false;
     this.continueChange = false;
+    this.detached = false;
     this.hydrated = false;
     this.initCb = () => {
       if (this.props.editorDidConfigure) {
@@ -649,6 +654,8 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
   public componentDidMount() {
 
     if (SERVER_RENDERED) return;
+
+    this.detached = (this.props.detach === true);
 
     if (this.props.defineMode) {
       if (this.props.defineMode.name && this.props.defineMode.fn) {
@@ -716,7 +723,23 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
   /** @internal */
   public componentWillReceiveProps(nextProps) {
 
-    if (SERVER_RENDERED) return;
+    if(this.detached && (nextProps.detach === false)) {
+      this.detached = false;
+      if (this.props.editorDidAttach) {
+        this.props.editorDidAttach(this.editor);
+      }
+    }
+
+    if(!this.detached && (nextProps.detach === true)) {
+      this.detached = true;
+      if (this.props.editorDidDetach) {
+        this.props.editorDidDetach(this.editor);
+      }
+    }
+
+
+
+    if (SERVER_RENDERED || this.detached) return;
 
     let preserved: IPreservedOptions = {cursor: null};
 
@@ -755,7 +778,13 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
 
   /** @internal */
   public shouldComponentUpdate(nextProps, nextState) {
-    return !SERVER_RENDERED
+
+    let update = true;
+
+    if (SERVER_RENDERED) update = false;
+    if (this.detached) update = false;
+
+    return update;
   }
 
   /** @internal */

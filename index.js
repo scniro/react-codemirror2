@@ -409,6 +409,7 @@ var UnControlled = (function (_super) {
         _this.applied = false;
         _this.appliedUserDefined = false;
         _this.continueChange = false;
+        _this.detached = false;
         _this.hydrated = false;
         _this.initCb = function () {
             if (_this.props.editorDidConfigure) {
@@ -452,6 +453,7 @@ var UnControlled = (function (_super) {
         var _this = this;
         if (SERVER_RENDERED)
             return;
+        this.detached = (this.props.detach === true);
         if (this.props.defineMode) {
             if (this.props.defineMode.name && this.props.defineMode.fn) {
                 cm.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
@@ -517,7 +519,19 @@ var UnControlled = (function (_super) {
         }
     };
     UnControlled.prototype.componentWillReceiveProps = function (nextProps) {
-        if (SERVER_RENDERED)
+        if (this.detached && (nextProps.detach === false)) {
+            this.detached = false;
+            if (this.props.editorDidAttach) {
+                this.props.editorDidAttach(this.editor);
+            }
+        }
+        if (!this.detached && (nextProps.detach === true)) {
+            this.detached = true;
+            if (this.props.editorDidDetach) {
+                this.props.editorDidDetach(this.editor);
+            }
+        }
+        if (SERVER_RENDERED || this.detached)
             return;
         var preserved = { cursor: null };
         if (nextProps.value !== this.props.value) {
@@ -546,7 +560,12 @@ var UnControlled = (function (_super) {
         }
     };
     UnControlled.prototype.shouldComponentUpdate = function (nextProps, nextState) {
-        return !SERVER_RENDERED;
+        var update = true;
+        if (SERVER_RENDERED)
+            update = false;
+        if (this.detached)
+            update = false;
+        return update;
     };
     UnControlled.prototype.render = function () {
         var _this = this;

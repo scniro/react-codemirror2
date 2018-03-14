@@ -65,6 +65,9 @@ export interface IControlledCodeMirror extends ICodeMirror {
     value: string;
 }
 export interface IUnControlledCodeMirror extends ICodeMirror {
+    detach?: boolean;
+    editorDidAttach?: (editor: IInstance) => void;
+    editorDidDetach?: (editor: IInstance) => void;
     onBeforeChange?: (editor: IInstance, data: codemirror.EditorChange, value: string, next: () => void) => void;
     value?: string;
 }

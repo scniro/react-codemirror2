@@ -115,8 +115,10 @@ class Editor extends React.Component {
     } else {
       return (
         <UnControlled
+          detachOnMount={true}
           value={this.getUncontrolledValue(this.props.mode)}
           defineMode={{name: 'strings', fn: sampleMode}}
+          detach={this.state.detach}
           options={{
             mode: this.props.mode,
             theme: this.props.theme,
@@ -131,7 +133,11 @@ class Editor extends React.Component {
   }
 
   render() {
-    return this.renderEditor(this.props.controlled)
+    return (
+      <div>
+        {this.renderEditor(this.props.controlled)}
+      </div>
+    )
   }
 }
 
