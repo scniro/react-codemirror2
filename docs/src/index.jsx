@@ -25,7 +25,7 @@ const store = createStore(app, initialState);
 
 render(
   <Provider store={store}>
-    <App/>
+    <App version={REACT_CODEMIRROR2_V}/>
   </Provider>
   , document.getElementById('app'));
 

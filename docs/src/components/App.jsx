@@ -18,6 +18,7 @@ export default class App extends React.Component {
     return (
       <div id='container'>
         <header>
+          <span id='doc-v'>{this.props.version}</span>
           <a href='https://github.com/scniro/react-codemirror2' target='_blank'>
             <h1>
               <i className='fa fa-github' aria-hidden='true'/>

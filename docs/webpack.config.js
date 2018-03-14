@@ -1,9 +1,10 @@
 'use strict';
 
-let webpack = require('webpack');
-let path = require('path');
+const pkg = require('../package.json');
+const webpack = require('webpack');
+const path = require('path');
 
-let config = {
+const config = {
   devtool: 'eval',
   entry: path.resolve(__dirname, 'src', 'index.jsx'),
   output: {
@@ -41,10 +42,10 @@ let config = {
     new webpack.DefinePlugin({
       'process.env': {
         'BUILD': process.env['BUILD']
-      }
+      },
+      'REACT_CODEMIRROR2_V': JSON.stringify(pkg.version)
     })
   ]
 };
-
 
 module.exports = config;

@@ -1,3 +1,7 @@
+4.2.0
+==================
+* add notion of UnControlled#detach => [`editorDidAttach`, `editorDidDetach`] (related to #37)
+
 4.1.0
 ==================
 * https://github.com/scniro/react-codemirror2/issues/63

@@ -50,16 +50,19 @@ td, th {
 @import '../../node_modules/prismjs/themes/prism.css';
 
 .react-codemirror2 {
+  flex: 1 1 auto;
+  margin-top: 0;
   height: 100%;
+  position: relative;
 }
 
 .CodeMirror {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
   height: 100%;
-  border: solid 1px transparent;
-
-  &.cm-s-xq-light {
-    border-color: #ddd;
-  }
 }
 
 // </libs>
@@ -79,6 +82,22 @@ html, body, #app {
     margin: 0 auto;
 
     header {
+
+      #doc-v {
+        font-size: 14pt;
+        padding: 0.125em 0.250em;
+        border: solid 1px #30bb60;
+        margin-right: 0.500em;
+        position: relative;
+        bottom: 0.125em;
+        background-color: rgba(48, 187, 96, 0.15);
+        user-select: none;
+        color: #777;
+
+        i {
+          color: #ddd;
+        }
+      }
 
       a {
 
@@ -114,9 +133,7 @@ html, body, #app {
       padding: 0.250em 0.750em;
       height: 2.500em;
       background-color: #f5f2f0;
-      border-top: solid 1px #ddd;
-      border-left: solid 1px #ddd;
-      border-right: solid 1px #ddd;
+      border: solid 1px #ddd;
 
       select {
         margin-right: 1.000em;
@@ -135,7 +152,6 @@ html, body, #app {
         float: left;
 
         &:last-of-type {
-          border-top: solid 1px #ddd;
           border-bottom: solid 1px #ddd;
           border-right: solid 1px #ddd;
         }
