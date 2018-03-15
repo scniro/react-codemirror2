@@ -41,7 +41,6 @@ export interface IDoc extends codemirror.Doc {
 export interface IInstance extends codemirror.Editor, IDoc {
   options: codemirror.EditorConfiguration
 }
-
 /* </tshacks> */
 
 export interface ICodeMirror {
@@ -559,9 +558,7 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
 
     let className = this.props.className ? `react-codemirror2 ${this.props.className}` : 'react-codemirror2';
 
-    return (
-      <div className={className} ref={(self) => this.ref = self}/>
-    )
+    return <div className={className} ref={self => this.ref = self}/>
   }
 }
 
@@ -723,21 +720,19 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
   /** @internal */
   public componentWillReceiveProps(nextProps) {
 
-    if(this.detached && (nextProps.detach === false)) {
+    if (this.detached && (nextProps.detach === false)) {
       this.detached = false;
       if (this.props.editorDidAttach) {
         this.props.editorDidAttach(this.editor);
       }
     }
 
-    if(!this.detached && (nextProps.detach === true)) {
+    if (!this.detached && (nextProps.detach === true)) {
       this.detached = true;
       if (this.props.editorDidDetach) {
         this.props.editorDidDetach(this.editor);
       }
     }
-
-
 
     if (SERVER_RENDERED || this.detached) return;
 
@@ -794,8 +789,6 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
 
     let className = this.props.className ? `react-codemirror2 ${this.props.className}` : 'react-codemirror2';
 
-    return (
-      <div className={className} ref={(self) => this.ref = self}/>
-    )
+    return <div className={className} ref={self => this.ref = self}/>
   }
 }
