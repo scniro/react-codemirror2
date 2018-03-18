@@ -467,7 +467,7 @@ var UnControlled = (function (_super) {
             }
         });
         this.editor.on('change', function (cm, data) {
-            if (!_this.mounted) {
+            if (!_this.mounted || !_this.props.onChange) {
                 return;
             }
             if (_this.props.onBeforeChange) {

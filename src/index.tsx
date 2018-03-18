@@ -41,6 +41,7 @@ export interface IDoc extends codemirror.Doc {
 export interface IInstance extends codemirror.Editor, IDoc {
   options: codemirror.EditorConfiguration
 }
+
 /* </tshacks> */
 
 export interface ICodeMirror {
@@ -673,7 +674,7 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
 
     this.editor.on('change', (cm, data) => {
 
-      if (!this.mounted) {
+      if (!this.mounted || !this.props.onChange) {
         return;
       }
 
