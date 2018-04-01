@@ -169,9 +169,9 @@ render() {
 }
 ```
 
-- How can I make a resizable editor?
+- How can I have a resizable editor?
 
-Check out [bokuweb/re-resizable](https://github.com/bokuweb/re-resizable) to wrap the editor in `<Resizable/>` components
+Check out [bokuweb/re-resizable](https://github.com/bokuweb/re-resizable). Wrapping your component with `<Resizable/>'s` works well
 
 
 [MIT](./LICENSE) © 2018 [scniro](https://github.com/scniro)
