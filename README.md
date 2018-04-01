@@ -149,15 +149,15 @@ require('codemirror/mode/javascript/javascript');
 - `onUpdate(editor, event)` - *[update](https://codemirror.net/doc/manual.html#event_update)*
 - `onViewportChange(editor, from, to)` - *[viewportChange](https://codemirror.net/doc/manual.html#event_viewportChange)*
 
-## misc. notes
+## FAQ
 
-- server rendering
+- Is server side rendering supported?
 
-react-codemirror2 will prevent rendering in absence of `navigator` that is typical of a server environment. In case of any issue, you can force the component to not render via a `PREVENT_CODEMIRROR_RENDER` global variable that this wrapper respond to.
+Yes. react-codemirror2 will prevent rendering in absence of `navigator`. You can also force the component to not render via a `PREVENT_CODEMIRROR_RENDER` global.
 
-- getting the instance
+- How can I get the instance?
 
-getting the instance of the underlying editor can be done via the event callbacks where `editor` is returned. There is no static method to get it on demand, e.g. `CodeMirror.getInstance()`. The recommended approach can be observed as follows...
+The recommended technique to get the instance is to persist the `editor` returned via event callbacks. There is no static method to get it on demand, e.g. `CodeMirror.getInstance()`. Example...
 
 ```jsx
 constructor() {
@@ -168,6 +168,10 @@ render() {
   <CodeMirror editorDidMount={editor => { this.instance = editor }}/>
 }
 ```
+
+- How can I make a resizable editor?
+
+Check out [bokuweb/re-resizable](https://github.com/bokuweb/re-resizable) to wrap the editor in `<Resizable/>` components
 
 
 [MIT](./LICENSE) © 2018 [scniro](https://github.com/scniro)
