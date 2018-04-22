@@ -26,6 +26,9 @@ export interface IDoc extends codemirror.Doc {
 export interface IInstance extends codemirror.Editor, IDoc {
     options: codemirror.EditorConfiguration;
 }
+export interface DomEvent {
+    (editor: IInstance, event: Event): void;
+}
 export interface ICodeMirror {
     autoCursor?: boolean;
     autoFocus?: boolean;
@@ -37,20 +40,29 @@ export interface ICodeMirror {
     editorDidMount?: (editor: IInstance, value: string, cb: () => void) => void;
     editorWillMount?: () => void;
     editorWillUnmount?: (lib: any) => void;
-    onBlur?: (editor: IInstance, event: Event) => void;
+    onBlur?: DomEvent;
     onChange?: (editor: IInstance, data: codemirror.EditorChange, value: string) => void;
+    onContextMenu?: DomEvent;
+    onCopy?: DomEvent;
     onCursor?: (editor: IInstance, data: codemirror.Position) => void;
+    onCut?: DomEvent;
     onCursorActivity?: (editor: IInstance) => void;
-    onDragEnter?: (editor: IInstance, event: Event) => void;
-    onDragOver?: (editor: IInstance, event: Event) => void;
-    onDrop?: (editor: IInstance, event: Event) => void;
-    onFocus?: (editor: IInstance, event: Event) => void;
+    onDblClick?: DomEvent;
+    onDragEnter?: DomEvent;
+    onDragLeave?: DomEvent;
+    onDragOver?: DomEvent;
+    onDragStart?: DomEvent;
+    onDrop?: DomEvent;
+    onFocus?: DomEvent;
     onGutterClick?: (editor: IInstance, lineNumber: number, gutter: string, event: Event) => void;
-    onKeyDown?: (editor: IInstance, event: Event) => void;
-    onKeyPress?: (editor: IInstance, event: Event) => void;
-    onKeyUp?: (editor: IInstance, event: Event) => void;
+    onKeyDown?: DomEvent;
+    onKeyPress?: DomEvent;
+    onKeyUp?: DomEvent;
+    onMouseDown?: DomEvent;
+    onPaste?: DomEvent;
     onScroll?: (editor: IInstance, data: codemirror.ScrollInfo) => void;
     onSelection?: (editor: IInstance, data: IGetSelectionOptions) => void;
+    onTouchStart: DomEvent;
     onUpdate?: (editor: IInstance) => void;
     onViewportChange?: (editor: IInstance, start: number, end: number) => void;
     options?: codemirror.EditorConfiguration;

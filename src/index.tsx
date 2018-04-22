@@ -44,6 +44,10 @@ export interface IInstance extends codemirror.Editor, IDoc {
 
 /* </tshacks> */
 
+export interface DomEvent {
+  (editor: IInstance, event: Event): void;
+}
+
 export interface ICodeMirror {
   autoCursor?: boolean; // default: true
   autoFocus?: boolean; // default: false
@@ -55,20 +59,29 @@ export interface ICodeMirror {
   editorDidMount?: (editor: IInstance, value: string, cb: () => void) => void;
   editorWillMount?: () => void;
   editorWillUnmount?: (lib: any) => void;
-  onBlur?: (editor: IInstance, event: Event) => void;
+  onBlur?: DomEvent;
   onChange?: (editor: IInstance, data: codemirror.EditorChange, value: string) => void;
+  onContextMenu?: DomEvent;
+  onCopy?: DomEvent;
   onCursor?: (editor: IInstance, data: codemirror.Position) => void;
+  onCut?: DomEvent;
   onCursorActivity?: (editor: IInstance) => void;
-  onDragEnter?: (editor: IInstance, event: Event) => void;
-  onDragOver?: (editor: IInstance, event: Event) => void;
-  onDrop?: (editor: IInstance, event: Event) => void;
-  onFocus?: (editor: IInstance, event: Event) => void;
+  onDblClick?: DomEvent;
+  onDragEnter?: DomEvent;
+  onDragLeave?: DomEvent;
+  onDragOver?: DomEvent
+  onDragStart?: DomEvent;
+  onDrop?: DomEvent;
+  onFocus?: DomEvent
   onGutterClick?: (editor: IInstance, lineNumber: number, gutter: string, event: Event) => void;
-  onKeyDown?: (editor: IInstance, event: Event) => void;
-  onKeyPress?: (editor: IInstance, event: Event) => void;
-  onKeyUp?: (editor: IInstance, event: Event) => void;
+  onKeyDown?: DomEvent;
+  onKeyPress?: DomEvent;
+  onKeyUp?: DomEvent;
+  onMouseDown?: DomEvent;
+  onPaste?: DomEvent;
   onScroll?: (editor: IInstance, data: codemirror.ScrollInfo) => void;
   onSelection?: (editor: IInstance, data: IGetSelectionOptions) => void;
+  onTouchStart: DomEvent;
   onUpdate?: (editor: IInstance) => void;
   onViewportChange?: (editor: IInstance, start: number, end: number) => void;
   options?: codemirror.EditorConfiguration
@@ -90,7 +103,7 @@ export interface IUnControlledCodeMirror extends ICodeMirror {
 }
 
 declare interface ICommon {
-  wire: (name: string) => void;
+  wire: (props: IControlledCodeMirror | IUnControlledCodeMirror) => void;
   apply: (props: IControlledCodeMirror | IUnControlledCodeMirror) => void;
   applyNext: (props: IControlledCodeMirror | IUnControlledCodeMirror, next?: IControlledCodeMirror | IUnControlledCodeMirror, preserved?: IPreservedOptions) => void;
   applyUserDefined: (props: IControlledCodeMirror | IUnControlledCodeMirror, preserved?: IPreservedOptions) => void;
@@ -191,100 +204,157 @@ class Shared implements ICommon {
     }
   }
 
-  public wire(name: string) {
+  public wire(props: IControlledCodeMirror | IUnControlledCodeMirror) {
 
-    switch (name) {
-      case 'onBlur': {
-        (this.editor as any).on('blur', (cm, event) => {
-          this.props.onBlur(this.editor, event);
-        });
+    Object.keys(props || {}).filter(p => /^on/.test(p)).forEach(prop => {
+
+      switch (prop) {
+        case 'onBlur': {
+          (this.editor as any).on('blur', (cm, event) => {
+            this.props.onBlur(this.editor, event);
+          });
+        }
+          break;
+        case 'onContextMenu': {
+          this.editor.on('contextmenu', (cm, event) => {
+            this.props.onContextMenu(this.editor, event);
+          });
+          break;
+        }
+        case 'onCopy': {
+          this.editor.on('copy', (cm, event) => {
+            this.props.onCopy(this.editor, event);
+          });
+          break;
+        }
+        case 'onCursor': {
+          this.editor.on('cursorActivity', (cm) => {
+            this.props.onCursor(this.editor, this.editor.getCursor());
+          });
+        }
+          break;
+        case 'onCursorActivity': {
+          this.editor.on('cursorActivity', (cm) => {
+            this.props.onCursorActivity(this.editor);
+          });
+        }
+          break;
+        case 'onCut': {
+          this.editor.on('cut', (cm) => {
+            this.props.onCut(this.editor, event);
+          });
+          break;
+        }
+        case 'onDblClick': {
+          this.editor.on('dblclick', (cm) => {
+            this.props.onDblClick(this.editor, event);
+          });
+          break;
+        }
+        case 'onDragEnter': {
+          this.editor.on('dragenter', (cm, event) => {
+            this.props.onDragEnter(this.editor, event);
+          });
+        }
+          break;
+        case 'onDragLeave': {
+          this.editor.on('dragleave', (cm) => {
+            this.props.onDragLeave(this.editor, event);
+          });
+          break;
+        }
+        case 'onDragOver': {
+          this.editor.on('dragover', (cm, event) => {
+            this.props.onDragOver(this.editor, event);
+          });
+        }
+          break;
+        case 'onDragStart': {
+          this.editor.on('dragstart', (cm) => {
+            this.props.onDragStart(this.editor, event);
+          });
+          break;
+        }
+        case 'onDrop': {
+          this.editor.on('drop', (cm, event) => {
+            this.props.onDrop(this.editor, event);
+          });
+        }
+          break;
+        case 'onFocus': {
+          (this.editor as any).on('focus', (cm, event) => {
+            this.props.onFocus(this.editor, event);
+          });
+        }
+          break;
+        case 'onGutterClick': {
+          this.editor.on('gutterClick', (cm, lineNumber, gutter, event) => {
+            this.props.onGutterClick(this.editor, lineNumber, gutter, event);
+          });
+        }
+          break;
+        case 'onKeyDown': {
+          this.editor.on('keydown', (cm, event) => {
+            this.props.onKeyDown(this.editor, event);
+          });
+        }
+          break;
+        case 'onKeyPress': {
+          this.editor.on('keypress', (cm, event) => {
+            this.props.onKeyPress(this.editor, event);
+          });
+        }
+          break;
+        case 'onKeyUp': {
+          this.editor.on('keyup', (cm, event) => {
+            this.props.onKeyUp(this.editor, event);
+          });
+        }
+          break;
+        case 'onMouseDown': {
+          this.editor.on('mousedown', (cm) => {
+            this.props.onMouseDown(this.editor, event);
+          });
+          break;
+        }
+        case 'onPaste': {
+          this.editor.on('paste', (cm) => {
+            this.props.onPaste(this.editor, event);
+          });
+          break;
+        }
+        case 'onScroll': {
+          this.editor.on('scroll', (cm) => {
+            this.props.onScroll(this.editor, this.editor.getScrollInfo());
+          });
+        }
+          break;
+        case 'onSelection': {
+          this.editor.on('beforeSelectionChange', (cm, data: any) => {
+            this.props.onSelection(this.editor, data);
+          });
+        }
+          break;
+        case 'onTouchStart': {
+          this.editor.on('touchstart', (cm) => {
+            this.props.onTouchStart(this.editor, event);
+          });
+          break;
+        }
+        case 'onUpdate': {
+          this.editor.on('update', (cm) => {
+            this.props.onUpdate(this.editor);
+          });
+        }
+          break;
+        case 'onViewportChange': {
+          this.editor.on('viewportChange', (cm, from, to) => {
+            this.props.onViewportChange(this.editor, from, to);
+          });
+        }
+          break;
       }
-        break;
-      case 'onCursor': {
-        this.editor.on('cursorActivity', (cm) => {
-          this.props.onCursor(this.editor, this.editor.getCursor());
-        });
-      }
-        break;
-      case 'onCursorActivity': {
-        this.editor.on('cursorActivity', (cm) => {
-          this.props.onCursorActivity(this.editor);
-        });
-      }
-        break;
-      case 'onDragEnter': {
-        this.editor.on('dragenter', (cm, event) => {
-          this.props.onDragEnter(this.editor, event);
-        });
-      }
-        break;
-      case 'onDragOver': {
-        this.editor.on('dragover', (cm, event) => {
-          this.props.onDragOver(this.editor, event);
-        });
-      }
-        break;
-      case 'onDrop': {
-        this.editor.on('drop', (cm, event) => {
-          this.props.onDrop(this.editor, event);
-        });
-      }
-        break;
-      case 'onFocus': {
-        (this.editor as any).on('focus', (cm, event) => {
-          this.props.onFocus(this.editor, event);
-        });
-      }
-        break;
-      case 'onGutterClick': {
-        this.editor.on('gutterClick', (cm, lineNumber, gutter, event) => {
-          this.props.onGutterClick(this.editor, lineNumber, gutter, event);
-        });
-      }
-        break;
-      case 'onKeyDown': {
-        this.editor.on('keydown', (cm, event) => {
-          this.props.onKeyDown(this.editor, event);
-        });
-      }
-        break;
-      case 'onKeyPress': {
-        this.editor.on('keypress', (cm, event) => {
-          this.props.onKeyPress(this.editor, event);
-        });
-      }
-        break;
-      case 'onKeyUp': {
-        this.editor.on('keyup', (cm, event) => {
-          this.props.onKeyUp(this.editor, event);
-        });
-      }
-        break;
-      case 'onScroll': {
-        this.editor.on('scroll', (cm) => {
-          this.props.onScroll(this.editor, this.editor.getScrollInfo());
-        });
-      }
-        break;
-      case 'onSelection': {
-        this.editor.on('beforeSelectionChange', (cm, data: any) => {
-          this.props.onSelection(this.editor, data);
-        });
-      }
-        break;
-      case 'onUpdate': {
-        this.editor.on('update', (cm) => {
-          this.props.onUpdate(this.editor);
-        });
-      }
-        break;
-      case 'onViewportChange': {
-        this.editor.on('viewportChange', (cm, from, to) => {
-          this.props.onViewportChange(this.editor, from, to);
-        });
-      }
-        break;
-    }
+    });
   }
 }
 
@@ -490,21 +560,7 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
 
     this.mounted = true;
 
-    if (this.props.onBlur) this.shared.wire('onBlur');
-    if (this.props.onCursor) this.shared.wire('onCursor');
-    if (this.props.onCursorActivity) this.shared.wire('onCursorActivity');
-    if (this.props.onDragEnter) this.shared.wire('onDragEnter');
-    if (this.props.onDragOver) this.shared.wire('onDragOver');
-    if (this.props.onDrop) this.shared.wire('onDrop');
-    if (this.props.onFocus) this.shared.wire('onFocus');
-    if (this.props.onGutterClick) this.shared.wire('onGutterClick');
-    if (this.props.onKeyDown) this.shared.wire('onKeyDown');
-    if (this.props.onKeyPress) this.shared.wire('onKeyPress');
-    if (this.props.onKeyUp) this.shared.wire('onKeyUp');
-    if (this.props.onScroll) this.shared.wire('onScroll');
-    if (this.props.onSelection) this.shared.wire('onSelection');
-    if (this.props.onUpdate) this.shared.wire('onUpdate');
-    if (this.props.onViewportChange) this.shared.wire('onViewportChange');
+    this.shared.wire(this.props);
 
     if (this.props.editorDidMount) {
       this.props.editorDidMount(this.editor, this.editor.getValue(), this.initCb);
@@ -695,21 +751,7 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
 
     this.mounted = true;
 
-    if (this.props.onBlur) this.shared.wire('onBlur');
-    if (this.props.onCursor) this.shared.wire('onCursor');
-    if (this.props.onCursorActivity) this.shared.wire('onCursorActivity');
-    if (this.props.onDragEnter) this.shared.wire('onDragEnter');
-    if (this.props.onDragOver) this.shared.wire('onDragOver');
-    if (this.props.onDrop) this.shared.wire('onDrop');
-    if (this.props.onFocus) this.shared.wire('onFocus');
-    if (this.props.onGutterClick) this.shared.wire('onGutterClick');
-    if (this.props.onKeyDown) this.shared.wire('onKeyDown');
-    if (this.props.onKeyPress) this.shared.wire('onKeyPress');
-    if (this.props.onKeyUp) this.shared.wire('onKeyUp');
-    if (this.props.onScroll) this.shared.wire('onScroll');
-    if (this.props.onSelection) this.shared.wire('onSelection');
-    if (this.props.onUpdate) this.shared.wire('onUpdate');
-    if (this.props.onViewportChange) this.shared.wire('onViewportChange');
+    this.shared.wire(this.props);
 
     this.editor.clearHistory();
 

@@ -1,17 +1,21 @@
 const gulp = require('gulp');
 const replace = require('gulp-replace');
 const rimraf = require('rimraf');
+const beautify = require('gulp-beautify');
+const babel = require('gulp-babel');
 
 gulp.task('ts-scrub:index', () => {
   return gulp.src('./.ts/index.js')
-  .pipe(replace('var codemirror = require("codemirror");', ''))
-  .pipe(replace('"', '\''))
-  .pipe(gulp.dest('.'));
+    .pipe(replace('var codemirror = require("codemirror");', ''))
+    .pipe(replace('"', '\''))
+    .pipe(babel())
+    .pipe(beautify({indent_size: 2}))
+    .pipe(gulp.dest('.'));
 });
 
 gulp.task('ts-scrub:declaration', () => {
   return gulp.src('./.ts/index.d.ts')
-  .pipe(gulp.dest('.'));
+    .pipe(gulp.dest('.'));
 });
 
 gulp.task('ts-scrub', ['ts-scrub:index', 'ts-scrub:declaration'], (done) => {

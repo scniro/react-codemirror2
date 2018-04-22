@@ -1,3 +1,8 @@
+4.3.0
+==================
+* #74 => add support for more DOM events => onContextMenu | onCopy | onCut | onDblClick | onDragLeave | onDragStart | onMouseDown | onPaste | onTouchStart
+* #76 => babel-ify index.js package for out of the box runtime support e.g. `Object.assign`
+
 4.2.0
 ==================
 * add notion of UnControlled#detach => [`editorDidAttach`, `editorDidDetach`] (related to #37)
