@@ -31,7 +31,6 @@ export interface DomEvent {
 }
 export interface ICodeMirror {
     autoCursor?: boolean;
-    autoFocus?: boolean;
     autoScroll?: boolean;
     className?: string;
     cursor?: codemirror.Position;

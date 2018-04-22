@@ -88,7 +88,7 @@ var Shared = function() {
       this.delegateSelection(props.selection.ranges, props.selection.focus || false);
     }
     if (props && props.cursor) {
-      this.delegateCursor(props.cursor, props.autoScroll || false, props.autoFocus || false);
+      this.delegateCursor(props.cursor, props.autoScroll || false, this.editor.getOption('autofocus') || false);
     }
     if (props && props.scroll) {
       this.delegateScroll(props.scroll);
@@ -113,7 +113,7 @@ var Shared = function() {
   };
   Shared.prototype.applyUserDefined = function(props, preserved) {
     if (preserved && preserved.cursor) {
-      this.delegateCursor(preserved.cursor, props.autoScroll || false, props.autoFocus || false);
+      this.delegateCursor(preserved.cursor, props.autoScroll || false, this.editor.getOption('autofocus') || false);
     }
   };
   Shared.prototype.wire = function(props) {
@@ -429,6 +429,9 @@ var Controlled = function(_super) {
     this.applied = true;
     this.mounted = true;
     this.shared.wire(this.props);
+    if (this.editor.getOption('autofocus')) {
+      this.editor.focus();
+    }
     if (this.props.editorDidMount) {
       this.props.editorDidMount(this.editor, this.editor.getValue(), this.initCb);
     }

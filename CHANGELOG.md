@@ -1,3 +1,7 @@
+5.0.0
+==================
+* #75 - remove `autoFocus` in favor of codemirror.options.autofocus
+
 4.3.0
 ==================
 * #74 => add support for more DOM events => onContextMenu | onCopy | onCut | onDblClick | onDragLeave | onDragStart | onMouseDown | onPaste | onTouchStart

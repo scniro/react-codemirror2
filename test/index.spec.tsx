@@ -853,38 +853,6 @@ describe('Props', () => {
   // </value>
 
   // <misc>
-  it('[Controlled]: autoFocus', () => {
-    let wrapper = Enzyme.mount(
-      <Controlled
-        value='foo'
-        autoFocus={true}
-        cursor={{
-          line: 0,
-          ch: 3
-        }}/>
-    );
-
-    let editor = wrapper.instance().editor;
-
-    expect(editor.state.focused).toBeTruthy();
-  });
-
-  it('[UnControlled]: autoFocus', () => {
-    let wrapper = Enzyme.mount(
-      <UnControlled
-        value='foo'
-        autoFocus={true}
-        cursor={{
-          line: 0,
-          ch: 3
-        }}/>
-    );
-
-    let editor = wrapper.instance().editor;
-
-    expect(editor.state.focused).toBeTruthy();
-  });
-
   it('[UnControlled]: detached | should detach', () => {
     const spy = sinon.spy();
     const wrapper = Enzyme.mount(

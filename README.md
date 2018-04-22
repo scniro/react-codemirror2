@@ -71,8 +71,7 @@ require('codemirror/mode/javascript/javascript');
 
 | prop         | type&nbsp;*`default`*  | components                        | description                                                                                                           |
 |--------------|------------------------|-----------------------------------|-----------------------------------------------------------------------------------------------------------------------|
-| `autoCursor` | boolean&nbsp;*`true`*  | `Controlled`&nbsp;`UnControlled`  | should component cursor position correct when `value` changed                                                         |
-| `autoFocus`  | boolean&nbsp;*`false`* | `Controlled`&nbsp;`UnControlled`  | should component focus on mount                                                                                       |
+| `autoCursor` | boolean&nbsp;*`true`*  | `Controlled`&nbsp;`UnControlled`  | should component cursor position correct when `value` changed                                                         |                                                                                   |
 | `autoScroll` | boolean&nbsp;*`true`*  | `Controlled`&nbsp;`UnControlled`  | should component scroll cursor position into view when `value` changed                                                |
 | `className`  | string                 | `Controlled`&nbsp;`UnControlled`  | pass through class *`class="react-codemirror2 className"`*                                                            |
 | `defineMode` | object                 | `Controlled`&nbsp;`UnControlled`  | pass a [custom mode](http://marijnhaverbeke.nl/blog/codemirror-mode-system.html) via `{name: 'custom', fn: myModeFn}` |

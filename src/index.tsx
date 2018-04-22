@@ -50,7 +50,6 @@ export interface DomEvent {
 
 export interface ICodeMirror {
   autoCursor?: boolean; // default: true
-  autoFocus?: boolean; // default: false
   autoScroll?: boolean; // default: false
   className?: string;
   cursor?: codemirror.Position;
@@ -165,7 +164,7 @@ class Shared implements ICommon {
 
     // init cursor
     if (props && props.cursor) {
-      this.delegateCursor(props.cursor, (props.autoScroll || false), (props.autoFocus || false));
+      this.delegateCursor(props.cursor, (props.autoScroll || false), (this.editor.getOption('autofocus') || false));
     }
 
     // init scroll
@@ -200,7 +199,7 @@ class Shared implements ICommon {
 
   public applyUserDefined(props: IControlledCodeMirror | IUnControlledCodeMirror, preserved?: any) {
     if (preserved && preserved.cursor) {
-      this.delegateCursor(preserved.cursor, (props.autoScroll || false), (props.autoFocus || false));
+      this.delegateCursor(preserved.cursor, (props.autoScroll || false), (this.editor.getOption('autofocus') || false));
     }
   }
 
@@ -561,6 +560,10 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
     this.mounted = true;
 
     this.shared.wire(this.props);
+
+    if (this.editor.getOption('autofocus')) {
+      this.editor.focus();
+    }
 
     if (this.props.editorDidMount) {
       this.props.editorDidMount(this.editor, this.editor.getValue(), this.initCb);
