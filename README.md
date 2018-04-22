@@ -134,18 +134,27 @@ require('codemirror/mode/javascript/javascript');
 ## events cont. [wrapped codemirror events](https://codemirror.net/doc/manual.html#events)
 
 - `onBlur(editor, event)` - *[blur](https://codemirror.net/doc/manual.html#event_blur)*
+- `onContextMenu(editor, event)` - *[contextmenu](https://codemirror.net/doc/manual.html#event_dom)*
+- `onCopy(editor, event)` - *[copy](https://codemirror.net/doc/manual.html#event_dom)*
 - `onCursor(editor, data)`- *[cursorActivity](https://codemirror.net/doc/manual.html#event_doc_cursorActivity)*
 - `onCursorActivity(editor)` - *[cursorActivity](https://codemirror.net/doc/manual.html#event_cursorActivity)*
+- `onCut(editor, event)` - *[cut](https://codemirror.net/doc/manual.html#event_dom)*
+- `onDblClick(editor, event)` - *[dblclick](https://codemirror.net/doc/manual.html#event_dom)*
 - `onDragEnter(editor, event)` - *[dragenter](https://codemirror.net/doc/manual.html#event_dom)*
 - `onDragOver(editor, event)` - *[dragover](https://codemirror.net/doc/manual.html#event_dom)*
+- `onDragLeave(editor, event)` - *[dragleave](https://codemirror.net/doc/manual.html#event_dom)*
+- `onDragStart(editor, event)` - *[dragstart](https://codemirror.net/doc/manual.html#event_dom)*
 - `onDrop(editor, event)` - *[drop](https://codemirror.net/doc/manual.html#event_dom)*
 - `onFocus(editor, event)` - *[focus](https://codemirror.net/doc/manual.html#event_focus)*
 - `onGutterClick(editor, lineNumber, gutter, event)` - *[gutterClick](https://codemirror.net/doc/manual.html#event_gutterClick)*
 - `onKeyDown(editor, event)` - *[keydown](https://codemirror.net/doc/manual.html#event_dom)*
 - `onKeyPress(editor, event)` - *[keypress](https://codemirror.net/doc/manual.html#event_dom)*
 - `onKeyUp(editor, event)` - *[keyup](https://codemirror.net/doc/manual.html#event_dom)*
+- `onMouseDown(editor, event)` - *[mousedown](https://codemirror.net/doc/manual.html#event_dom)*
+- `onPaste(editor, event)` - *[paste](https://codemirror.net/doc/manual.html#event_dom)*
 - `onScroll(editor, data)` - *[scroll](https://codemirror.net/doc/manual.html#event_scroll)*
 - `onSelection(editor, data)` - *[beforeSelectionChange](https://codemirror.net/doc/manual.html#event_doc_beforeSelectionChange)*
+- `onTouchStart(editor, event)` - *[touchstart](https://codemirror.net/doc/manual.html#event_dom)*
 - `onUpdate(editor, event)` - *[update](https://codemirror.net/doc/manual.html#event_update)*
 - `onViewportChange(editor, from, to)` - *[viewportChange](https://codemirror.net/doc/manual.html#event_viewportChange)*
 
