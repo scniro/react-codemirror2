@@ -1,3 +1,7 @@
+5.0.1
+==================
+* #78
+
 5.0.0
 ==================
 * #75 - remove `autoFocus` in favor of codemirror.options.autofocus
