@@ -80,7 +80,7 @@ export interface ICodeMirror {
   onPaste?: DomEvent;
   onScroll?: (editor: IInstance, data: codemirror.ScrollInfo) => void;
   onSelection?: (editor: IInstance, data: IGetSelectionOptions) => void;
-  onTouchStart: DomEvent;
+  onTouchStart?: DomEvent;
   onUpdate?: (editor: IInstance) => void;
   onViewportChange?: (editor: IInstance, start: number, end: number) => void;
   options?: codemirror.EditorConfiguration
