@@ -1,7 +1,5 @@
-let express = require('express');
-let path = require('path');
-let open = require('open');
-
+const express = require('express');
+const path = require('path');
 const app = express();
 
 app.set('port', 8000);
@@ -17,6 +15,5 @@ app.listen(app.get('port'), function (err) {
     console.log(err);
   } else {
     console.log(`react-codemirror2 demo listening on port ${app.get('port')}`);
-    open(`http://localhost:${app.get('port')}`);
   }
 });
