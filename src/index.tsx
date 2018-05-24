@@ -227,7 +227,7 @@ class Shared implements ICommon {
           break;
         }
         case 'onCursor': {
-          this.editor.on('cursorActivity', (cm, event) => {
+          this.editor.on('cursorActivity', (cm) => {
             this.props.onCursor(this.editor, this.editor.getCursor());
           });
         }
