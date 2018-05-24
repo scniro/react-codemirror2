@@ -227,7 +227,7 @@ class Shared implements ICommon {
           break;
         }
         case 'onCursor': {
-          this.editor.on('cursorActivity', (cm) => {
+          this.editor.on('cursorActivity', (cm, event) => {
             this.props.onCursor(this.editor, this.editor.getCursor());
           });
         }
@@ -239,13 +239,13 @@ class Shared implements ICommon {
         }
           break;
         case 'onCut': {
-          this.editor.on('cut', (cm) => {
+          this.editor.on('cut', (cm, event) => {
             this.props.onCut(this.editor, event);
           });
           break;
         }
         case 'onDblClick': {
-          this.editor.on('dblclick', (cm) => {
+          this.editor.on('dblclick', (cm, event) => {
             this.props.onDblClick(this.editor, event);
           });
           break;
@@ -257,7 +257,7 @@ class Shared implements ICommon {
         }
           break;
         case 'onDragLeave': {
-          this.editor.on('dragleave', (cm) => {
+          this.editor.on('dragleave', (cm, event) => {
             this.props.onDragLeave(this.editor, event);
           });
           break;
@@ -269,7 +269,7 @@ class Shared implements ICommon {
         }
           break;
         case 'onDragStart': {
-          this.editor.on('dragstart', (cm) => {
+          this.editor.on('dragstart', (cm, event) => {
             this.props.onDragStart(this.editor, event);
           });
           break;
@@ -311,13 +311,13 @@ class Shared implements ICommon {
         }
           break;
         case 'onMouseDown': {
-          this.editor.on('mousedown', (cm) => {
+          this.editor.on('mousedown', (cm, event) => {
             this.props.onMouseDown(this.editor, event);
           });
           break;
         }
         case 'onPaste': {
-          this.editor.on('paste', (cm) => {
+          this.editor.on('paste', (cm, event) => {
             this.props.onPaste(this.editor, event);
           });
           break;
@@ -335,7 +335,7 @@ class Shared implements ICommon {
         }
           break;
         case 'onTouchStart': {
-          this.editor.on('touchstart', (cm) => {
+          this.editor.on('touchstart', (cm, event) => {
             this.props.onTouchStart(this.editor, event);
           });
           break;
