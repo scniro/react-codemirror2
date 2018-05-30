@@ -190,6 +190,6 @@ Pull Requests are welcome. Be mindful of the availbe scripts below to help submi
 - `npm run test` to ensure tests continue to pass
 - `npm run build` to generate the demo bundle
 
-* note that it's necessary to bump the [package.json](https://github.com/scniro/react-codemirror2/blob/master/package.json#L3) version prior to final `npm run build` so we can grab the proposed new version as seen in the demo header. Also note, the core changes are to be made in `src/index.tsx` as `./index.js` and `./index.d.ts` are _generated_
+note that it's necessary to bump the [package.json](https://github.com/scniro/react-codemirror2/blob/master/package.json#L3) version prior to final `npm run build` so we can grab the proposed new version as seen in the demo header. Also note, the core changes are to be made in `src/index.tsx` as `./index.js` and `./index.d.ts` are _generated_
 
 [MIT](./LICENSE) © 2018 [scniro](https://github.com/scniro)
