@@ -59,6 +59,7 @@ export interface ICodeMirror {
     onKeyUp?: DomEvent;
     onMouseDown?: DomEvent;
     onPaste?: DomEvent;
+    onRenderLine?: (editor: IInstance, line: codemirror.LineHandle, element: HTMLElement) => void;
     onScroll?: (editor: IInstance, data: codemirror.ScrollInfo) => void;
     onSelection?: (editor: IInstance, data: IGetSelectionOptions) => void;
     onTouchStart?: DomEvent;

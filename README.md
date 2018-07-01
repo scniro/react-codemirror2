@@ -105,15 +105,18 @@ require('codemirror/mode/javascript/javascript');
   onScroll={(editor, data) => {}}
 />
 ```
-- `selection={array<{anchor, head}>}` - *[setSelections](https://codemirror.net/doc/manual.html#setSelections)*
+- `selection={{ranges: array<{anchor, head}>, focus?: boolean}` - *[setSelections](https://codemirror.net/doc/manual.html#setSelections)*
 > will programmatically select the ranges specified
 ```jsx
 <CodeMirror
   [...]
-  selection={[{
-    anchor: {ch: 8, line: 5},
-    head: {ch: 37, line: 5}
-  }]}
+  selection={{
+    ranges: [{
+      anchor: {ch: 8, line: 5},
+      head: {ch: 37, line: 5}
+    }],
+    focus: true // defaults false if not specified
+  }}
   onSelection={(editor, data) => {}}
 />
 ```

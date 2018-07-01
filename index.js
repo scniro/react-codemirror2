@@ -255,6 +255,13 @@ var Shared = function() {
             });
             break;
           }
+        case 'onRenderLine':
+          {
+            _this.editor.on('renderLine', function(cm, line, element) {
+              _this.props.onRenderLine(_this.editor, line, element);
+            });
+            break;
+          }
         case 'onScroll':
           {
             _this.editor.on('scroll', function(cm) {

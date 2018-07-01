@@ -187,6 +187,22 @@ describe('DOM Events', () => {
     wrapper.instance().editor.getInputField().blur();
     expect(callback.called).toBeTruthy();
   });
+
+  it('onRenderLine(editor, line, element)', () => {
+
+    let callback;
+
+    let wrapper = Enzyme.mount(
+      <Controlled
+        value='foo'
+        onRenderLine={(editor, line, element) => {
+          callback = sinon.spy();
+          callback();
+        }}/>
+    );
+    wrapper.setProps({value: 'bar'});
+    expect(callback.called).toBeTruthy();
+  });
 });
 
 describe('Change', () => {
