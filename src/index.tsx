@@ -515,12 +515,12 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
       }
     }
 
-    this.editor = cm(this.ref) as IInstance;
+    this.editor = cm(this.ref, this.props.options) as IInstance;
 
     this.shared = new Shared(this.editor, this.props);
 
     this.mirror = (cm as any)(() => {
-    });
+    }, this.props.options);
 
     this.editor.on('electricInput', () => {
       this.mirror.setHistory(this.editor.getHistory());
@@ -726,7 +726,7 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
       }
     }
 
-    this.editor = cm(this.ref) as IInstance;
+    this.editor = cm(this.ref, this.props.options) as IInstance;
 
     this.shared = new Shared(this.editor, this.props);
 
