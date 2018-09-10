@@ -405,9 +405,9 @@ var Controlled = function(_super) {
         cm.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
       }
     }
-    this.editor = cm(this.ref);
+    this.editor = cm(this.ref, this.props.options);
     this.shared = new Shared(this.editor, this.props);
-    this.mirror = cm(function() {});
+    this.mirror = cm(function() {}, this.props.options);
     this.editor.on('electricInput', function() {
       _this.mirror.setHistory(_this.editor.getHistory());
     });
@@ -550,7 +550,7 @@ var UnControlled = function(_super) {
         cm.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
       }
     }
-    this.editor = cm(this.ref);
+    this.editor = cm(this.ref, this.props.options);
     this.shared = new Shared(this.editor, this.props);
     this.editor.on('beforeChange', function(cm, data) {
       if (_this.props.onBeforeChange) {
