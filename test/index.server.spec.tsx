@@ -3,7 +3,6 @@ global['PREVENT_CODEMIRROR_RENDER'] = true;
 import * as React from 'react';
 import * as Adapter from 'enzyme-adapter-react-16';
 import * as Enzyme from 'enzyme';
-import * as sinon from 'sinon';
 
 import {Controlled, UnControlled} from '../src';
 
@@ -14,7 +13,8 @@ describe('Server Rendering', () => {
   it('should not render', () => {
 
     let uWrapper = Enzyme.mount(<UnControlled/>);
-    let cWrapper = Enzyme.mount(<Controlled value='' onBeforeChange={() => {}}/>);
+    let cWrapper = Enzyme.mount(<Controlled value='' onBeforeChange={() => {
+    }}/>);
 
     cWrapper.setProps({value: 'nomatter'});
     uWrapper.setProps({value: 'nomatter'});

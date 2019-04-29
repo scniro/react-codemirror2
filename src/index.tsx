@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as codemirror from 'codemirror';
+import {Position} from "codemirror";
 
 declare let global: any;
 declare let require: any;
@@ -26,26 +27,8 @@ export interface ISetSelectionOptions {
   head: codemirror.Position;
 }
 
-export interface IGetSelectionOptions {
-  ranges: Array<ISetSelectionOptions>;
-  origin: string;
-  update: (ranges: Array<ISetSelectionOptions>) => void;
-}
-
-/* <tshacks>: laundry list of incorrect typings in @types/codemirror */
-export interface IDoc extends codemirror.Doc {
-  setCursor: (pos: codemirror.Position, ch?: number, options?: {}) => void;
-  setSelections: (ranges: Array<ISetSelectionOptions>) => void;
-}
-
-export interface IInstance extends codemirror.Editor, IDoc {
-  options: codemirror.EditorConfiguration
-}
-
-/* </tshacks> */
-
 export interface DomEvent {
-  (editor: IInstance, event: Event): void;
+  (editor: codemirror.Editor, event: Event): void;
 }
 
 export interface ICodeMirror {
@@ -54,17 +37,16 @@ export interface ICodeMirror {
   className?: string;
   cursor?: codemirror.Position;
   defineMode?: IDefineModeOptions;
-  editorDidConfigure?: (editor: IInstance) => void;
-  editorDidMount?: (editor: IInstance, value: string, cb: () => void) => void;
-  editorWillMount?: () => void;
+  editorDidConfigure?: (editor: codemirror.Editor) => void;
+  editorDidMount?: (editor: codemirror.Editor, value: string, cb: () => void) => void;
   editorWillUnmount?: (lib: any) => void;
   onBlur?: DomEvent;
-  onChange?: (editor: IInstance, data: codemirror.EditorChange, value: string) => void;
+  onChange?: (editor: codemirror.Editor, data: codemirror.EditorChange, value: string) => void;
   onContextMenu?: DomEvent;
   onCopy?: DomEvent;
-  onCursor?: (editor: IInstance, data: codemirror.Position) => void;
+  onCursor?: (editor: codemirror.Editor, data: codemirror.Position) => void;
   onCut?: DomEvent;
-  onCursorActivity?: (editor: IInstance) => void;
+  onCursorActivity?: (editor: codemirror.Editor) => void;
   onDblClick?: DomEvent;
   onDragEnter?: DomEvent;
   onDragLeave?: DomEvent;
@@ -72,33 +54,33 @@ export interface ICodeMirror {
   onDragStart?: DomEvent;
   onDrop?: DomEvent;
   onFocus?: DomEvent
-  onGutterClick?: (editor: IInstance, lineNumber: number, gutter: string, event: Event) => void;
+  onGutterClick?: (editor: codemirror.Editor, lineNumber: number, gutter: string, event: Event) => void;
   onKeyDown?: DomEvent;
   onKeyPress?: DomEvent;
   onKeyUp?: DomEvent;
   onMouseDown?: DomEvent;
   onPaste?: DomEvent;
-  onRenderLine?: (editor: IInstance, line: codemirror.LineHandle, element: HTMLElement) => void;
-  onScroll?: (editor: IInstance, data: codemirror.ScrollInfo) => void;
-  onSelection?: (editor: IInstance, data: IGetSelectionOptions) => void;
+  onRenderLine?: (editor: codemirror.Editor, line: codemirror.LineHandle, element: HTMLElement) => void;
+  onScroll?: (editor: codemirror.Editor, data: codemirror.ScrollInfo) => void;
+  onSelection?: (editor: codemirror.Editor, data: any) => void;
   onTouchStart?: DomEvent;
-  onUpdate?: (editor: IInstance) => void;
-  onViewportChange?: (editor: IInstance, start: number, end: number) => void;
+  onUpdate?: (editor: codemirror.Editor) => void;
+  onViewportChange?: (editor: codemirror.Editor, start: number, end: number) => void;
   options?: codemirror.EditorConfiguration
   selection?: { ranges: Array<ISetSelectionOptions>, focus?: boolean };
   scroll?: ISetScrollOptions;
 }
 
 export interface IControlledCodeMirror extends ICodeMirror {
-  onBeforeChange: (editor: IInstance, data: codemirror.EditorChange, value: string) => void;
+  onBeforeChange: (editor: codemirror.Editor, data: codemirror.EditorChange, value: string) => void;
   value: string;
 }
 
 export interface IUnControlledCodeMirror extends ICodeMirror {
   detach?: boolean;
-  editorDidAttach?: (editor: IInstance) => void;
-  editorDidDetach?: (editor: IInstance) => void;
-  onBeforeChange?: (editor: IInstance, data: codemirror.EditorChange, value: string, next: () => void) => void;
+  editorDidAttach?: (editor: codemirror.Editor) => void;
+  editorDidDetach?: (editor: codemirror.Editor) => void;
+  onBeforeChange?: (editor: codemirror.Editor, data: codemirror.EditorChange, value: string, next: () => void) => void;
   value?: string;
 }
 
@@ -125,7 +107,7 @@ abstract class Helper {
 
 class Shared implements ICommon {
 
-  private editor: IInstance;
+  private editor: codemirror.Editor;
   private props: ICodeMirror;
 
   constructor(editor, props) {
@@ -135,7 +117,7 @@ class Shared implements ICommon {
 
   delegateCursor(position: codemirror.Position, scroll?: boolean, focus?: boolean) {
 
-    let doc = this.editor.getDoc() as IDoc;
+    const doc = this.editor.getDoc() as codemirror.Doc;
 
     if (focus) {
       this.editor.focus();
@@ -149,7 +131,9 @@ class Shared implements ICommon {
   }
 
   delegateSelection(ranges: Array<ISetSelectionOptions>, focus?: boolean) {
-    this.editor.setSelections(ranges);
+
+    const doc = this.editor.getDoc() as codemirror.Doc;
+    doc.setSelections(ranges);
 
     if (focus) {
       this.editor.focus();
@@ -228,7 +212,7 @@ class Shared implements ICommon {
         }
         case 'onCursor': {
           this.editor.on('cursorActivity', (cm) => {
-            this.props.onCursor(this.editor, this.editor.getCursor());
+            this.props.onCursor(this.editor, this.editor.getDoc().getCursor());
           });
         }
           break;
@@ -335,7 +319,8 @@ class Shared implements ICommon {
         }
           break;
         case 'onSelection': {
-          this.editor.on('beforeSelectionChange', (cm, data: any) => {
+
+          this.editor.on('beforeSelectionChange', (cm, data) => {
             this.props.onSelection(this.editor, data);
           });
         }
@@ -374,7 +359,7 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
   /** @internal */
   private deferred: any;
   /** @internal */
-  private editor: IInstance;
+  private editor: codemirror.Editor;
   /** @internal */
   private emulating: boolean;
   /** @internal */
@@ -413,12 +398,16 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
   /** @internal */
   private hydrate(props) {
 
-    let userDefinedOptions = Object.assign({}, cm.defaults, this.editor.options, props.options || {});
-    let optionDelta = Object.keys(userDefinedOptions).some(key => this.editor.getOption(key) !== userDefinedOptions[key]);
+    const _options = props && props.options ? props.options : {};
+
+    const userDefinedOptions = Object.assign({}, cm.defaults, (this.editor as any).options, _options);
+
+    const optionDelta = Object.keys(userDefinedOptions).some(key => this.editor.getOption(key) !== userDefinedOptions[key]);
 
     if (optionDelta) {
       Object.keys(userDefinedOptions).forEach(key => {
-        if (props.options.hasOwnProperty(key)) {
+
+        if (_options.hasOwnProperty(key)) {
           if (this.editor.getOption(key) !== userDefinedOptions[key]) {
             this.editor.setOption(key, userDefinedOptions[key]);
             this.mirror.setOption(key, userDefinedOptions[key]);
@@ -426,19 +415,9 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
         }
       });
     }
-
     if (!this.hydrated) {
-      if (!this.mounted) {
-        this.initChange(props.value || '');
-      } else {
-        if (this.deferred) {
-          this.resolveChange();
-        } else {
-          this.initChange(props.value || '');
-        }
-      }
+      this.deferred ? this.resolveChange() : this.initChange(props.value || '')
     }
-
     this.hydrated = true;
   }
 
@@ -447,15 +426,16 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
 
     this.emulating = true;
 
-    let lastLine = this.editor.lastLine();
-    let lastChar = this.editor.getLine(this.editor.lastLine()).length;
+    const doc = this.editor.getDoc();
+    const lastLine = doc.lastLine();
+    const lastChar = doc.getLine(doc.lastLine()).length;
 
-    this.editor.replaceRange(value || '',
+    doc.replaceRange(value || '',
       {line: 0, ch: 0},
       {line: lastLine, ch: lastChar});
 
     this.mirror.setValue(value);
-    this.editor.clearHistory();
+    doc.clearHistory();
     this.mirror.clearHistory();
 
     this.emulating = false;
@@ -466,12 +446,14 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
 
     this.emulating = true;
 
+    const doc = this.editor.getDoc();
+
     if (this.deferred.origin === 'undo') {
-      this.editor.undo();
+      doc.undo();
     } else if (this.deferred.origin === 'redo') {
-      this.editor.redo();
+      doc.redo();
     } else {
-      this.editor.replaceRange(this.deferred.text, this.deferred.from, this.deferred.to, this.deferred.origin);
+      doc.replaceRange(this.deferred.text, this.deferred.from, this.deferred.to, this.deferred.origin);
     }
 
     this.emulating = false;
@@ -481,27 +463,19 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
   /** @internal */
   private mirrorChange(deferred) {
 
+    const doc = this.editor.getDoc();
+
     if (deferred.origin === 'undo') {
-      this.editor.setHistory(this.mirror.getHistory());
+      doc.setHistory(this.mirror.getHistory());
       this.mirror.undo();
     } else if (deferred.origin === 'redo') {
-      this.editor.setHistory(this.mirror.getHistory());
+      doc.setHistory(this.mirror.getHistory());
       this.mirror.redo();
     } else {
       this.mirror.replaceRange(deferred.text, deferred.from, deferred.to, deferred.origin);
     }
 
     return this.mirror.getValue();
-  }
-
-  /** @internal */
-  public componentWillMount() {
-
-    if (SERVER_RENDERED) return;
-
-    if (this.props.editorWillMount) {
-      this.props.editorWillMount();
-    }
   }
 
   /** @internal */
@@ -515,7 +489,7 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
       }
     }
 
-    this.editor = cm(this.ref) as IInstance;
+    this.editor = cm(this.ref) as codemirror.Editor;
 
     this.shared = new Shared(this.editor, this.props);
 
@@ -523,11 +497,11 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
     });
 
     this.editor.on('electricInput', () => {
-      this.mirror.setHistory(this.editor.getHistory());
+      this.mirror.setHistory(this.editor.getDoc().getHistory());
     });
 
     this.editor.on('cursorActivity', () => {
-      this.mirror.setCursor(this.editor.getCursor());
+      this.mirror.setCursor(this.editor.getDoc().getCursor());
     });
 
     this.editor.on('beforeChange', (cm, data) => {
@@ -588,7 +562,7 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
     }
 
     if (!this.props.autoCursor && this.props.autoCursor !== undefined) {
-      preserved.cursor = this.editor.getCursor();
+      preserved.cursor = this.editor.getDoc().getCursor();
     }
 
     this.hydrate(nextProps);
@@ -639,7 +613,7 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
   /** @internal */
   private detached: boolean;
   /** @internal */
-  private editor: IInstance;
+  private editor: codemirror.Editor;
   /** @internal */
   private hydrated: boolean;
   /** @internal */
@@ -678,12 +652,13 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
   /** @internal */
   private hydrate(props) {
 
-    let userDefinedOptions = Object.assign({}, cm.defaults, this.editor.options, props.options || {});
-    let optionDelta = Object.keys(userDefinedOptions).some(key => this.editor.getOption(key) !== userDefinedOptions[key]);
+    const _options = props && props.options ? props.options : {};
+    const userDefinedOptions = Object.assign({}, cm.defaults, (this.editor as any).options, _options);
+    const optionDelta = Object.keys(userDefinedOptions).some(key => this.editor.getOption(key) !== userDefinedOptions[key]);
 
     if (optionDelta) {
       Object.keys(userDefinedOptions).forEach(key => {
-        if (props.options.hasOwnProperty(key)) {
+        if (_options.hasOwnProperty(key)) {
           if (this.editor.getOption(key) !== userDefinedOptions[key]) {
             this.editor.setOption(key, userDefinedOptions[key]);
           }
@@ -692,25 +667,16 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
     }
 
     if (!this.hydrated) {
-      let lastLine = this.editor.lastLine();
-      let lastChar = this.editor.getLine(this.editor.lastLine()).length;
+      const doc = this.editor.getDoc();
+      const lastLine = doc.lastLine();
+      const lastChar = doc.getLine(doc.lastLine()).length;
 
-      this.editor.replaceRange(props.value || '',
+      doc.replaceRange(props.value || '',
         {line: 0, ch: 0},
         {line: lastLine, ch: lastChar});
     }
 
     this.hydrated = true;
-  }
-
-  /** @internal */
-  public componentWillMount() {
-
-    if (SERVER_RENDERED) return;
-
-    if (this.props.editorWillMount) {
-      this.props.editorWillMount();
-    }
   }
 
   /** @internal */
@@ -726,7 +692,7 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
       }
     }
 
-    this.editor = cm(this.ref) as IInstance;
+    this.editor = cm(this.ref) as codemirror.Editor;
 
     this.shared = new Shared(this.editor, this.props);
 
@@ -762,7 +728,7 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
 
     this.shared.wire(this.props);
 
-    this.editor.clearHistory();
+    this.editor.getDoc().clearHistory();
 
     if (this.props.editorDidMount) {
       this.props.editorDidMount(this.editor, this.editor.getValue(), this.initCb);
@@ -797,7 +763,7 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
     }
 
     if (!this.props.autoCursor && this.props.autoCursor !== undefined) {
-      preserved.cursor = this.editor.getCursor();
+      preserved.cursor = this.editor.getDoc().getCursor();
     }
 
     this.hydrate(nextProps);

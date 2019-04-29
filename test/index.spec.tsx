@@ -7,25 +7,31 @@ import {Controlled, UnControlled} from '../src';
 
 Enzyme.configure({adapter: new Adapter()});
 
-global.console = {
+(global as any).console = {
   warn: jest.fn(),
   log: console.log,
   error: console.error
 };
 
-global.focus = jest.fn();
+(global as any).focus = jest.fn();
 
 describe('[Controlled, UnControlled]: init', () => {
 
   it('should render | props: {}', () => {
 
-    let sampleOptions = {lineNumbers: true};
-
-    let uncontrolled = Enzyme.shallow(<UnControlled options={sampleOptions}/>);
-    let controlled = Enzyme.shallow(<Controlled options={sampleOptions}/>);
-
-    expect.anything(controlled.html());
-    expect.anything(uncontrolled.html());
+    const options = {lineNumbers: true};
+    const uncontrolled = Enzyme.shallow(
+      <UnControlled
+        options={options}
+      />);
+    const controlled = Enzyme.shallow(
+      <Controlled
+        value=""
+        options={options}
+        onBeforeChange={sinon.spy}
+      />);
+    expect(controlled.html()).not.toBeUndefined();
+    expect(uncontrolled.html()).not.toBeUndefined();
   });
 
   it('should unmount', () => {
@@ -33,52 +39,40 @@ describe('[Controlled, UnControlled]: init', () => {
     let uUnmounted = false;
     let cUnmounted = false;
 
-    let uWrapper = Enzyme.mount(<UnControlled editorWillUnmount={(cm) => {
-      uUnmounted = true;
-    }}/>);
-
-    let cWrapper = Enzyme.mount(<UnControlled editorWillUnmount={(cm) => {
-      cUnmounted = true;
-    }}/>);
-
+    const uWrapper = Enzyme.mount(
+      <UnControlled
+        editorWillUnmount={cm => {
+          uUnmounted = true;
+        }}
+      />);
+    const cWrapper = Enzyme.mount(
+      <Controlled
+        value=""
+        onBeforeChange={sinon.spy}
+        editorWillUnmount={cm => {
+          cUnmounted = true;
+        }}
+      />);
     uWrapper.unmount();
     cWrapper.unmount();
-
     expect(uUnmounted).toBeTruthy();
     expect(cUnmounted).toBeTruthy();
   });
 
   it('should append a class name', () => {
 
-    let uWrapper = Enzyme.mount(<UnControlled className={'class-uncontrolled'}/>);
-    let cWrapper = Enzyme.mount(<Controlled className={'class-controlled'}/>);
-
-    // todo maybe bring in cheerio
+    const uWrapper = Enzyme.mount(
+      <UnControlled
+        className={'class-uncontrolled'}
+      />);
+    const cWrapper = Enzyme.mount(
+      <Controlled
+        className={'class-controlled'}
+        value=""
+        onBeforeChange={sinon.spy}
+      />);
     expect(/react-codemirror2 class-uncontrolled/g.test(uWrapper.html())).toBeTruthy();
     expect(/react-codemirror2 class-controlled/g.test(cWrapper.html())).toBeTruthy();
-  });
-});
-
-describe('[Controlled, UnControlled]: editorWillMount', () => {
-
-  it('editorWillMount(editor, next)', () => {
-
-    Enzyme.shallow(
-      <UnControlled
-        editorWillMount={() => {
-          this.uMounted = true;
-        }}/>
-    );
-
-    Enzyme.shallow(
-      <Controlled
-        editorWillMount={() => {
-          this.cMounted = true;
-        }}/>
-    );
-
-    expect(this.cMounted).toBe(true);
-    expect(this.uMounted).toBe(true);
   });
 });
 
@@ -92,21 +86,23 @@ describe('[Controlled, UnControlled]: editorDidConfigure', () => {
           this.uCallback = sinon.spy(next);
           this.uCallback();
         }}
-        editorDidConfigure={(editor) => {
+        editorDidConfigure={editor => {
           this.uConfigured = true;
-        }}/>
-    );
+        }}
+      />);
 
     Enzyme.shallow(
       <Controlled
+        value=""
+        onBeforeChange={sinon.spy}
         editorDidMount={(editor, value, next) => {
           this.cCallback = sinon.spy(next);
           this.cCallback();
         }}
-        editorDidConfigure={(editor) => {
+        editorDidConfigure={editor => {
           this.cConfigured = true;
-        }}/>
-    );
+        }}
+      />);
 
     expect(this.uConfigured).toBe(true);
     expect(this.uCallback.called).toBe(true);
@@ -119,7 +115,7 @@ describe('[Controlled, UnControlled]: defineMode', () => {
 
   it('defineMode', () => {
 
-    let mode = {
+    let mode: any = {
       name: 'testMode',
       fn: () => {
         return {
@@ -135,16 +131,18 @@ describe('[Controlled, UnControlled]: defineMode', () => {
     let uWrapper = Enzyme.shallow(
       <UnControlled
         defineMode={mode}
-        editorDidMount={(editor, next) => {
-          expect(editor.doc.mode.name).toBe('testMode');
+        editorDidMount={(editor, value, next) => {
+          expect(editor.getDoc().getMode().name).toBe('testMode');
         }}/>
     );
 
     let cWrapper = Enzyme.shallow(
       <Controlled
+        value=""
+        onBeforeChange={sinon.spy}
         defineMode={mode}
-        editorDidMount={(editor, next) => {
-          expect(editor.doc.mode.name).toBe('testMode');
+        editorDidMount={(editor, value, next) => {
+          expect(editor.getDoc().getMode().name).toBe('testMode');
         }}/>
     );
 
@@ -155,161 +153,234 @@ describe('[Controlled, UnControlled]: defineMode', () => {
 
 describe('DOM Events', () => {
 
-  it('onFocus(editor, event)', () => {
+  it('[Controlled] onFocus', done => {
 
-    let callback;
+    let onFocus = false;
 
-    let wrapper = Enzyme.mount(
+    const wrapper = Enzyme.mount(
       <Controlled
+        value='foo'
+        onBeforeChange={sinon.spy}
+        onFocus={() => {
+          onFocus = true;
+          wrapper.unmount();
+        }}
+        editorWillUnmount={cm => {
+          expect(onFocus).toBeTruthy();
+          done();
+        }}
+      />);
+    wrapper.instance().editor.focus();
+  });
+
+  it('[UnControlled] onFocus', done => {
+
+    let onFocus = false;
+
+    const wrapper = Enzyme.mount(
+      <UnControlled
         value='foo'
         onFocus={() => {
-          callback = sinon.spy();
-          callback();
-        }}/>
-    );
+          onFocus = true;
+          wrapper.unmount();
+        }}
+        editorWillUnmount={cm => {
+          expect(onFocus).toBeTruthy();
+          done();
+        }}
+      />);
     wrapper.instance().editor.focus();
   });
 
-  it('onBlur(editor, event)', () => {
+  it('[Controlled] onBlur', done => {
 
-    let callback;
+    let onBlur = false;
 
-    let wrapper = Enzyme.mount(
+    const wrapper = Enzyme.mount(
       <Controlled
         value='foo'
-        onBlur={(editor, event) => {
-          callback = sinon.spy();
-          callback();
-        }}/>
-    );
-
+        onBeforeChange={sinon.spy}
+        onBlur={() => {
+          onBlur = true;
+          wrapper.unmount();
+        }}
+        editorWillUnmount={cm => {
+          expect(onBlur).toBeTruthy();
+          done();
+        }}
+      />);
     wrapper.instance().editor.focus();
     wrapper.instance().editor.getInputField().blur();
-    expect(callback.called).toBeTruthy();
   });
 
-  it('onRenderLine(editor, line, element)', () => {
+  it('[UnControlled] onBlur', done => {
 
-    let callback;
+    let onBlur = false;
 
-    let wrapper = Enzyme.mount(
-      <Controlled
+    const wrapper = Enzyme.mount(
+      <UnControlled
         value='foo'
-        onRenderLine={(editor, line, element) => {
-          callback = sinon.spy();
-          callback();
-        }}/>
-    );
-    wrapper.setProps({value: 'bar'});
-    expect(callback.called).toBeTruthy();
+        onBlur={() => {
+          onBlur = true;
+          wrapper.unmount();
+        }}
+        editorWillUnmount={cm => {
+          expect(onBlur).toBeTruthy();
+          done();
+        }}
+      />);
+    wrapper.instance().editor.focus();
+    wrapper.instance().editor.getInputField().blur();
   });
 });
 
 describe('Change', () => {
 
-  it('[UnControlled] onChange(editor, event)', () => {
-
-    let callback;
-
-    let wrapper = Enzyme.mount(
-      <UnControlled
-        value='foo'
-        onChange={(editor, data, value) => {
-          callback = sinon.spy();
-          callback();
-        }}/>
-    );
-
-    let doc = wrapper.instance().editor.getDoc();
-    doc.replaceRange('bar', {line: 1, ch: 1});
-    expect(callback.called).toBeTruthy();
-  });
-
-  it('[UnControlled] onBeforeChange(editor, event)', () => {
-
-    let callback, beforeCallback;
-
-    let wrapper = Enzyme.mount(
-      <UnControlled
-        value='foo'
-        onBeforeChange={(editor, data, value, next) => {
-          beforeCallback = sinon.spy(next);
-          beforeCallback();
-        }}
-        onChange={(editor, data, value) => {
-          callback = sinon.spy();
-          callback();
-        }}/>
-    );
-
-    let doc = wrapper.instance().editor.getDoc();
-    doc.replaceRange('bar', {line: 1, ch: 1});
-    expect(callback.called).toBeTruthy();
-    expect(beforeCallback.called).toBeTruthy();
-  });
-
-  it('[Controlled] onChange(editor, event)', () => {
-
-    let callback, beforeCallback;
-
-    let wrapper = Enzyme.mount(
+  it('[Controlled] change:onChange', done => {
+    const wrapper = Enzyme.mount(
       <Controlled
         value='foo'
         onBeforeChange={(editor, data, value) => {
-          beforeCallback = sinon.spy();
-          beforeCallback();
-          wrapper.setProps({value: 'foobar'});
+          wrapper.setProps({value});
         }}
         onChange={(editor, data, value) => {
-          callback = sinon.spy();
-          callback();
-        }}/>
-    );
-
-    let doc = wrapper.instance().editor.getDoc();
+          expect(value).toEqual('foobar');
+          expect(editor.getValue()).toEqual('foobar');
+          done();
+        }}
+      />);
+    const doc = wrapper.instance().editor.getDoc();
     doc.replaceRange('bar', {line: 1, ch: 1});
-    expect(callback.called).toBeTruthy();
-    expect(beforeCallback.called).toBeTruthy();
   });
 
-  it('[Controlled] onChange(editor, event) undo | redo', () => {
-
-    let wrapper = Enzyme.mount(
+  it('[Controlled] change:onRenderLine', done => {
+    const wrapper = Enzyme.mount(
       <Controlled
         value='foo'
         onBeforeChange={(editor, data, value) => {
-          wrapper.setProps({value: value});
-        }}/>
-    );
+          wrapper.setProps({value});
+        }}
+        onRenderLine={(editor, line, element) => {
+          expect(line.text).toEqual('foobar');
+          expect(element).toBeDefined();
+          expect(editor.getValue()).toEqual('foobar');
+          done();
+        }}
+      />);
+    const doc = wrapper.instance().editor.getDoc();
+    doc.replaceRange('bar', {line: 1, ch: 1});
+  });
 
-    let editor = wrapper.instance().editor;
+  it('[Controlled] change:undo|redo', done => {
 
-    editor.replaceRange('bar', {line: 1, ch: 1});
-    expect(editor.getValue()).toEqual('foobar');
-    editor.undo();
-    expect(editor.getValue()).toEqual('foo');
-    editor.redo();
-    expect(editor.getValue()).toEqual('foobar');
+    let n = 0;
+
+    const wrapper = Enzyme.mount(
+      <Controlled
+        value='foo'
+        onBeforeChange={(editor, data, value) => {
+          wrapper.setProps({value});
+        }}
+        onChange={(editor, data, value) => {
+          const doc = editor.getDoc();
+          n += 1;
+          switch (n) {
+            case 1:
+              expect(editor.getValue()).toEqual('foobar');
+              doc.undo();
+              break;
+            case 2:
+              expect(editor.getValue()).toEqual('foo');
+              doc.redo();
+              break;
+            case 3:
+              expect(value).toEqual('foobar');
+              done();
+              break;
+          }
+        }}
+      />);
+    const doc = wrapper.instance().editor.getDoc();
+    doc.replaceRange('bar', {line: 1, ch: 1});
+  });
+
+  it('[UnControlled] change:onChange', done => {
+    const wrapper = Enzyme.mount(
+      <UnControlled
+        value='foo'
+        onChange={(editor, data, value) => {
+          expect(value).toEqual('foobar');
+          expect(editor.getValue()).toEqual('foobar');
+          done();
+        }}
+      />);
+    const doc = wrapper.instance().editor.getDoc();
+    doc.replaceRange('bar', {line: 1, ch: 1});
+  });
+
+  it('[UnControlled] change:onRenderLine', done => {
+    const wrapper = Enzyme.mount(
+      <UnControlled
+        value='foo'
+        onRenderLine={(editor, line, element) => {
+          expect(line.text).toEqual('foobar');
+          expect(element).toBeDefined();
+          expect(editor.getValue()).toEqual('foobar');
+          done();
+        }}
+      />);
+    const doc = wrapper.instance().editor.getDoc();
+    doc.replaceRange('bar', {line: 1, ch: 1});
+  });
+
+  it('[Controlled] change:undo|redo', done => {
+
+    let n = 0;
+
+    const wrapper = Enzyme.mount(
+      <UnControlled
+        value='foo'
+        onChange={(editor, data, value) => {
+          const doc = editor.getDoc();
+          n += 1;
+          switch (n) {
+            case 1:
+              expect(editor.getValue()).toEqual('foobar');
+              doc.undo();
+              break;
+            case 2:
+              expect(editor.getValue()).toEqual('foo');
+              doc.redo();
+              break;
+            case 3:
+              expect(value).toEqual('foobar');
+              done();
+              break;
+          }
+        }}
+      />);
+    const doc = wrapper.instance().editor.getDoc();
+    doc.replaceRange('bar', {line: 1, ch: 1});
   });
 });
 
 describe('Props', () => {
 
-  // <scroll>
   it('[Controlled]: scroll | newProps', () => {
 
     // todo can't find way to actually invoke a DOM scroll => `onScroll`
     let wrapper = Enzyme.mount(
       <Controlled
         value='foo'
+        onBeforeChange={sinon.spy}
         scroll={{
           x: 50,
           y: 50
         }}
         onScroll={(editor, data) => {
-          console.log(data)
-        }}/>
-    );
+          //
+        }}
+      />);
 
     wrapper.setProps({
       scroll: {
@@ -332,9 +403,9 @@ describe('Props', () => {
           y: 50
         }}
         onScroll={(editor, data) => {
-          console.log(data)
-        }}/>
-    );
+          //console.log(data)
+        }}
+      />);
 
     wrapper.setProps({
       scroll: {
@@ -345,16 +416,15 @@ describe('Props', () => {
 
     wrapper.unmount();
   });
-  // </scroll>
 
-  // <selection>
   it('[Controlled, UnControlled]: selection', () => {
 
     let expected = ['oo'];
 
     Enzyme.mount(
       <Controlled
-        value='foo'
+        value="foo"
+        onBeforeChange={sinon.spy}
         selection={{
           ranges: [{
             anchor: {ch: 1, line: 0},
@@ -362,9 +432,9 @@ describe('Props', () => {
           }]
         }}
         editorDidMount={(editor) => {
-          expect(editor.getSelections()).toEqual(expected)
-        }}/>
-    );
+          expect(editor.getDoc().getSelections()).toEqual(expected)
+        }}
+      />);
 
     Enzyme.mount(
       <UnControlled
@@ -376,9 +446,9 @@ describe('Props', () => {
           }]
         }}
         editorDidMount={(editor) => {
-          expect(editor.getSelections()).toEqual(expected)
-        }}/>
-    );
+          expect(editor.getDoc().getSelections()).toEqual(expected)
+        }}
+      />);
   });
 
   it('[Controlled, UnControlled]: selection: focus', () => {
@@ -387,7 +457,8 @@ describe('Props', () => {
 
     Enzyme.mount(
       <Controlled
-        value='foo'
+        value="foo"
+        onBeforeChange={sinon.spy}
         selection={{
           focus: true,
           ranges: [{
@@ -397,9 +468,9 @@ describe('Props', () => {
         }}
         editorDidMount={(editor) => {
           expect(editor.state.focused).toBeTruthy();
-          expect(editor.getSelections()).toEqual(expected);
-        }}/>
-    );
+          expect(editor.getDoc().getSelections()).toEqual(expected);
+        }}
+      />);
 
     Enzyme.mount(
       <UnControlled
@@ -413,9 +484,9 @@ describe('Props', () => {
         }}
         editorDidMount={(editor) => {
           expect(editor.state.focused).toBeTruthy();
-          expect(editor.getSelections()).toEqual(expected);
-        }}/>
-    );
+          expect(editor.getDoc().getSelections()).toEqual(expected);
+        }}
+      />);
   });
 
   it('[Controlled: selection | newProps', () => {
@@ -428,10 +499,11 @@ describe('Props', () => {
     let wrapper = Enzyme.mount(
       <Controlled
         value='foo\nbar\nbaz'
-        onSelection={(editor, data) => {
-          expect(data.ranges).toEqual(expectedRanges);
-        }}/>
-    );
+        onBeforeChange={sinon.spy}
+        onSelection={(editor) => {
+          expect(editor.getDoc().getSelection()).toEqual(expectedRanges);
+        }}
+      />);
 
     wrapper.setProps({
       selection: {
@@ -455,10 +527,10 @@ describe('Props', () => {
     let wrapper = Enzyme.mount(
       <UnControlled
         value='foo\nbar\nbaz'
-        onSelection={(editor, data) => {
-          expect(data.ranges).toEqual(expectedRanges);
-        }}/>
-    );
+        onSelection={(editor) => {
+          expect(editor.getDoc().getSelection()).toEqual(expectedRanges);
+        }}
+      />);
 
     wrapper.setProps({
       selection: {
@@ -472,96 +544,18 @@ describe('Props', () => {
     wrapper.unmount();
   });
 
-  it('[Controlled: selection | newProps & props', () => {
-
-    let currentRanges = [{
-      anchor: {ch: 1, line: 0},
-      head: {ch: 2, line: 0}
-    }];
-
-    let expectedRanges = [{
-      anchor: {ch: 1, line: 0},
-      head: {ch: 3, line: 0}
-    }];
-
-    let wrapper = Enzyme.mount(
-      <Controlled
-        value='foobar'
-        selection={{ranges: currentRanges}}
-        editorDidMount={(editor) => {
-          expect(editor.doc.sel.ranges).toEqual(currentRanges);
-        }}
-        onSelection={(editor, data) => {
-          expect(data.ranges).toEqual(expectedRanges);
-        }}/>
-    );
-
-    wrapper.setProps({
-      selection: {
-        ranges: [{
-          anchor: {ch: 1, line: 0},
-          head: {ch: 3, line: 0}
-        }]
-      }
-    });
-
-    wrapper.unmount();
-  });
-
-  it('[UnControlled: selection | newProps & props', () => {
-
-    let currentRanges = [{
-      anchor: {ch: 1, line: 0},
-      head: {ch: 2, line: 0}
-    }];
-
-    let expectedRanges = [{
-      anchor: {ch: 1, line: 0},
-      head: {ch: 3, line: 0}
-    }];
-
-    let wrapper = Enzyme.mount(
-      <UnControlled
-        selection={{
-          ranges: [{
-            anchor: {ch: 1, line: 0},
-            head: {ch: 2, line: 0}
-          }]
-        }}
-        value='foobar'
-        editorDidMount={(editor) => {
-          expect(editor.doc.sel.ranges).toEqual(currentRanges);
-        }}
-        onSelection={(editor, data) => {
-          expect(data.ranges).toEqual(expectedRanges);
-        }}/>
-    );
-
-    wrapper.setProps({
-      selection: {
-        ranges: [{
-          anchor: {ch: 1, line: 0},
-          head: {ch: 3, line: 0}
-        }]
-      }
-    });
-
-    wrapper.unmount();
-  });
-  // </selection>
-
-  // <cursor>
   it('[Controlled, UnControlled]: cursor', () => {
 
     Enzyme.mount(
       <Controlled
         value='foo'
+        onBeforeChange={sinon.spy}
         cursor={{
           line: 0,
           ch: 3
         }}
-        onSelection={(editor, data) => {
-          expect.anything(data.ranges)
+        onSelection={(editor) => {
+          expect(editor.getDoc().getCursor()).not.toBeNull()
         }}/>
     );
 
@@ -572,8 +566,8 @@ describe('Props', () => {
           line: 0,
           ch: 3
         }}
-        onSelection={(editor, data) => {
-          expect.anything(data.ranges)
+        onSelection={(editor) => {
+          expect(editor.getDoc().getCursor()).not.toBeNull()
         }}/>
     );
   });
@@ -584,6 +578,7 @@ describe('Props', () => {
     let wrapper = Enzyme.mount(
       <Controlled
         value='foo'
+        onBeforeChange={sinon.spy}
         onCursor={(editor, data) => {
           console.log('oncursor')
         }}/>
@@ -626,6 +621,7 @@ describe('Props', () => {
     let wrapper = Enzyme.mount(
       <Controlled
         value='foo'
+        onBeforeChange={sinon.spy}
         cursor={{
           line: 1,
           ch: 1
@@ -677,6 +673,7 @@ describe('Props', () => {
       <Controlled
         autoCursor={false}
         value='foo'
+        onBeforeChange={sinon.spy}
         cursor={{
           line: 1,
           ch: 1
@@ -728,6 +725,7 @@ describe('Props', () => {
     let wrapper = Enzyme.mount(
       <Controlled
         value='foo'
+        onBeforeChange={sinon.spy}
         cursor={{
           line: 1,
           ch: 1
@@ -778,6 +776,7 @@ describe('Props', () => {
     let wrapper = Enzyme.mount(
       <Controlled
         value='foo'
+        onBeforeChange={sinon.spy}
         autoScroll={true}
         cursor={{
           line: 1,
@@ -823,9 +822,7 @@ describe('Props', () => {
 
     wrapper.unmount();
   });
-  // </cursor>
 
-  // <value>
   it('[UnControlled]: new value | invoke apply pipeline accordingly`', () => {
     let wrapper = Enzyme.mount(
       <UnControlled
@@ -849,6 +846,7 @@ describe('Props', () => {
     let wrapper = Enzyme.mount(
       <Controlled
         value='foo'
+        onBeforeChange={sinon.spy}
         onChange={(editor, data) => {
         }}/>
     );
@@ -866,9 +864,7 @@ describe('Props', () => {
 
     wrapper.unmount();
   });
-  // </value>
 
-  // <misc>
   it('[UnControlled]: detached | should detach', () => {
     const spy = sinon.spy();
     const wrapper = Enzyme.mount(
@@ -953,5 +949,39 @@ describe('Props', () => {
       done();
     }, 200);
   });
-  // </misc>
+
+  it('[Controlled: selection | newProps & props', done => {
+
+    const currentRanges = [{
+      anchor: {ch: 1, line: 0},
+      head: {ch: 2, line: 0}
+    }];
+
+    const expectedRanges = [{
+      anchor: {ch: 1, line: 0},
+      head: {ch: 3, line: 0}
+    }];
+
+    const wrapper = Enzyme.mount(
+      <Controlled
+        value='foobar'
+        onBeforeChange={sinon.spy}
+        selection={{ranges: currentRanges}}
+        onSelection={(editor, data) => {
+          expect(data.ranges).toEqual(expectedRanges);
+          done();
+        }}/>
+    );
+
+    wrapper.setProps({
+      selection: {
+        ranges: [{
+          anchor: {ch: 1, line: 0},
+          head: {ch: 3, line: 0}
+        }]
+      }
+    });
+
+    wrapper.unmount();
+  });
 });

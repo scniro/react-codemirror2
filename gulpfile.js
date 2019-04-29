@@ -8,7 +8,12 @@ gulp.task('ts-scrub:index', () => {
   return gulp.src('./.ts/index.js')
     .pipe(replace('var codemirror = require("codemirror");', ''))
     .pipe(replace('"', '\''))
-    .pipe(babel())
+    .pipe(babel({
+      presets: [
+        '@babel/preset-env',
+        '@babel/preset-react'
+      ]
+    }))
     .pipe(beautify({indent_size: 2}))
     .pipe(gulp.dest('.'));
 });
@@ -18,6 +23,6 @@ gulp.task('ts-scrub:declaration', () => {
     .pipe(gulp.dest('.'));
 });
 
-gulp.task('ts-scrub', ['ts-scrub:index', 'ts-scrub:declaration'], (done) => {
+gulp.task('ts-scrub', gulp.series(['ts-scrub:index', 'ts-scrub:declaration']), (done) => {
   rimraf('./.ts', done);
 });

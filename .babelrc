@@ -1,7 +1,7 @@
 {
   "presets": [
-    "react",
-    "es2015"
+    "@babel/preset-env",
+    "@babel/preset-react"
   ],
   "plugins": [
     "transform-object-assign"
