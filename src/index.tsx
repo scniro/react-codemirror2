@@ -27,8 +27,8 @@ export interface ISetSelectionOptions {
   head: codemirror.Position;
 }
 
-export interface DomEvent {
-  (editor: codemirror.Editor, event: Event): void;
+export interface DomEvent<T extends Event = Event> {
+  (editor: codemirror.Editor, event: T): void;
 }
 
 export interface ICodeMirror {
@@ -40,26 +40,26 @@ export interface ICodeMirror {
   editorDidConfigure?: (editor: codemirror.Editor) => void;
   editorDidMount?: (editor: codemirror.Editor, value: string, cb: () => void) => void;
   editorWillUnmount?: (lib: any) => void;
-  onBlur?: DomEvent;
+  onBlur?: DomEvent<FocusEvent>;
   onChange?: (editor: codemirror.Editor, data: codemirror.EditorChange, value: string) => void;
   onContextMenu?: DomEvent;
-  onCopy?: DomEvent;
+  onCopy?: DomEvent<ClipboardEvent>;
   onCursor?: (editor: codemirror.Editor, data: codemirror.Position) => void;
-  onCut?: DomEvent;
+  onCut?: DomEvent<ClipboardEvent>;
   onCursorActivity?: (editor: codemirror.Editor) => void;
   onDblClick?: DomEvent;
-  onDragEnter?: DomEvent;
-  onDragLeave?: DomEvent;
-  onDragOver?: DomEvent
-  onDragStart?: DomEvent;
-  onDrop?: DomEvent;
+  onDragEnter?: DomEvent<DragEvent>;
+  onDragLeave?: DomEvent<DragEvent>;
+  onDragOver?: DomEvent<DragEvent>;
+  onDragStart?: DomEvent<DragEvent>;
+  onDrop?: DomEvent<DragEvent>;
   onFocus?: DomEvent
   onGutterClick?: (editor: codemirror.Editor, lineNumber: number, gutter: string, event: Event) => void;
-  onKeyDown?: DomEvent;
-  onKeyPress?: DomEvent;
-  onKeyUp?: DomEvent;
-  onMouseDown?: DomEvent;
-  onPaste?: DomEvent;
+  onKeyDown?: DomEvent<KeyboardEvent>;
+  onKeyPress?: DomEvent<KeyboardEvent>;
+  onKeyUp?: DomEvent<KeyboardEvent>;
+  onMouseDown?: DomEvent<MouseEvent>;
+  onPaste?: DomEvent<ClipboardEvent>;
   onRenderLine?: (editor: codemirror.Editor, line: codemirror.LineHandle, element: HTMLElement) => void;
   onScroll?: (editor: codemirror.Editor, data: codemirror.ScrollInfo) => void;
   onSelection?: (editor: codemirror.Editor, data: any) => void;
