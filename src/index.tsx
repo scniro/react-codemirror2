@@ -416,7 +416,7 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
       });
     }
     if (!this.hydrated) {
-      this.deferred ? this.resolveChange() : this.initChange(props.value || '')
+      this.deferred ? this.resolveChange(props.value) : this.initChange(props.value || '')
     }
     this.hydrated = true;
   }
@@ -442,7 +442,7 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
   }
 
   /** @internal */
-  private resolveChange() {
+  private resolveChange(value) {
 
     this.emulating = true;
 
@@ -454,6 +454,12 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
       doc.redo();
     } else {
       doc.replaceRange(this.deferred.text, this.deferred.from, this.deferred.to, this.deferred.origin);
+    }
+
+    if (value && value !== doc.getValue()) {
+      const cursor = doc.getCursor();
+      doc.setValue(value);
+      doc.setCursor(cursor);
     }
 
     this.emulating = false;
