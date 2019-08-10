@@ -551,7 +551,7 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
   }
 
   /** @internal */
-  public componentWillReceiveProps(nextProps) {
+  public UNSAFE_componentWillReceiveProps(nextProps) {
 
     if (SERVER_RENDERED) return;
 
@@ -736,7 +736,7 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
   }
 
   /** @internal */
-  public componentWillReceiveProps(nextProps) {
+  public UNSAFE_componentWillReceiveProps(nextProps) {
 
     if (this.detached && (nextProps.detach === false)) {
       this.detached = false;

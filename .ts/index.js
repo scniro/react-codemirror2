@@ -389,7 +389,7 @@ var Controlled = (function (_super) {
             this.props.editorDidMount(this.editor, this.editor.getValue(), this.initCb);
         }
     };
-    Controlled.prototype.componentWillReceiveProps = function (nextProps) {
+    Controlled.prototype.UNSAFE_componentWillReceiveProps = function (nextProps) {
         if (SERVER_RENDERED)
             return;
         var preserved = { cursor: null };
@@ -511,7 +511,7 @@ var UnControlled = (function (_super) {
             this.props.editorDidMount(this.editor, this.editor.getValue(), this.initCb);
         }
     };
-    UnControlled.prototype.componentWillReceiveProps = function (nextProps) {
+    UnControlled.prototype.UNSAFE_componentWillReceiveProps = function (nextProps) {
         if (this.detached && (nextProps.detach === false)) {
             this.detached = false;
             if (this.props.editorDidAttach) {
