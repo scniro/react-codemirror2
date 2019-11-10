@@ -15,8 +15,10 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
 var SERVER_RENDERED = (typeof navigator === 'undefined' || global['PREVENT_CODEMIRROR_RENDER'] === true);
+var cm;
+exports.cm = cm;
 if (!SERVER_RENDERED) {
-    exports.cm = require('codemirror');
+    exports.cm = cm = require('codemirror');
 }
 var Helper = (function () {
     function Helper() {
@@ -281,7 +283,7 @@ var Controlled = (function (_super) {
     Controlled.prototype.hydrate = function (props) {
         var _this = this;
         var _options = props && props.options ? props.options : {};
-        var userDefinedOptions = Object.assign({}, exports.cm.defaults, this.editor.options, _options);
+        var userDefinedOptions = Object.assign({}, cm.defaults, this.editor.options, _options);
         var optionDelta = Object.keys(userDefinedOptions).some(function (key) { return _this.editor.getOption(key) !== userDefinedOptions[key]; });
         if (optionDelta) {
             Object.keys(userDefinedOptions).forEach(function (key) {
@@ -345,12 +347,12 @@ var Controlled = (function (_super) {
             return;
         if (this.props.defineMode) {
             if (this.props.defineMode.name && this.props.defineMode.fn) {
-                exports.cm.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
+                cm.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
             }
         }
-        this.editor = exports.cm(this.ref);
+        this.editor = cm(this.ref);
         this.shared = new Shared(this.editor, this.props);
-        this.mirror = exports.cm(function () {
+        this.mirror = cm(function () {
         });
         this.editor.on('electricInput', function () {
             _this.mirror.setHistory(_this.editor.getDoc().getHistory());
@@ -410,7 +412,7 @@ var Controlled = (function (_super) {
         if (SERVER_RENDERED)
             return;
         if (this.props.editorWillUnmount) {
-            this.props.editorWillUnmount(exports.cm);
+            this.props.editorWillUnmount(cm);
         }
     };
     Controlled.prototype.shouldComponentUpdate = function (nextProps, nextState) {
@@ -451,7 +453,7 @@ var UnControlled = (function (_super) {
     UnControlled.prototype.hydrate = function (props) {
         var _this = this;
         var _options = props && props.options ? props.options : {};
-        var userDefinedOptions = Object.assign({}, exports.cm.defaults, this.editor.options, _options);
+        var userDefinedOptions = Object.assign({}, cm.defaults, this.editor.options, _options);
         var optionDelta = Object.keys(userDefinedOptions).some(function (key) { return _this.editor.getOption(key) !== userDefinedOptions[key]; });
         if (optionDelta) {
             Object.keys(userDefinedOptions).forEach(function (key) {
@@ -477,10 +479,10 @@ var UnControlled = (function (_super) {
         this.detached = (this.props.detach === true);
         if (this.props.defineMode) {
             if (this.props.defineMode.name && this.props.defineMode.fn) {
-                exports.cm.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
+                cm.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
             }
         }
-        this.editor = exports.cm(this.ref);
+        this.editor = cm(this.ref);
         this.shared = new Shared(this.editor, this.props);
         this.editor.on('beforeChange', function (cm, data) {
             if (_this.props.onBeforeChange) {
@@ -548,7 +550,7 @@ var UnControlled = (function (_super) {
         if (SERVER_RENDERED)
             return;
         if (this.props.editorWillUnmount) {
-            this.props.editorWillUnmount(exports.cm);
+            this.props.editorWillUnmount(cm);
         }
     };
     UnControlled.prototype.shouldComponentUpdate = function (nextProps, nextState) {

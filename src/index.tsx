@@ -7,10 +7,11 @@ declare let require: any;
 
 const SERVER_RENDERED = (typeof navigator === 'undefined' || global['PREVENT_CODEMIRROR_RENDER'] === true);
 
-export let cm;
+let cm;
 if (!SERVER_RENDERED) {
   cm = require('codemirror');
 }
+export { cm };
 
 export interface IDefineModeOptions {
   fn: () => codemirror.Mode<any>;
