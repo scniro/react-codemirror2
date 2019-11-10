@@ -66,6 +66,7 @@ var cm;
 
 if (!SERVER_RENDERED) {
   cm = require('codemirror');
+  exports.cm = cm;
 }
 
 var Helper = function() {
