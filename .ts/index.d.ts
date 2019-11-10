@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as codemirror from 'codemirror';
+export declare let cm: any;
 export interface IDefineModeOptions {
     fn: () => codemirror.Mode<any>;
     name: string;

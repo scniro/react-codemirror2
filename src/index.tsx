@@ -7,7 +7,7 @@ declare let require: any;
 
 const SERVER_RENDERED = (typeof navigator === 'undefined' || global['PREVENT_CODEMIRROR_RENDER'] === true);
 
-let cm;
+export let cm;
 if (!SERVER_RENDERED) {
   cm = require('codemirror');
 }

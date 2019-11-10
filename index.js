@@ -62,11 +62,9 @@ Object.defineProperty(exports, '__esModule', {
 var React = require('react');
 
 var SERVER_RENDERED = typeof navigator === 'undefined' || global['PREVENT_CODEMIRROR_RENDER'] === true;
-var cm;
 
 if (!SERVER_RENDERED) {
-  cm = require('codemirror');
-  exports.cm = cm;
+  exports.cm = require('codemirror');
 }
 
 var Helper = function() {
@@ -410,7 +408,7 @@ var Controlled = function(_super) {
 
     var _options = props && props.options ? props.options : {};
 
-    var userDefinedOptions = _extends({}, cm.defaults, this.editor.options, _options);
+    var userDefinedOptions = _extends({}, exports.cm.defaults, this.editor.options, _options);
 
     var optionDelta = Object.keys(userDefinedOptions).some(function(key) {
       return _this.editor.getOption(key) !== userDefinedOptions[key];
@@ -492,13 +490,13 @@ var Controlled = function(_super) {
 
     if (this.props.defineMode) {
       if (this.props.defineMode.name && this.props.defineMode.fn) {
-        cm.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
+        exports.cm.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
       }
     }
 
-    this.editor = cm(this.ref);
+    this.editor = exports.cm(this.ref);
     this.shared = new Shared(this.editor, this.props);
-    this.mirror = cm(function() {});
+    this.mirror = exports.cm(function() {});
     this.editor.on('electricInput', function() {
       _this.mirror.setHistory(_this.editor.getDoc().getHistory());
     });
@@ -570,7 +568,7 @@ var Controlled = function(_super) {
     if (SERVER_RENDERED) return;
 
     if (this.props.editorWillUnmount) {
-      this.props.editorWillUnmount(cm);
+      this.props.editorWillUnmount(exports.cm);
     }
   };
 
@@ -629,7 +627,7 @@ var UnControlled = function(_super) {
 
     var _options = props && props.options ? props.options : {};
 
-    var userDefinedOptions = _extends({}, cm.defaults, this.editor.options, _options);
+    var userDefinedOptions = _extends({}, exports.cm.defaults, this.editor.options, _options);
 
     var optionDelta = Object.keys(userDefinedOptions).some(function(key) {
       return _this.editor.getOption(key) !== userDefinedOptions[key];
@@ -669,11 +667,11 @@ var UnControlled = function(_super) {
 
     if (this.props.defineMode) {
       if (this.props.defineMode.name && this.props.defineMode.fn) {
-        cm.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
+        exports.cm.defineMode(this.props.defineMode.name, this.props.defineMode.fn);
       }
     }
 
-    this.editor = cm(this.ref);
+    this.editor = exports.cm(this.ref);
     this.shared = new Shared(this.editor, this.props);
     this.editor.on('beforeChange', function(cm, data) {
       if (_this.props.onBeforeChange) {
@@ -754,7 +752,7 @@ var UnControlled = function(_super) {
     if (SERVER_RENDERED) return;
 
     if (this.props.editorWillUnmount) {
-      this.props.editorWillUnmount(cm);
+      this.props.editorWillUnmount(exports.cm);
     }
   };
 
