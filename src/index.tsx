@@ -551,13 +551,13 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
   }
 
   /** @internal */
-  public componentWillReceiveProps(nextProps) {
+  public componentDidUpdate(prevProps) {
 
     if (SERVER_RENDERED) return;
 
     let preserved: IPreservedOptions = {cursor: null};
 
-    if (nextProps.value !== this.props.value) {
+    if (this.props.value !== prevProps.value) {
       this.hydrated = false;
     }
 
@@ -565,14 +565,14 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
       preserved.cursor = this.editor.getDoc().getCursor();
     }
 
-    this.hydrate(nextProps);
+    this.hydrate(this.props);
 
     if (!this.appliedNext) {
-      this.shared.applyNext(this.props, nextProps, preserved);
+      this.shared.applyNext(prevProps, this.props, preserved);
       this.appliedNext = true;
     }
 
-    this.shared.applyUserDefined(this.props, preserved);
+    this.shared.applyUserDefined(prevProps, preserved);
     this.appliedUserDefined = true;
   }
 
@@ -736,19 +736,18 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
   }
 
   /** @internal */
-  public componentWillReceiveProps(nextProps) {
-
-    if (this.detached && (nextProps.detach === false)) {
+  public componentDidUpdate(prevProps) {
+    if (this.detached && (this.props.detach === false)) {
       this.detached = false;
-      if (this.props.editorDidAttach) {
-        this.props.editorDidAttach(this.editor);
+      if (prevProps.editorDidAttach) {
+        prevProps.editorDidAttach(this.editor);
       }
     }
 
-    if (!this.detached && (nextProps.detach === true)) {
+    if (!this.detached && (this.props.detach === true)) {
       this.detached = true;
-      if (this.props.editorDidDetach) {
-        this.props.editorDidDetach(this.editor);
+      if (prevProps.editorDidDetach) {
+        prevProps.editorDidDetach(this.editor);
       }
     }
 
@@ -756,25 +755,25 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
 
     let preserved: IPreservedOptions = {cursor: null};
 
-    if (nextProps.value !== this.props.value) {
+    if (this.props.value !== prevProps.value) {
       this.hydrated = false;
       this.applied = false;
       this.appliedUserDefined = false;
     }
 
-    if (!this.props.autoCursor && this.props.autoCursor !== undefined) {
+    if (!prevProps.autoCursor && prevProps.autoCursor !== undefined) {
       preserved.cursor = this.editor.getDoc().getCursor();
     }
 
-    this.hydrate(nextProps);
+    this.hydrate(this.props);
 
     if (!this.applied) {
-      this.shared.apply(this.props);
+      this.shared.apply(prevProps);
       this.applied = true;
     }
 
     if (!this.appliedUserDefined) {
-      this.shared.applyUserDefined(this.props, preserved);
+      this.shared.applyUserDefined(prevProps, preserved);
       this.appliedUserDefined = true;
     }
   }
@@ -795,7 +794,7 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
     let update = true;
 
     if (SERVER_RENDERED) update = false;
-    if (this.detached) update = false;
+    if (this.detached && nextProps.detach) update = false;
 
     return update;
   }
