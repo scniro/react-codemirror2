@@ -195,4 +195,4 @@ Pull Requests are welcome. Be mindful of the availbe scripts below to help submi
 
 note that it's necessary to bump the [package.json](https://github.com/scniro/react-codemirror2/blob/master/package.json#L3) version prior to final `npm run build` so we can grab the proposed new version as seen in the demo header. Also note, the core changes are to be made in `src/index.tsx` as `./index.js` and `./index.d.ts` are _generated_
 
-[MIT](./LICENSE) © 2018 [scniro](https://github.com/scniro)
+[MIT](./LICENSE) © 2020 [scniro](https://github.com/scniro)
