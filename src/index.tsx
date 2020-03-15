@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as codemirror from 'codemirror';
-import {Position} from "codemirror";
 
 declare let global: any;
 declare let require: any;
@@ -28,7 +27,7 @@ export interface ISetSelectionOptions {
 }
 
 export interface DomEvent {
-  (editor: codemirror.Editor, event: Event): void;
+  (editor: codemirror.Editor, event?: Event | codemirror.EditorChangeCancellable | codemirror.EditorChangeLinkedList | codemirror.EditorChangeLinkedList[]): void;
 }
 
 export interface ICodeMirror {
@@ -205,8 +204,8 @@ class Shared implements ICommon {
           break;
         }
         case 'onCopy': {
-          this.editor.on('copy', (cm, event) => {
-            this.props.onCopy(this.editor, event);
+          this.editor.on('copy', (cm) => {
+            this.props.onCopy(this.editor);
           });
           break;
         }
@@ -223,8 +222,8 @@ class Shared implements ICommon {
         }
           break;
         case 'onCut': {
-          this.editor.on('cut', (cm, event) => {
-            this.props.onCut(this.editor, event);
+          this.editor.on('cut', (cm) => {
+            this.props.onCut(this.editor);
           });
           break;
         }
@@ -301,8 +300,8 @@ class Shared implements ICommon {
           break;
         }
         case 'onPaste': {
-          this.editor.on('paste', (cm, event) => {
-            this.props.onPaste(this.editor, event);
+          this.editor.on('paste', (cm) => {
+            this.props.onPaste(this.editor);
           });
           break;
         }
@@ -402,15 +401,15 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
 
     const userDefinedOptions = Object.assign({}, cm.defaults, (this.editor as any).options, _options);
 
-    const optionDelta = Object.keys(userDefinedOptions).some(key => this.editor.getOption(key) !== userDefinedOptions[key]);
+    const optionDelta = Object.keys(userDefinedOptions).some(key => this.editor.getOption(key as any) !== userDefinedOptions[key]);
 
     if (optionDelta) {
       Object.keys(userDefinedOptions).forEach(key => {
 
         if (_options.hasOwnProperty(key)) {
-          if (this.editor.getOption(key) !== userDefinedOptions[key]) {
-            this.editor.setOption(key, userDefinedOptions[key]);
-            this.mirror.setOption(key, userDefinedOptions[key]);
+          if (this.editor.getOption(key as any) !== userDefinedOptions[key]) {
+            this.editor.setOption(key as any, userDefinedOptions[key]);
+            this.mirror.setOption(key as any, userDefinedOptions[key]);
           }
         }
       });
@@ -654,13 +653,13 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
 
     const _options = props && props.options ? props.options : {};
     const userDefinedOptions = Object.assign({}, cm.defaults, (this.editor as any).options, _options);
-    const optionDelta = Object.keys(userDefinedOptions).some(key => this.editor.getOption(key) !== userDefinedOptions[key]);
+    const optionDelta = Object.keys(userDefinedOptions).some(key => this.editor.getOption(key as any) !== userDefinedOptions[key]);
 
     if (optionDelta) {
       Object.keys(userDefinedOptions).forEach(key => {
         if (_options.hasOwnProperty(key)) {
-          if (this.editor.getOption(key) !== userDefinedOptions[key]) {
-            this.editor.setOption(key, userDefinedOptions[key]);
+          if (this.editor.getOption(key as any) !== userDefinedOptions[key]) {
+            this.editor.setOption(key as any, userDefinedOptions[key]);
           }
         }
       });

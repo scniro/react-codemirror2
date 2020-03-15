@@ -16,6 +16,7 @@ function _extends() {
 }
 
 function _typeof(obj) {
+  "@babel/helpers - typeof";
   if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
     _typeof = function _typeof(obj) {
       return typeof obj;
@@ -164,215 +165,190 @@ var Shared = function() {
       return /^on/.test(p);
     }).forEach(function(prop) {
       switch (prop) {
-        case 'onBlur':
-          {
-            _this.editor.on('blur', function(cm, event) {
-              _this.props.onBlur(_this.editor, event);
-            });
-          }
-          break;
+        case 'onBlur': {
+          _this.editor.on('blur', function(cm, event) {
+            _this.props.onBlur(_this.editor, event);
+          });
+        }
+        break;
 
-        case 'onContextMenu':
-          {
-            _this.editor.on('contextmenu', function(cm, event) {
-              _this.props.onContextMenu(_this.editor, event);
-            });
+      case 'onContextMenu': {
+        _this.editor.on('contextmenu', function(cm, event) {
+          _this.props.onContextMenu(_this.editor, event);
+        });
 
-            break;
-          }
+        break;
+      }
 
-        case 'onCopy':
-          {
-            _this.editor.on('copy', function(cm, event) {
-              _this.props.onCopy(_this.editor, event);
-            });
+      case 'onCopy': {
+        _this.editor.on('copy', function(cm) {
+          _this.props.onCopy(_this.editor);
+        });
 
-            break;
-          }
+        break;
+      }
 
-        case 'onCursor':
-          {
-            _this.editor.on('cursorActivity', function(cm) {
-              _this.props.onCursor(_this.editor, _this.editor.getDoc().getCursor());
-            });
-          }
-          break;
+      case 'onCursor': {
+        _this.editor.on('cursorActivity', function(cm) {
+          _this.props.onCursor(_this.editor, _this.editor.getDoc().getCursor());
+        });
+      }
+      break;
 
-        case 'onCursorActivity':
-          {
-            _this.editor.on('cursorActivity', function(cm) {
-              _this.props.onCursorActivity(_this.editor);
-            });
-          }
-          break;
+      case 'onCursorActivity': {
+        _this.editor.on('cursorActivity', function(cm) {
+          _this.props.onCursorActivity(_this.editor);
+        });
+      }
+      break;
 
-        case 'onCut':
-          {
-            _this.editor.on('cut', function(cm, event) {
-              _this.props.onCut(_this.editor, event);
-            });
+      case 'onCut': {
+        _this.editor.on('cut', function(cm) {
+          _this.props.onCut(_this.editor);
+        });
 
-            break;
-          }
+        break;
+      }
 
-        case 'onDblClick':
-          {
-            _this.editor.on('dblclick', function(cm, event) {
-              _this.props.onDblClick(_this.editor, event);
-            });
+      case 'onDblClick': {
+        _this.editor.on('dblclick', function(cm, event) {
+          _this.props.onDblClick(_this.editor, event);
+        });
 
-            break;
-          }
+        break;
+      }
 
-        case 'onDragEnter':
-          {
-            _this.editor.on('dragenter', function(cm, event) {
-              _this.props.onDragEnter(_this.editor, event);
-            });
-          }
-          break;
+      case 'onDragEnter': {
+        _this.editor.on('dragenter', function(cm, event) {
+          _this.props.onDragEnter(_this.editor, event);
+        });
+      }
+      break;
 
-        case 'onDragLeave':
-          {
-            _this.editor.on('dragleave', function(cm, event) {
-              _this.props.onDragLeave(_this.editor, event);
-            });
+      case 'onDragLeave': {
+        _this.editor.on('dragleave', function(cm, event) {
+          _this.props.onDragLeave(_this.editor, event);
+        });
 
-            break;
-          }
+        break;
+      }
 
-        case 'onDragOver':
-          {
-            _this.editor.on('dragover', function(cm, event) {
-              _this.props.onDragOver(_this.editor, event);
-            });
-          }
-          break;
+      case 'onDragOver': {
+        _this.editor.on('dragover', function(cm, event) {
+          _this.props.onDragOver(_this.editor, event);
+        });
+      }
+      break;
 
-        case 'onDragStart':
-          {
-            _this.editor.on('dragstart', function(cm, event) {
-              _this.props.onDragStart(_this.editor, event);
-            });
+      case 'onDragStart': {
+        _this.editor.on('dragstart', function(cm, event) {
+          _this.props.onDragStart(_this.editor, event);
+        });
 
-            break;
-          }
+        break;
+      }
 
-        case 'onDrop':
-          {
-            _this.editor.on('drop', function(cm, event) {
-              _this.props.onDrop(_this.editor, event);
-            });
-          }
-          break;
+      case 'onDrop': {
+        _this.editor.on('drop', function(cm, event) {
+          _this.props.onDrop(_this.editor, event);
+        });
+      }
+      break;
 
-        case 'onFocus':
-          {
-            _this.editor.on('focus', function(cm, event) {
-              _this.props.onFocus(_this.editor, event);
-            });
-          }
-          break;
+      case 'onFocus': {
+        _this.editor.on('focus', function(cm, event) {
+          _this.props.onFocus(_this.editor, event);
+        });
+      }
+      break;
 
-        case 'onGutterClick':
-          {
-            _this.editor.on('gutterClick', function(cm, lineNumber, gutter, event) {
-              _this.props.onGutterClick(_this.editor, lineNumber, gutter, event);
-            });
-          }
-          break;
+      case 'onGutterClick': {
+        _this.editor.on('gutterClick', function(cm, lineNumber, gutter, event) {
+          _this.props.onGutterClick(_this.editor, lineNumber, gutter, event);
+        });
+      }
+      break;
 
-        case 'onKeyDown':
-          {
-            _this.editor.on('keydown', function(cm, event) {
-              _this.props.onKeyDown(_this.editor, event);
-            });
-          }
-          break;
+      case 'onKeyDown': {
+        _this.editor.on('keydown', function(cm, event) {
+          _this.props.onKeyDown(_this.editor, event);
+        });
+      }
+      break;
 
-        case 'onKeyPress':
-          {
-            _this.editor.on('keypress', function(cm, event) {
-              _this.props.onKeyPress(_this.editor, event);
-            });
-          }
-          break;
+      case 'onKeyPress': {
+        _this.editor.on('keypress', function(cm, event) {
+          _this.props.onKeyPress(_this.editor, event);
+        });
+      }
+      break;
 
-        case 'onKeyUp':
-          {
-            _this.editor.on('keyup', function(cm, event) {
-              _this.props.onKeyUp(_this.editor, event);
-            });
-          }
-          break;
+      case 'onKeyUp': {
+        _this.editor.on('keyup', function(cm, event) {
+          _this.props.onKeyUp(_this.editor, event);
+        });
+      }
+      break;
 
-        case 'onMouseDown':
-          {
-            _this.editor.on('mousedown', function(cm, event) {
-              _this.props.onMouseDown(_this.editor, event);
-            });
+      case 'onMouseDown': {
+        _this.editor.on('mousedown', function(cm, event) {
+          _this.props.onMouseDown(_this.editor, event);
+        });
 
-            break;
-          }
+        break;
+      }
 
-        case 'onPaste':
-          {
-            _this.editor.on('paste', function(cm, event) {
-              _this.props.onPaste(_this.editor, event);
-            });
+      case 'onPaste': {
+        _this.editor.on('paste', function(cm) {
+          _this.props.onPaste(_this.editor);
+        });
 
-            break;
-          }
+        break;
+      }
 
-        case 'onRenderLine':
-          {
-            _this.editor.on('renderLine', function(cm, line, element) {
-              _this.props.onRenderLine(_this.editor, line, element);
-            });
+      case 'onRenderLine': {
+        _this.editor.on('renderLine', function(cm, line, element) {
+          _this.props.onRenderLine(_this.editor, line, element);
+        });
 
-            break;
-          }
+        break;
+      }
 
-        case 'onScroll':
-          {
-            _this.editor.on('scroll', function(cm) {
-              _this.props.onScroll(_this.editor, _this.editor.getScrollInfo());
-            });
-          }
-          break;
+      case 'onScroll': {
+        _this.editor.on('scroll', function(cm) {
+          _this.props.onScroll(_this.editor, _this.editor.getScrollInfo());
+        });
+      }
+      break;
 
-        case 'onSelection':
-          {
-            _this.editor.on('beforeSelectionChange', function(cm, data) {
-              _this.props.onSelection(_this.editor, data);
-            });
-          }
-          break;
+      case 'onSelection': {
+        _this.editor.on('beforeSelectionChange', function(cm, data) {
+          _this.props.onSelection(_this.editor, data);
+        });
+      }
+      break;
 
-        case 'onTouchStart':
-          {
-            _this.editor.on('touchstart', function(cm, event) {
-              _this.props.onTouchStart(_this.editor, event);
-            });
+      case 'onTouchStart': {
+        _this.editor.on('touchstart', function(cm, event) {
+          _this.props.onTouchStart(_this.editor, event);
+        });
 
-            break;
-          }
+        break;
+      }
 
-        case 'onUpdate':
-          {
-            _this.editor.on('update', function(cm) {
-              _this.props.onUpdate(_this.editor);
-            });
-          }
-          break;
+      case 'onUpdate': {
+        _this.editor.on('update', function(cm) {
+          _this.props.onUpdate(_this.editor);
+        });
+      }
+      break;
 
-        case 'onViewportChange':
-          {
-            _this.editor.on('viewportChange', function(cm, from, to) {
-              _this.props.onViewportChange(_this.editor, from, to);
-            });
-          }
-          break;
+      case 'onViewportChange': {
+        _this.editor.on('viewportChange', function(cm, from, to) {
+          _this.props.onViewportChange(_this.editor, from, to);
+        });
+      }
+      break;
       }
     });
   };

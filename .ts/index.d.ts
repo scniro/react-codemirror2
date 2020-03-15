@@ -13,7 +13,7 @@ export interface ISetSelectionOptions {
     head: codemirror.Position;
 }
 export interface DomEvent {
-    (editor: codemirror.Editor, event: Event): void;
+    (editor: codemirror.Editor, event?: Event | codemirror.EditorChangeCancellable | codemirror.EditorChangeLinkedList | codemirror.EditorChangeLinkedList[]): void;
 }
 export interface ICodeMirror {
     autoCursor?: boolean;

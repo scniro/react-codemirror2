@@ -1,3 +1,11 @@
+7.0.0
+==================
+* remove `event` param from `copy` `cut` `paste` per [@types/codemirror](https://www.npmjs.com/package/@types/codemirror)
+
+6.0.1
+==================
+* https://github.com/scniro/react-codemirror2/pull/176
+
 5.1.0
 ==================
 * add support for `renderLine` (#98)

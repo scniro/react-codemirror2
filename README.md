@@ -137,10 +137,10 @@ require('codemirror/mode/javascript/javascript');
 
 - `onBlur(editor, event)` - *[blur](https://codemirror.net/doc/manual.html#event_blur)*
 - `onContextMenu(editor, event)` - *[contextmenu](https://codemirror.net/doc/manual.html#event_dom)*
-- `onCopy(editor, event)` - *[copy](https://codemirror.net/doc/manual.html#event_dom)*
+- `onCopy(editor)` - *[copy](https://codemirror.net/doc/manual.html#event_dom)*
 - `onCursor(editor, data)`- *[cursorActivity](https://codemirror.net/doc/manual.html#event_doc_cursorActivity)*
 - `onCursorActivity(editor)` - *[cursorActivity](https://codemirror.net/doc/manual.html#event_cursorActivity)*
-- `onCut(editor, event)` - *[cut](https://codemirror.net/doc/manual.html#event_dom)*
+- `onCut(editor)` - *[cut](https://codemirror.net/doc/manual.html#event_dom)*
 - `onDblClick(editor, event)` - *[dblclick](https://codemirror.net/doc/manual.html#event_dom)*
 - `onDragEnter(editor, event)` - *[dragenter](https://codemirror.net/doc/manual.html#event_dom)*
 - `onDragOver(editor, event)` - *[dragover](https://codemirror.net/doc/manual.html#event_dom)*
@@ -153,7 +153,7 @@ require('codemirror/mode/javascript/javascript');
 - `onKeyPress(editor, event)` - *[keypress](https://codemirror.net/doc/manual.html#event_dom)*
 - `onKeyUp(editor, event)` - *[keyup](https://codemirror.net/doc/manual.html#event_dom)*
 - `onMouseDown(editor, event)` - *[mousedown](https://codemirror.net/doc/manual.html#event_dom)*
-- `onPaste(editor, event)` - *[paste](https://codemirror.net/doc/manual.html#event_dom)*
+- `onPaste(editor)` - *[paste](https://codemirror.net/doc/manual.html#event_dom)*
 - `onScroll(editor, data)` - *[scroll](https://codemirror.net/doc/manual.html#event_scroll)*
 - `onSelection(editor, data)` - *[beforeSelectionChange](https://codemirror.net/doc/manual.html#event_doc_beforeSelectionChange)*
 - `onTouchStart(editor, event)` - *[touchstart](https://codemirror.net/doc/manual.html#event_dom)*
@@ -186,10 +186,9 @@ Check out [bokuweb/re-resizable](https://github.com/bokuweb/re-resizable). Wrapp
 
 ## Contributing
 
-Pull Requests are welcome. Be mindful of the availbe scripts below to help submitting a well-received contribution.
+Pull Requests are welcome. Be mindful of the available scripts below to help submitting a well-received contribution.
 
 - `npm run start` to run the app on `localhost:8000`
-- `npm run webpack` to re-bundle the react app
 - `npm run test` to ensure tests continue to pass
 - `npm run build` to generate the demo bundle
 
