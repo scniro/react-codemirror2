@@ -149,7 +149,9 @@ require('codemirror/mode/javascript/javascript');
 - `onDrop(editor, event)` - *[drop](https://codemirror.net/doc/manual.html#event_dom)*
 - `onFocus(editor, event)` - *[focus](https://codemirror.net/doc/manual.html#event_focus)*
 - `onGutterClick(editor, lineNumber, gutter, event)` - *[gutterClick](https://codemirror.net/doc/manual.html#event_gutterClick)*
+- `onInputRead(editor, changeObj)` - *[gutterClick](https://codemirror.net/doc/manual.html#events)*
 - `onKeyDown(editor, event)` - *[keydown](https://codemirror.net/doc/manual.html#event_dom)*
+- `onKeyHandled(editor, key, event)` - *[keyhandled](https://codemirror.net/doc/manual.html#events)*
 - `onKeyPress(editor, event)` - *[keypress](https://codemirror.net/doc/manual.html#event_dom)*
 - `onKeyUp(editor, event)` - *[keyup](https://codemirror.net/doc/manual.html#event_dom)*
 - `onMouseDown(editor, event)` - *[mousedown](https://codemirror.net/doc/manual.html#event_dom)*

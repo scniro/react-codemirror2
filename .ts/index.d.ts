@@ -13,7 +13,13 @@ export interface ISetSelectionOptions {
     head: codemirror.Position;
 }
 export interface DomEvent {
-    (editor: codemirror.Editor, event?: Event | codemirror.EditorChangeCancellable | codemirror.EditorChangeLinkedList | codemirror.EditorChangeLinkedList[]): void;
+    (editor: codemirror.Editor, event?: any): void;
+}
+export interface KeyHandledEvent {
+    (editor: codemirror.Editor, name: string, event: any): void;
+}
+export interface EditorChangeEvent {
+    (editor: codemirror.Editor, changeObj: codemirror.EditorChange): void;
 }
 export interface ICodeMirror {
     autoCursor?: boolean;
@@ -39,7 +45,9 @@ export interface ICodeMirror {
     onDrop?: DomEvent;
     onFocus?: DomEvent;
     onGutterClick?: (editor: codemirror.Editor, lineNumber: number, gutter: string, event: Event) => void;
+    onInputRead?: EditorChangeEvent;
     onKeyDown?: DomEvent;
+    onKeyHandled?: KeyHandledEvent;
     onKeyPress?: DomEvent;
     onKeyUp?: DomEvent;
     onMouseDown?: DomEvent;

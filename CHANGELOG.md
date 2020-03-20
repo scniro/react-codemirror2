@@ -1,5 +1,10 @@
 7.0.0
 ==================
+* #180 (fix event handling for `copy` `cut` `paste`)
+* add support for codemirror events `inputRead` `keyHandled`
+
+7.0.0
+==================
 * remove `event` param from `copy` `cut` `paste` per [@types/codemirror](https://www.npmjs.com/package/@types/codemirror)
 
 6.0.1
@@ -9,15 +14,13 @@
 5.1.0
 ==================
 * add support for `renderLine` (#98)
-
-
+    
 5.0.3
 ==================
 * #88
 
 5.0.2
 ==================
-
 
 5.0.1
 ==================

@@ -181,8 +181,8 @@ var Shared = function() {
       }
 
       case 'onCopy': {
-        _this.editor.on('copy', function(cm) {
-          _this.props.onCopy(_this.editor);
+        _this.editor.on('copy', function(cm, event) {
+          _this.props.onCopy(_this.editor, event);
         });
 
         break;
@@ -203,8 +203,8 @@ var Shared = function() {
       break;
 
       case 'onCut': {
-        _this.editor.on('cut', function(cm) {
-          _this.props.onCut(_this.editor);
+        _this.editor.on('cut', function(cm, event) {
+          _this.props.onCut(_this.editor, event);
         });
 
         break;
@@ -269,9 +269,23 @@ var Shared = function() {
       }
       break;
 
+      case 'onInputRead': {
+        _this.editor.on('inputRead', function(cm, EditorChangeEvent) {
+          _this.props.onInputRead(_this.editor, EditorChangeEvent);
+        });
+      }
+      break;
+
       case 'onKeyDown': {
         _this.editor.on('keydown', function(cm, event) {
           _this.props.onKeyDown(_this.editor, event);
+        });
+      }
+      break;
+
+      case 'onKeyHandled': {
+        _this.editor.on('keyHandled', function(cm, key, event) {
+          _this.props.onKeyHandled(_this.editor, key, event);
         });
       }
       break;
@@ -299,8 +313,8 @@ var Shared = function() {
       }
 
       case 'onPaste': {
-        _this.editor.on('paste', function(cm) {
-          _this.props.onPaste(_this.editor);
+        _this.editor.on('paste', function(cm, event) {
+          _this.props.onPaste(_this.editor, event);
         });
 
         break;

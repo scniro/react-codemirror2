@@ -27,7 +27,15 @@ export interface ISetSelectionOptions {
 }
 
 export interface DomEvent {
-  (editor: codemirror.Editor, event?: Event | codemirror.EditorChangeCancellable | codemirror.EditorChangeLinkedList | codemirror.EditorChangeLinkedList[]): void;
+  (editor: codemirror.Editor, event?: any): void;
+}
+
+export interface KeyHandledEvent {
+  (editor: codemirror.Editor, name: string, event: any): void;
+}
+
+export interface EditorChangeEvent {
+  (editor: codemirror.Editor, changeObj: codemirror.EditorChange): void;
 }
 
 export interface ICodeMirror {
@@ -54,7 +62,9 @@ export interface ICodeMirror {
   onDrop?: DomEvent;
   onFocus?: DomEvent
   onGutterClick?: (editor: codemirror.Editor, lineNumber: number, gutter: string, event: Event) => void;
+  onInputRead?: EditorChangeEvent;
   onKeyDown?: DomEvent;
+  onKeyHandled?: KeyHandledEvent;
   onKeyPress?: DomEvent;
   onKeyUp?: DomEvent;
   onMouseDown?: DomEvent;
@@ -106,7 +116,7 @@ abstract class Helper {
 
 class Shared implements ICommon {
 
-  private editor: codemirror.Editor;
+  private readonly editor: codemirror.Editor;
   private props: ICodeMirror;
 
   constructor(editor, props) {
@@ -204,8 +214,8 @@ class Shared implements ICommon {
           break;
         }
         case 'onCopy': {
-          this.editor.on('copy', (cm) => {
-            this.props.onCopy(this.editor);
+          this.editor.on('copy', (cm, event?) => {
+            this.props.onCopy(this.editor, event);
           });
           break;
         }
@@ -222,8 +232,8 @@ class Shared implements ICommon {
         }
           break;
         case 'onCut': {
-          this.editor.on('cut', (cm) => {
-            this.props.onCut(this.editor);
+          this.editor.on('cut', (cm, event?) => {
+            this.props.onCut(this.editor, event);
           });
           break;
         }
@@ -275,9 +285,21 @@ class Shared implements ICommon {
           });
         }
           break;
+        case 'onInputRead': {
+          this.editor.on('inputRead', (cm, EditorChangeEvent) => {
+            this.props.onInputRead(this.editor, EditorChangeEvent);
+          });
+        }
+          break;
         case 'onKeyDown': {
           this.editor.on('keydown', (cm, event) => {
             this.props.onKeyDown(this.editor, event);
+          });
+        }
+          break;
+        case 'onKeyHandled': {
+          this.editor.on('keyHandled', (cm, key, event) => {
+            this.props.onKeyHandled(this.editor, key, event);
           });
         }
           break;
@@ -300,8 +322,8 @@ class Shared implements ICommon {
           break;
         }
         case 'onPaste': {
-          this.editor.on('paste', (cm) => {
-            this.props.onPaste(this.editor);
+          this.editor.on('paste', (cm, event?) => {
+            this.props.onPaste(this.editor, event);
           });
           break;
         }
