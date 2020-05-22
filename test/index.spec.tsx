@@ -59,6 +59,29 @@ describe('[Controlled, UnControlled]: init', () => {
     expect(cUnmounted).toBeTruthy();
   });
 
+  // refs https://github.com/scniro/react-codemirror2/issues/100
+  // prior to 7115754851dde1e1ae90be9f1c1a5e46faecc016 would throw
+  it('should allow inputStyle to be set (uses the constructor)', () => {
+    let inputStyle = 'contenteditable' as const;
+    const options = {inputStyle};
+    Enzyme.shallow(
+      <UnControlled
+        options={options}
+        editorDidMount={(editor, value, next) => {
+          expect(editor.getInputField().tagName).toBe('DIV');
+        }}
+      />);
+    Enzyme.shallow(
+      <Controlled
+        value=""
+        options={options}
+        onBeforeChange={sinon.spy}
+        editorDidMount={(editor, value, next) => {
+          expect(editor.getInputField().tagName).toBe('DIV');
+        }}
+      />);
+  });
+
   it('should append a class name', () => {
 
     const uWrapper = Enzyme.mount(
