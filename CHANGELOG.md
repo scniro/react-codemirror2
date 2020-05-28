@@ -1,3 +1,12 @@
+7.2.0
+==================
+* #100
+
+7.1.0
+==================
+* #180 (fix event handling for `copy` `cut` `paste`)
+* add support for codemirror events `inputRead` `keyHandled`
+
 7.0.0
 ==================
 * #180 (fix event handling for `copy` `cut` `paste`)
@@ -14,7 +23,7 @@
 5.1.0
 ==================
 * add support for `renderLine` (#98)
-    
+
 5.0.3
 ==================
 * #88
