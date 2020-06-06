@@ -385,6 +385,23 @@ describe('Change', () => {
     const doc = wrapper.instance().editor.getDoc();
     doc.replaceRange('bar', {line: 1, ch: 1});
   });
+
+  it('[Controlled] transform value', done => {
+    const wrapper = Enzyme.mount(
+      <Controlled
+        value='foo'
+        onBeforeChange={(editor, data, value) => {
+          wrapper.setProps({value: value.replace(/o/g, 'p')});
+        }}
+        onChange={(editor, data, value) => {
+          expect(value).toEqual('fppfpp');
+          expect(editor.getValue()).toEqual('fppfpp');
+          done();
+        }}
+      />);
+    const doc = wrapper.instance().editor.getDoc();
+    doc.replaceRange('foo', {line: 1, ch: 1});
+  });
 });
 
 describe('Props', () => {

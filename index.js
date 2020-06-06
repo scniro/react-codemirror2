@@ -419,7 +419,7 @@ var Controlled = function(_super) {
     }
 
     if (!this.hydrated) {
-      this.deferred ? this.resolveChange() : this.initChange(props.value || '');
+      this.deferred ? this.resolveChange(props.value) : this.initChange(props.value || '');
     }
 
     this.hydrated = true;
@@ -443,7 +443,7 @@ var Controlled = function(_super) {
     this.emulating = false;
   };
 
-  Controlled.prototype.resolveChange = function() {
+  Controlled.prototype.resolveChange = function(value) {
     this.emulating = true;
     var doc = this.editor.getDoc();
 
@@ -453,6 +453,12 @@ var Controlled = function(_super) {
       doc.redo();
     } else {
       doc.replaceRange(this.deferred.text, this.deferred.from, this.deferred.to, this.deferred.origin);
+    }
+
+    if (value && value !== doc.getValue()) {
+      var cursor = doc.getCursor();
+      doc.setValue(value);
+      doc.setCursor(cursor);
     }
 
     this.emulating = false;
