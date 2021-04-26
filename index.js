@@ -492,7 +492,7 @@ var Controlled = function(_super) {
       }
     }
 
-    this.editor = cm(this.ref, this.props.options);
+    this.editor = this.props.codeMirrorInstance ? this.props.codeMirrorInstance(this.ref, this.props.options) : cm(this.ref, this.props.options);
     this.shared = new Shared(this.editor, this.props);
     this.mirror = cm(function() {}, this.props.options);
     this.editor.on('electricInput', function() {
@@ -669,7 +669,7 @@ var UnControlled = function(_super) {
       }
     }
 
-    this.editor = cm(this.ref, this.props.options);
+    this.editor = this.props.codeMirrorInstance ? this.props.codeMirrorInstance(this.ref, this.props.options) : cm(this.ref, this.props.options);
     this.shared = new Shared(this.editor, this.props);
     this.editor.on('beforeChange', function(cm, data) {
       if (_this.props.onBeforeChange) {

@@ -44,6 +44,7 @@ export interface ICodeMirror {
   className?: string;
   cursor?: codemirror.Position;
   defineMode?: IDefineModeOptions;
+  codeMirrorInstance?: typeof codemirror;
   editorDidConfigure?: (editor: codemirror.Editor) => void;
   editorDidMount?: (editor: codemirror.Editor, value: string, cb: () => void) => void;
   editorWillUnmount?: (lib: any) => void;
@@ -516,7 +517,9 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
       }
     }
 
-    this.editor = cm(this.ref, this.props.options) as codemirror.Editor;
+    this.editor = this.props.codeMirrorInstance
+      ? this.props.codeMirrorInstance(this.ref, this.props.options)
+      : cm(this.ref, this.props.options) as codemirror.Editor;
 
     this.shared = new Shared(this.editor, this.props);
 
@@ -719,7 +722,9 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
       }
     }
 
-    this.editor = cm(this.ref, this.props.options) as codemirror.Editor;
+    this.editor = this.props.codeMirrorInstance
+      ? this.props.codeMirrorInstance(this.ref, this.props.options)
+      : cm(this.ref, this.props.options) as codemirror.Editor;
 
     this.shared = new Shared(this.editor, this.props);
 
