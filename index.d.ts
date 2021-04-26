@@ -27,6 +27,7 @@ export interface ICodeMirror {
     className?: string;
     cursor?: codemirror.Position;
     defineMode?: IDefineModeOptions;
+    codeMirrorInstance?: typeof codemirror;
     editorDidConfigure?: (editor: codemirror.Editor) => void;
     editorDidMount?: (editor: codemirror.Editor, value: string, cb: () => void) => void;
     editorWillUnmount?: (lib: any) => void;

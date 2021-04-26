@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as Adapter from 'enzyme-adapter-react-16';
 import * as Enzyme from 'enzyme';
 import * as sinon from 'sinon';
+import * as codemirror from 'codemirror';
 
 import {Controlled, UnControlled} from '../src';
 
@@ -1021,6 +1022,44 @@ describe('Props', () => {
         }]
       }
     });
+
+    wrapper.unmount();
+  });
+
+  it('[UnControlled]: codeMirrorInstance | is used', done => {
+    const codeMirrorInstance = codemirror;
+    codeMirrorInstance.defineExtension("testExtensionForUncontrolled", () => {})
+    
+    function editorDidMount(editor: codemirror.Editor) {
+      (editor as any).testExtensionForUncontrolled();
+      done();
+    }
+
+    let wrapper = Enzyme.mount(
+      <UnControlled
+        codeMirrorInstance={codeMirrorInstance}
+        editorDidMount={editorDidMount}
+        />
+    );
+
+    wrapper.unmount();
+  });
+
+  it('[Controlled]: codeMirrorInstance | is used', done => {
+    const codeMirrorInstance = codemirror;
+    codeMirrorInstance.defineExtension("testExtensionForControlled", () => {})
+    
+    function editorDidMount(editor: codemirror.Editor) {
+      (editor as any).testExtensionForControlled();
+      done();
+    }
+
+    let wrapper = Enzyme.mount(
+      <UnControlled
+        codeMirrorInstance={codeMirrorInstance}
+        editorDidMount={editorDidMount}
+        />
+    );
 
     wrapper.unmount();
   });
