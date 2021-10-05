@@ -53,8 +53,8 @@
     "code"
   ],
   "peerDependencies": {
-    "react": ">=15.5 <=16.x",
-    "codemirror": "5.x"
+    "codemirror": "5.x",
+    "react": ">=15.5 <=17.x"
   },
   "devDependencies": {
     "@babel/preset-env": "7.10.1",
