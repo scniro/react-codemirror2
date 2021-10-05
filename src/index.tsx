@@ -4,7 +4,7 @@ import * as codemirror from 'codemirror';
 declare let global: any;
 declare let require: any;
 
-const SERVER_RENDERED = (typeof navigator === 'undefined' || global['PREVENT_CODEMIRROR_RENDER'] === true);
+const SERVER_RENDERED = (typeof navigator === 'undefined' || (typeof global !== 'undefined' && global['PREVENT_CODEMIRROR_RENDER'] === true));
 
 let cm;
 if (!SERVER_RENDERED) {
