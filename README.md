@@ -191,6 +191,32 @@ render() {
 
 Check out [bokuweb/re-resizable](https://github.com/bokuweb/re-resizable). Wrapping your component with `<Resizable/>'s` works well
 
+- Testing with [React Testing Library](https://testing-library.com/) (RTL)
+
+One issue when rendering react-codemirror2 with RTL is that if you pass in a string with line breaks (`\n`), like beautified JSON,
+it will only render the closing curly bracket `}`. This is due to how codemirror decides on what to show/hide
+in the editor with [jsdom](https://github.com/jsdom/jsdom/issues/135).
+Without the stub, codemirror will not render the entire string when testing with RTL.
+
+```jsx
+it('will render JSON beautified with react-testing-library', () => {
+  Object.defineProperties(window.HTMLElement.prototype, {
+    offsetWidth: {
+      get() { return parseFloat(this.style.width) || 1 },
+    }
+  });
+
+  render(<UnControlled
+    options={{
+      mode: 'application/json',
+    }}
+    value={JSON.stringify({"react-testing-library": "works with react-codemirror2"}, null, 2)}
+  />);
+
+  expect(screen.getByText(/"react-testing-library": "works with react-codemirror2"/)).toBeVisible();
+});
+```
+
 ## Contributing
 
 Pull Requests are welcome. Be mindful of the available scripts below to help submitting a well-received contribution.
