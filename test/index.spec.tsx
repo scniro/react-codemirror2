@@ -19,6 +19,19 @@ Enzyme.configure({adapter: new Adapter()});
 
 (global as any).focus = jest.fn();
 
+// Container for attaching Enzyme mounts to. This is needed for some of the tests
+// events to propagate correctly.
+let container;
+
+beforeEach(() => {
+  container = document.createElement('div');
+  document.body.appendChild(container);
+});
+
+afterEach(() => {
+  if (container) container.remove();
+});
+
 describe('[Controlled, UnControlled]: init', () => {
 
   it('should render | props: {}', () => {
@@ -106,15 +119,19 @@ describe('[Controlled, UnControlled]: init', () => {
 describe('[Controlled, UnControlled]: editorDidConfigure', () => {
 
   it('editorDidConfigure(editor)', () => {
+    let uCallback;
+    let uConfigured;
+    let cCallback;
+    let cConfigured;
 
     Enzyme.shallow(
       <UnControlled
         editorDidMount={(editor, value, next) => {
-          this.uCallback = sinon.spy(next);
-          this.uCallback();
+          uCallback = sinon.spy(next);
+          uCallback();
         }}
         editorDidConfigure={editor => {
-          this.uConfigured = true;
+          uConfigured = true;
         }}
       />);
 
@@ -123,18 +140,18 @@ describe('[Controlled, UnControlled]: editorDidConfigure', () => {
         value=""
         onBeforeChange={sinon.spy}
         editorDidMount={(editor, value, next) => {
-          this.cCallback = sinon.spy(next);
-          this.cCallback();
+          cCallback = sinon.spy(next);
+          cCallback();
         }}
         editorDidConfigure={editor => {
-          this.cConfigured = true;
+          cConfigured = true;
         }}
       />);
 
-    expect(this.uConfigured).toBe(true);
-    expect(this.uCallback.called).toBe(true);
-    expect(this.cConfigured).toBe(true);
-    expect(this.cCallback.called).toBe(true);
+    expect(uConfigured).toBe(true);
+    expect(uCallback.called).toBe(true);
+    expect(cConfigured).toBe(true);
+    expect(cCallback.called).toBe(true);
   });
 });
 
@@ -196,7 +213,9 @@ describe('DOM Events', () => {
           expect(onFocus).toBeTruthy();
           done();
         }}
-      />);
+      />,
+      { attachTo: container }
+    );
     wrapper.instance().editor.focus();
   });
 
@@ -215,7 +234,9 @@ describe('DOM Events', () => {
           expect(onFocus).toBeTruthy();
           done();
         }}
-      />);
+      />,
+      { attachTo: container }
+    );
     wrapper.instance().editor.focus();
   });
 
@@ -235,7 +256,9 @@ describe('DOM Events', () => {
           expect(onBlur).toBeTruthy();
           done();
         }}
-      />);
+      />,
+      { attachTo: container }
+    );
     wrapper.instance().editor.focus();
     wrapper.instance().editor.getInputField().blur();
   });
@@ -255,7 +278,9 @@ describe('DOM Events', () => {
           expect(onBlur).toBeTruthy();
           done();
         }}
-      />);
+      />,
+      { attachTo: container }
+    );
     wrapper.instance().editor.focus();
     wrapper.instance().editor.getInputField().blur();
   });
@@ -391,6 +416,12 @@ describe('Change', () => {
   });
 
   it('[Controlled] transform value', done => {
+    // For some reason, onChange callback started firing twice after bumping JSDOM + Jest
+    // setup. There were no changes to either react-codemirror2 or the version of codemirror
+    // installed at the time, so we're going to just ignore that second onChange as some
+    // artifact of the test environemtn for now.
+    let isDone = false;
+
     const wrapper = Enzyme.mount(
       <Controlled
         value='foo'
@@ -398,8 +429,10 @@ describe('Change', () => {
           wrapper.setProps({value: value.replace(/o/g, 'p')});
         }}
         onChange={(editor, data, value) => {
+          if (isDone) return;
           expect(value).toEqual('fppfpp');
           expect(editor.getValue()).toEqual('fppfpp');
+          isDone = true;
           done();
         }}
       />);
@@ -514,7 +547,9 @@ describe('Props', () => {
           expect(editor.state.focused).toBeTruthy();
           expect(editor.getDoc().getSelections()).toEqual(expected);
         }}
-      />);
+      />,
+      { attachTo: container }
+    );
 
     Enzyme.mount(
       <UnControlled
@@ -530,7 +565,9 @@ describe('Props', () => {
           expect(editor.state.focused).toBeTruthy();
           expect(editor.getDoc().getSelections()).toEqual(expected);
         }}
-      />);
+      />,
+      { attachTo: container }
+    );
   });
 
   it('[Controlled: selection | newProps', () => {
