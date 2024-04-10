@@ -3,10 +3,12 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -15,7 +17,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UnControlled = exports.Controlled = void 0;
 var React = require("react");
-var SERVER_RENDERED = (typeof navigator === 'undefined' || global['PREVENT_CODEMIRROR_RENDER'] === true);
+var SERVER_RENDERED = (typeof navigator === 'undefined' || (typeof global !== 'undefined' && global['PREVENT_CODEMIRROR_RENDER'] === true));
 var cm;
 if (!SERVER_RENDERED) {
     cm = require('codemirror');
@@ -441,7 +443,7 @@ var Controlled = (function (_super) {
         var _this = this;
         if (SERVER_RENDERED)
             return null;
-        var className = this.props.className ? "react-codemirror2 " + this.props.className : 'react-codemirror2';
+        var className = this.props.className ? "react-codemirror2 ".concat(this.props.className) : 'react-codemirror2';
         return React.createElement("div", { className: className, ref: function (self) { return _this.ref = self; } });
     };
     return Controlled;
@@ -584,7 +586,7 @@ var UnControlled = (function (_super) {
         var _this = this;
         if (SERVER_RENDERED)
             return null;
-        var className = this.props.className ? "react-codemirror2 " + this.props.className : 'react-codemirror2';
+        var className = this.props.className ? "react-codemirror2 ".concat(this.props.className) : 'react-codemirror2';
         return React.createElement("div", { className: className, ref: function (self) { return _this.ref = self; } });
     };
     return UnControlled;
