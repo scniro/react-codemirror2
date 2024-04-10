@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 global['PREVENT_CODEMIRROR_RENDER'] = true;
 
 import * as React from 'react';
