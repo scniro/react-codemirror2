@@ -1,6 +1,3 @@
-[![Build Status](https://img.shields.io/travis/scniro/react-codemirror2.svg?style=flat-square)](https://travis-ci.org/scniro/react-codemirror2)
-[![Dependency Status](https://img.shields.io/david/scniro/react-codemirror2.svg?label=deps&style=flat-square)](https://david-dm.org/scniro/react-codemirror2)
-[![DevDependency Status](https://img.shields.io/david/dev/scniro/react-codemirror2.svg?label=devDeps&style=flat-square)](https://david-dm.org/scniro/react-codemirror2#info=devDependencies)
 [![Coverage](https://img.shields.io/coveralls/scniro/react-codemirror2.svg?style=flat-square)](https://coveralls.io/github/scniro/react-codemirror2)
 [![Downloads](https://img.shields.io/npm/dm/react-codemirror2.svg?style=flat-square)](https://www.npmjs.com/package/react-codemirror2)
 [![NPM Version](https://img.shields.io/npm/v/react-codemirror2.svg?style=flat-square)](https://www.npmjs.com/package/react-codemirror2)

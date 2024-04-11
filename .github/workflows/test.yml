@@ -1,0 +1,20 @@
+name: Checks + Tests
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+    - name: NPM install
+      run: npm install
+    - name: Verify build works
+      run: npm run build
+    - name: Jest
+      run: npm run test
+
