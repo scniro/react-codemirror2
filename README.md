@@ -168,7 +168,7 @@ require('codemirror/mode/javascript/javascript');
 
 - Is server side rendering supported?
 
-Yes. react-codemirror2 will prevent rendering in absence of `navigator`. You can also force the component to not render via a `PREVENT_CODEMIRROR_RENDER` global.
+Yes. react-codemirror2 will prevent rendering in absence of `window`. You can also force the component to not render via a `PREVENT_CODEMIRROR_RENDER` global.
 
 - How can I get the instance?
 
