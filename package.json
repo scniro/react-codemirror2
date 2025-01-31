@@ -20,10 +20,8 @@
       "src/**"
     ],
     "setupFiles": [
-      "@nteract/mockument",
-      "raf/polyfill"
+      "./test/setup.js"
     ],
-    "testRegex": "./test/(index|index.server).spec.tsx",
     "transform": {
       ".(ts|tsx)": "ts-jest"
     },
