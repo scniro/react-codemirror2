@@ -51,7 +51,7 @@ Object.defineProperty(exports, '__esModule', {
 });
 exports.UnControlled = exports.Controlled = void 0;
 var React = require('react');
-var SERVER_RENDERED = typeof navigator === 'undefined' || typeof global !== 'undefined' && global['PREVENT_CODEMIRROR_RENDER'] === true;
+var SERVER_RENDERED = typeof window === 'undefined' || typeof global !== 'undefined' && global['PREVENT_CODEMIRROR_RENDER'] === true;
 var cm;
 if (!SERVER_RENDERED) {
   cm = require('codemirror');
