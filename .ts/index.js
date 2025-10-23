@@ -573,6 +573,7 @@ var UnControlled = (function (_super) {
         if (this.props.editorWillUnmount) {
             this.props.editorWillUnmount(cm);
         }
+        this.hydrated = false;
     };
     UnControlled.prototype.shouldComponentUpdate = function (nextProps, nextState) {
         var update = true;

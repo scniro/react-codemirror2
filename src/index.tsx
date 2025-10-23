@@ -813,6 +813,7 @@ export class UnControlled extends React.Component<IUnControlledCodeMirror, any> 
     if (this.props.editorWillUnmount) {
       this.props.editorWillUnmount(cm);
     }
+    this.hydrated = false;
   }
 
   /** @internal */
