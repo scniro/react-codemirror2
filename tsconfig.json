@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "jsx": "React",
+    "jsx": "react",
     "target": "es5",
     "outDir": "./.ts",
     "declaration": true,
