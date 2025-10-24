@@ -454,6 +454,7 @@ var Controlled = function(_super) {
     if (this.props.editorWillUnmount) {
       this.props.editorWillUnmount(cm);
     }
+    this.hydrated = false;
   };
   Controlled.prototype.shouldComponentUpdate = function(nextProps, nextState) {
     return !SERVER_RENDERED;

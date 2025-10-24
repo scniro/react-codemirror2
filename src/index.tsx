@@ -611,6 +611,7 @@ export class Controlled extends React.Component<IControlledCodeMirror, any> {
     if (this.props.editorWillUnmount) {
       this.props.editorWillUnmount(cm);
     }
+    this.hydrated = false;
   }
 
   /** @internal */
